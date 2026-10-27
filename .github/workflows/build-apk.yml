@@ -27,21 +27,13 @@ jobs:
       - name: Instalar Dependencias
         run: npm install
 
-      - name: Crear Ícono Nativo (Fallback)
+      - name: Crear Ícono Nativo
         run: |
           mkdir -p assets
-          if [ ! -f assets/icon.png ]; then
-            cat << 'EOF' > assets/icon.svg
-            <svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-              <rect width="1024" height="1024" fill="#0A192F"/>
-              <path d="M512 250L250 400v300l262 150 262-150V400L512 250z" fill="none" stroke="#00F0FF" stroke-width="40"/>
-              <path d="M512 250v300 M250 400l262 150 M774 400L512 550" stroke="#00F0FF" stroke-width="40"/>
-            </svg>
-            EOF
-            sudo apt-get update && sudo apt-get install -y librsvg2-bin
-            rsvg-convert -w 1024 -h 1024 assets/icon.svg -o assets/icon.png
-            cp assets/icon.png assets/splash.png
-          fi
+          echo '<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><rect width="1024" height="1024" fill="#0A192F"/><path d="M512 250L250 400v300l262 150 262-150V400L512 250z" fill="none" stroke="#00F0FF" stroke-width="40"/><path d="M512 250v300 M250 400l262 150 M774 400L512 550" stroke="#00F0FF" stroke-width="40"/></svg>' > assets/icon.svg
+          sudo apt-get update && sudo apt-get install -y librsvg2-bin
+          rsvg-convert -w 1024 -h 1024 assets/icon.svg -o assets/icon.png
+          cp assets/icon.png assets/splash.png
 
       - name: Empaquetar Arquitectura Modular
         run: |
