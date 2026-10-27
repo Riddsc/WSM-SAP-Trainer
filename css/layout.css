@@ -1,0 +1,47 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* Quita el cuadro azul en móviles al tocar */
+    user-select: none; /* Evita que el usuario seleccione el texto por accidente */
+}
+
+body {
+    background-color: #000;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    overflow: hidden; /* Todo el scroll se maneja dentro del App Frame */
+}
+
+/* El contenedor principal que simula la pantalla del teléfono */
+.app-frame {
+    width: 100%;
+    max-width: 480px; /* Limita el ancho en pantallas grandes (Desktop) */
+    height: 100vh;
+    height: 100dvh; /* Soporte para Safari/iOS */
+    background-color: var(--bg-base);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 50px rgba(6, 182, 212, 0.05); /* Resplandor exterior en PC */
+}
+
+/* El área central de contenido donde ocurre el scroll */
+.scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--padding-global);
+    padding-bottom: 120px; /* Espacio extra para que el menú no tape el texto */
+    scroll-behavior: smooth;
+}
+
+/* Ocultar barra de desplazamiento (estilo App) */
+.scroll-area::-webkit-scrollbar {
+    display: none;
+}
+.scroll-area {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
