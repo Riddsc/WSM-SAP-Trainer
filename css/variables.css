@@ -1,0 +1,32 @@
+:root {
+    /* Paleta Deep Space & Neon (Tema Premium Dark) */
+    --bg-base: #030712;       /* Fondo más oscuro (Deep Space) */
+    --bg-panel: #0F172A;      /* Paneles secundarios (Slate) */
+    --bg-card: #1E293B;       /* Fondo de las tarjetas modulares */
+    
+    /* Acentos y Neones */
+    --cyan: #06B6D4;          /* Cian primario para la marca */
+    --cyan-glow: rgba(6, 182, 212, 0.4);
+    --success: #10B981;       /* Verde vibrante para aprobaciones */
+    --warning: #F59E0B;       /* Ámbar para advertencias */
+    --danger: #EF4444;        /* Rojo para errores/alertas */
+    
+    /* Tipografía y Textos */
+    --text-primary: #F8FAFC;  /* Blanco suave, menos agresivo que #FFF */
+    --text-muted: #94A3B8;    /* Gris azulado para subtítulos */
+    
+    /* Variables del Emulador SAP Fiori/GUI */
+    --sap-header: #022336;    /* Azul corporativo estricto SAP */
+    --sap-term-bg: #000000;
+    --sap-term-text: #00FF00; /* Verde terminal hacker */
+    
+    /* Dimensiones y Espaciados Críticos (Mobile First) */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --padding-global: 20px;
+    
+    /* Transiciones */
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
