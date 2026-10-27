@@ -1,7 +1,6 @@
 /**
  * Logística Pro - Simulador de Terminal SAP S/4HANA / EWM
  */
-
 const SAPEngine = {
     open(itemId) {
         AudioEngine.play('click');
@@ -26,7 +25,6 @@ const SAPEngine = {
                 </div>
             </div>
         `;
-
         document.getElementById('global-overlay').classList.remove('hidden');
         setTimeout(() => {
             const input = document.getElementById('sap-input-code');
@@ -42,16 +40,12 @@ const SAPEngine = {
 
         if (!inputEl || !outputEl) return;
         const val = inputEl.value.toUpperCase().trim();
-
-        outputEl.className = 'sap-console-log';
-        outputEl.innerHTML = '';
+        outputEl.className = 'sap-console-log'; outputEl.innerHTML = '';
 
         if (val === item.simTask.expectedCmd || val === `/N${item.simTask.expectedCmd}`) {
             AudioEngine.play('success');
             let text = item.simTask.successMessage;
             let i = 0;
-            
-            // Efecto Typewriter (Escritura en consola)
             let typingInterval = setInterval(() => {
                 if (i < text.length) {
                     outputEl.innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
@@ -60,16 +54,13 @@ const SAPEngine = {
                 } else {
                     clearInterval(typingInterval);
                     AppState.markComplete(itemId);
-                    setTimeout(() => {
-                        Router.closeModal();
-                        Router.renderDashboard();
-                    }, 3000);
+                    setTimeout(() => { Router.closeModal(); Router.renderDashboard(); }, 3500);
                 }
             }, 25);
         } else {
             AudioEngine.play('error');
             outputEl.classList.add('sap-error');
-            outputEl.innerHTML = `> ER_TRANS_NOT_FOUND: La transacción '${val}' no está autorizada o no existe en este entorno. Verifique el manual.`;
+            outputEl.innerHTML = `> ER_TRANS_NOT_FOUND: La transacción '${val}' no existe o el rol actual no tiene autorización.`;
         }
     }
 };
