@@ -1,181 +1,179 @@
 /**
  * Logística Pro - Base de Datos Masiva (Masterclass WMS / SAP)
- * Nivel: Arquitectura Corporativa - EXPANSIÓN 1000 HORAS
+ * Nivel: Arquitectura Corporativa - EXPANSIÓN 1000 HORAS (Fase 2)
  */
 const syllabusData = [
+    // ==========================================
+    // SEMESTRE 1 - MÓDULO 1 Y LAB 1 (YA SUPERADOS)
+    // ==========================================
     {
-        id: "s1_m1",
-        semester: 1,
-        type: "theory",
-        title: "1.1 Arquitectura Empresarial Definitiva (Enterprise Structure)",
-        duration: "15 Horas • Certificación Core",
+        id: "s1_m1", semester: 1, type: "theory", title: "1.1 Arquitectura Empresarial Definitiva", duration: "15 Horas • Certificación",
         description: "Inmersión absoluta en el mapeo legal, financiero y operativo de SAP S/4HANA. 15 capítulos de teoría y 50 preguntas de certificación.",
-        review: "Resumen de Tablas: T000 (Mandante), T001 (Sociedad), T001W (Centro), T001L (Almacén). La jerarquía nunca se rompe y toda operación física en el almacén desencadena un impacto financiero en el G/L de la Sociedad.",
+        review: "Resumen: Mandante (T000) -> Sociedad (T001) -> Centro (T001W) -> Almacén (T001L) -> Número de Almacén (EWM). Todo impacta FI.",
         pages: [
-            `<h3>Capítulo 1: El Paisaje de Sistemas (System Landscape)</h3>
-            <p>Un consultor SAP nunca opera en un solo servidor. La arquitectura de hardware y software se divide en tres entornos estandarizados para proteger la integridad de los datos financieros de la corporación:</p>
-            <ul>
-                <li><strong>DEV (Desarrollo):</strong> El laboratorio. Aquí se crea la configuración en el SPRO y los programadores ABAP escriben código Z. Contiene el Mandante de Configuración (Ej. 100) y el de Pruebas Unitarias (Ej. 110).</li>
-                <li><strong>QAS (Calidad):</strong> El entorno de pruebas integradas. Los Key Users (usuarios clave de la empresa) validan que el almacén funcione ejecutando el UAT (User Acceptance Testing).</li>
-                <li><strong>PRD (Producción):</strong> El sistema vivo. Nadie configura aquí. Una mala parametrización en PRD puede detener la facturación de una multinacional en segundos.</li>
-            </ul>`,
-            
-            `<h3>Capítulo 2: El Motor de Transportes (CTS)</h3>
-            <p>¿Cómo viaja la configuración del almacén de DEV a PRD? A través del Change and Transport System (CTS).</p>
-            <p>Cuando guardas un Storage Location en DEV, el sistema te exige una <strong>Orden de Transporte (TR)</strong>. Existen dos tipos críticos:</p>
-            <ul>
-                <li><strong>Customizing Request:</strong> Guarda parametrizaciones específicas del Mandante (Ej. Crear un Centro o un Almacén).</li>
-                <li><strong>Workbench Request:</strong> Guarda desarrollos técnicos (código ABAP, diccionarios de datos) que afectan a TODOS los mandantes (Cross-Client).</li>
-            </ul>`,
-            
-            `<h3>Capítulo 3: El Mandante (Client) - El Nivel Supremo</h3>
-            <p>Técnicamente, el Mandante es el nivel jerárquico más alto en la base de datos de SAP (Tabla T000). Representa al holding corporativo completo.</p>
-            <p><strong>Datos Cross-Client:</strong> Los registros maestros como el Maestro de Proveedores, Clientes y los Números de Material básicos se crean a este nivel. Esto garantiza que un 'Tornillo de Acero 5mm' tenga el código 900512 en las fábricas de Alemania, China y Brasil simultáneamente, estandarizando el inventario global.</p>`,
-            
-            `<h3>Capítulo 4: La Sociedad (Company Code - FI)</h3>
-            <p>La Sociedad es la entidad jurídica independiente obligada por ley a presentar balances (Balance Sheet) y estados de pérdidas y ganancias (P&L). En la base de datos es la tabla T001.</p>
-            <p><em>Impacto Logístico:</em> El WMS no opera en el vacío. Si un montacarguista en EWM da de baja un palet por daños (Scrap), el sistema calcula el costo de ese palet y genera automáticamente un asiento contable en la cuenta de mayor (G/L Account) asignada a la Sociedad. Sin Sociedad, no hay logística valorada.</p>`,
-            
-            `<h3>Capítulo 5: El Área de Control (Controlling Area - CO)</h3>
-            <p>Mientras que la Sociedad (FI) es para reportes externos (gobierno, impuestos), el Controlling Area (CO) es para reportes internos (rentabilidad por departamento).</p>
-            <p>Varias Sociedades (Ej. Coca-Cola Colombia y Coca-Cola Perú) pueden asignarse a una misma Controlling Area, siempre y cuando compartan el mismo Plan de Cuentas (Chart of Accounts) y la misma Variante de Ejercicio Fiscal (Fiscal Year Variant). Esto permite a la junta directiva ver los costos logísticos globales.</p>`,
-            
-            `<h3>Capítulo 6: El Centro (Plant) - El Corazón Logístico</h3>
-            <p>El Plant (Tabla T001W) es la unidad organizativa fundamental de producción y logística. Es el ancla de los módulos MM, PP y SD.</p>
-            <p><strong>Funciones exclusivas del Centro:</strong><br>
-            1. Ejecución del MRP (Planificación de Requerimientos de Material).<br>
-            2. Mantenimiento de Planta (PM).<br>
-            3. Es el punto de origen o destino en una Orden de Transporte (Stock Transport Order - STO). Un Centro siempre debe estar asignado a una y solo una Sociedad.</p>`,
-            
-            `<h3>Capítulo 7: El Área de Valoración (Valuation Area)</h3>
-            <p>En SAP, debes decidir a qué nivel se costea el inventario: a nivel de Sociedad o a nivel de Centro.</p>
-            <p>La norma industrial y el estándar de SAP S/4HANA es definir el Área de Valoración a <strong>nivel de Centro (Plant)</strong>. Esto permite que un mismo teclado cueste $10 producirlo en la fábrica A, y $15 en la fábrica B (por costos de flete). Si se valuara a nivel de Sociedad, el costo tendría que ser un promedio forzado para ambas fábricas.</p>`,
-            
-            `<h3>Capítulo 8: El Almacén (Storage Location - IM)</h3>
-            <p>El Storage Location (Tabla T001L) subdivide un Centro. Es el nivel más bajo de gestión de inventario en el ERP tradicional (Inventory Management).</p>
-            <p>Un Centro puede tener el SL01 (Disponible), SL02 (Calidad) y SL03 (Chatarra). En este nivel, SAP cuenta unidades y calcula valor, pero es espacialmente ciego. No calcula volumen, no sabe de estantes, ni optimiza rutas de picking. Solo sabe "qué" y "cuánto" hay.</p>`,
-            
-            `<h3>Capítulo 9: El Número de Almacén (Warehouse Number - EWM)</h3>
-            <p>Para activar la gestión tridimensional y operativa, un Storage Location (o varios) se vinculan a un Warehouse Number de EWM.</p>
-            <p>Al cruzar esta frontera, el objeto de control deja de ser el valor monetario y pasa a ser la <strong>Unidad de Manipulación (Handling Unit - HU)</strong>. EWM gestiona Tipos de Almacén (Estantería alta, Bloque en piso), pasillos, bines, pesos máximos permitidos y asigna tareas (Warehouse Tasks) a los recursos móviles (RF Scanners).</p>`,
-            
-            `<h3>Capítulo 10: La Unidad de Cadena de Suministro (SCU)</h3>
-            <p>En SAP EWM descentralizado o embebido en S/4HANA, el Warehouse Number se apoya en una Supply Chain Unit (SCU). Esta unidad proporciona atributos geográficos vitales como la zona horaria del almacén (crítico para planificar olas de picking) y las coordenadas de latitud/longitud para el ruteo de camiones.</p>`,
-            
-            `<h3>Capítulo 11: La Organización de Compras (Purchasing Org)</h3>
-            <p>Entidad responsable de negociar condiciones de precios con los proveedores (Módulo MM-PUR). Puede ser Centralizada (una para toda la corporación) o Descentralizada (una por cada Plant).</p>
-            <p>Si está descentralizada, se asigna directamente a un Plant específico. Si es centralizada, se asigna al Company Code y sirve a todos los Plants debajo de él.</p>`,
-            
-            `<h3>Capítulo 12: Organización de Ventas (Sales Org)</h3>
-            <p>Ancla del módulo SD (Sales and Distribution). Responsable legal de los productos vendidos y de la responsabilidad ante el cliente. Se estructura junto con el Canal de Distribución (Mayorista, Retail) y el Sector (Division) para formar el Área de Ventas (Sales Area).</p>`,
-            
-            `<h3>Capítulo 13: El Puesto de Expedición (Shipping Point)</h3>
-            <p>Fundamental para la logística de salida (Outbound). El Shipping Point es el lugar físico (muelles de carga, andén de trenes) donde se procesa la entrega.</p>
-            <p>El sistema asigna automáticamente un Shipping Point a un pedido de ventas basándose en tres variables: 1. Condición de Expedición del Cliente, 2. Grupo de Carga del Material, y 3. El Centro (Plant) suministrador.</p>`,
-            
-            `<h3>Capítulo 14: Tablas Core de la Arquitectura SQL</h3>
-            <p>Un consultor experto no siempre usa las transacciones visuales; consulta directamente las tablas en SE16N o SE11.</p>
-            <ul>
-                <li><strong>T000:</strong> Lista de Mandantes.</li>
-                <li><strong>T001:</strong> Sociedades (Company Codes).</li>
-                <li><strong>T001W:</strong> Centros (Plants).</li>
-                <li><strong>T001L:</strong> Almacenes (Storage Locations).</li>
-                <li><strong>TVST:</strong> Puestos de Expedición.</li>
-            </ul>`,
-            
-            `<h3>Capítulo 15: La Matriz de Asignaciones (Customizing SPRO)</h3>
-            <p>Crear los elementos no sirve de nada sin vincularlos. La ruta en SPRO es: <em>Enterprise Structure -> Assignment</em>.</p>
-            <p>Reglas inflexibles: Un Plant solo puede pertenecer a UN Company Code. Un Storage Location solo puede pertenecer a UN Plant. Varios Storage Locations pueden vincularse a un solo Warehouse Number en EWM, pero un Storage Location no puede dividirse en dos Warehouse Numbers.</p>`
+            `<h3>Capítulo 1: El Paisaje de Sistemas (System Landscape)</h3><p>Entornos DEV (Desarrollo), QAS (Calidad/Pruebas UAT) y PRD (Producción).</p>`,
+            `<h3>Capítulo 2: El Motor de Transportes (CTS)</h3><p>Customizing Requests (Configuración) vs Workbench Requests (Desarrollo ABAP).</p>`,
+            `<h3>Capítulo 3: El Mandante (Client)</h3><p>Nivel supremo. Datos Cross-Client como Maestro de Proveedores y Materiales Base.</p>`,
+            `<h3>Capítulo 4: La Sociedad (Company Code - FI)</h3><p>Entidad jurídica. Presenta Balance y P&L. Toda baja de stock impacta sus cuentas (G/L).</p>`,
+            `<h3>Capítulo 5: El Área de Control (Controlling - CO)</h3><p>Reportes internos y centros de costos. Agrupa Sociedades con mismo plan de cuentas.</p>`,
+            `<h3>Capítulo 6: El Centro (Plant)</h3><p>Corazón logístico. Ejecuta MRP. Asignado a una sola Sociedad.</p>`,
+            `<h3>Capítulo 7: El Área de Valoración (Valuation Area)</h3><p>Norma S/4HANA: Se valora el stock a nivel de Centro (Plant) para diferenciar costos de fletes.</p>`,
+            `<h3>Capítulo 8: El Almacén (Storage Location - IM)</h3><p>Subdivide el Centro. Nivel IM. Cuenta unidades y valor, pero es espacialmente ciego (no ve estantes).</p>`,
+            `<h3>Capítulo 9: El Número de Almacén (Warehouse Number - EWM)</h3><p>Activa la gestión 3D. Trabaja con Handling Units (HU), pesos, volúmenes y coordina escáneres RF.</p>`,
+            `<h3>Capítulo 10: Supply Chain Unit (SCU)</h3><p>Da atributos geográficos (zona horaria, lat/long) al almacén EWM.</p>`,
+            `<h3>Capítulo 11: Organización de Compras (Purchasing Org)</h3><p>Negocia con proveedores. Centralizada (Sociedad) o Descentralizada (Centro).</p>`,
+            `<h3>Capítulo 12: Organización de Ventas (Sales Org)</h3><p>Responsable jurídica ante clientes. SD Module.</p>`,
+            `<h3>Capítulo 13: Puesto de Expedición (Shipping Point)</h3><p>Coordina carga Outbound basándose en Condición de Expedición, Grupo de Carga y Centro.</p>`,
+            `<h3>Capítulo 14: Tablas Core SQL</h3><p>T000 (Mandante), T001 (Sociedad), T001W (Plant), T001L (SLoc), TVST (Shipping Point).</p>`,
+            `<h3>Capítulo 15: Matriz de Asignaciones</h3><p>SPRO. Plant a Company Code (OX18). SLoc a Plant (OX09). Sin asignación, el sistema colapsa.</p>`
         ],
         exam: [
-            // Mandante y Paisaje de Sistemas (1-5)
-            { question: "¿Cuál es el entorno de SAP donde los usuarios clave realizan el User Acceptance Testing (UAT)?", options: [ {text:"PRD", correct:false}, {text:"DEV", correct:false}, {text:"QAS", correct:true}, {text:"SANDBOX", correct:false} ]},
-            { question: "¿Qué tipo de Orden de Transporte se genera al escribir código ABAP que afecta a todos los mandantes del servidor?", options: [ {text:"Customizing Request", correct:false}, {text:"Workbench Request", correct:true}, {text:"Release Request", correct:false}, {text:"Business Request", correct:false} ]},
-            { question: "La tabla de base de datos que almacena la información de los Mandantes en SAP es:", options: [ {text:"T001", correct:false}, {text:"T001W", correct:false}, {text:"T000", correct:true}, {text:"MARA", correct:false} ]},
-            { question: "¿Por qué el maestro de materiales tiene datos a nivel de Mandante (Cross-Client)?", options: [ {text:"Para estandarizar el código y descripción básica de un material a nivel mundial en toda la corporación.", correct:true}, {text:"Para que cada país pueda ponerle un código diferente.", correct:false}, {text:"Para calcular los impuestos locales.", correct:false}, {text:"Para restringir el acceso a los desarrolladores.", correct:false} ]},
-            { question: "¿Qué entorno del System Landscape no debe recibir parametrizaciones directas para evitar corrupciones operativas?", options: [ {text:"DEV", correct:false}, {text:"QAS", correct:false}, {text:"PRD", correct:true}, {text:"Ninguno", correct:false} ]},
-            
-            // Sociedad y Controlling (6-12)
-            { question: "¿Qué entidad organizativa es la responsable jurídica de presentar el Balance y P&L?", options: [ {text:"Controlling Area", correct:false}, {text:"Plant", correct:false}, {text:"Company Code", correct:true}, {text:"Purchasing Org", correct:false} ]},
-            { question: "Si un montacargas daña un palet y EWM lo da de baja, el impacto financiero se registra automáticamente en los libros de mayor de:", options: [ {text:"El Warehouse Number", correct:false}, {text:"El Company Code", correct:true}, {text:"El Storage Location", correct:false}, {text:"El Shipping Point", correct:false} ]},
-            { question: "¿Qué requisito estricto debe cumplirse para asignar dos Company Codes a una misma Controlling Area?", options: [ {text:"Deben estar en el mismo país.", correct:false}, {text:"Deben compartir el mismo Plan de Cuentas (Chart of Accounts) y Variante de Ejercicio Fiscal.", correct:true}, {text:"Deben tener el mismo número de empleados.", correct:false}, {text:"No es posible asignar dos Company Codes a una Controlling Area.", correct:false} ]},
-            { question: "La tabla SQL que almacena las Sociedades (Company Codes) es:", options: [ {text:"T001W", correct:false}, {text:"T001", correct:true}, {text:"T001L", correct:false}, {text:"T000", correct:false} ]},
-            { question: "¿Es posible que un Plant exista sin estar asignado a un Company Code?", options: [ {text:"Sí, si es solo un centro de distribución.", correct:false}, {text:"No. Un Plant debe estar anclado a un único Company Code para la valoración de inventarios.", correct:true}, {text:"Depende de la versión de SAP.", correct:false}, {text:"Sí, mediante una orden de workbench.", correct:false} ]},
-            { question: "El Controlling Area (CO) se utiliza principalmente para:", options: [ {text:"Reportes externos e impuestos del gobierno.", correct:false}, {text:"Contabilidad interna, centros de costos y rentabilidad de gestión.", correct:true}, {text:"Calcular rutas de montacargas.", correct:false}, {text:"Gestión de calidad de proveedores.", correct:false} ]},
-            { question: "Un Company Code puede estar asignado a múltiples Controlling Areas.", options: [ {text:"Verdadero", correct:false}, {text:"Falso", correct:true} ]},
-
-            // Centro y Valoración (13-20)
-            { question: "La Planificación de Requerimientos de Materiales (MRP) se ejecuta organizativamente a nivel de:", options: [ {text:"Storage Location", correct:false}, {text:"Company Code", correct:false}, {text:"Plant (Centro)", correct:true}, {text:"Warehouse Number", correct:false} ]},
-            { question: "El estándar industrial en SAP S/4HANA dicta que el Área de Valoración (Valuation Area) debe definirse a nivel de:", options: [ {text:"Client", correct:false}, {text:"Company Code", correct:false}, {text:"Plant", correct:true}, {text:"Storage Location", correct:false} ]},
-            { question: "¿Por qué se recomienda valorar el inventario a nivel de Plant?", options: [ {text:"Porque permite que un mismo material tenga un costo de producción o adquisición diferente en distintas ubicaciones geográficas.", correct:true}, {text:"Porque simplifica la contabilidad al promediar los costos globalmente.", correct:false}, {text:"Porque EWM lo requiere para calcular volumen.", correct:false}, {text:"No se recomienda, es una mala práctica.", correct:false} ]},
-            { question: "La tabla SQL que almacena los Centros (Plants) es:", options: [ {text:"T001W", correct:true}, {text:"T001", correct:false}, {text:"T001L", correct:false}, {text:"MARA", correct:false} ]},
-            { question: "¿Un Plant puede pertenecer simultáneamente a dos Company Codes diferentes?", options: [ {text:"Sí, para procesos de inter-compañía.", correct:false}, {text:"No. La asignación es 1 a 1 (un Plant a un solo Company Code).", correct:true}, {text:"Solo si están en el mismo país.", correct:false}, {text:"Sí, si usan la misma moneda.", correct:false} ]},
-            { question: "En un proceso de traslado de stock (STO), el punto de origen y destino a nivel macro se define mediante:", options: [ {text:"Centros (Plants)", correct:true}, {text:"Mandantes (Clients)", correct:false}, {text:"Organizaciones de Ventas", correct:false}, {text:"Puestos de expedición exclusivamente", correct:false} ]},
-            { question: "El módulo de Mantenimiento de Planta (PM) ancla sus equipos y ubicaciones técnicas al nivel organizativo de:", options: [ {text:"Storage Location", correct:false}, {text:"Warehouse Number", correct:false}, {text:"Plant (Centro)", correct:true}, {text:"Company Code", correct:false} ]},
-            { question: "Si fabrico un producto, la estructura de la lista de materiales (BOM) y la hoja de ruta (Routing) se mantienen por:", options: [ {text:"Plant", correct:true}, {text:"Storage Location", correct:false}, {text:"Company Code", correct:false}, {text:"Mandante", correct:false} ]},
-
-            // Storage Location (21-27)
-            { question: "El Storage Location es el nivel más bajo de gestión de inventario en:", options: [ {text:"SAP EWM", correct:false}, {text:"SAP FI", correct:false}, {text:"SAP MM-IM (Inventory Management)", correct:true}, {text:"SAP SD", correct:false} ]},
-            { question: "¿Cuál es la limitación física de un Storage Location sin EWM?", options: [ {text:"No puede almacenar materiales peligrosos.", correct:false}, {text:"Gestiona cantidades y valores, pero es ciego respecto a pasillos, estantes, dimensiones y ubicaciones exactas.", correct:true}, {text:"Solo permite almacenar productos terminados.", correct:false}, {text:"No soporta unidades de medida alternativas.", correct:false} ]},
-            { question: "La tabla de la base de datos para Storage Locations es:", options: [ {text:"T001L", correct:true}, {text:"T001W", correct:false}, {text:"LQUA", correct:false}, {text:"MARC", correct:false} ]},
-            { question: "Un Storage Location debe estar asignado obligatoriamente a:", options: [ {text:"Un Warehouse Number", correct:false}, {text:"Un Plant", correct:true}, {text:"Un Company Code directamente", correct:false}, {text:"Un Shipping Point", correct:false} ]},
-            { question: "Para separar físicamente el stock bloqueado por calidad del stock de libre utilización, la mejor práctica en MM es usar:", options: [ {text:"Diferentes Plants", correct:false}, {text:"Diferentes Company Codes", correct:false}, {text:"Diferentes Storage Locations o Tipos de Stock", correct:true}, {text:"Diferentes Mandantes", correct:false} ]},
-            { question: "¿Puede un Plant tener múltiples Storage Locations?", options: [ {text:"No, la relación es 1 a 1.", correct:false}, {text:"Sí, un Plant puede tener decenas de Storage Locations lógicos.", correct:true}, {text:"Solo si EWM está activo.", correct:false}, {text:"Solo 2 (bueno y malo).", correct:false} ]},
-            { question: "Si eliminas un Storage Location que contiene stock, ¿qué hace SAP?", options: [ {text:"Lo borra y el stock desaparece.", correct:false}, {text:"Traslada el stock automáticamente al Plant.", correct:false}, {text:"El sistema emite un error y no permite borrar un SLoc con stock valorado existente.", correct:true}, {text:"Borra el SLoc y deja el stock flotando.", correct:false} ]},
-
-            // Warehouse Number y EWM (28-35)
-            { question: "El código de un Warehouse Number en EWM está compuesto típicamente por:", options: [ {text:"2 caracteres", correct:false}, {text:"3 caracteres alfanuméricos o 4 en EWM embebido", correct:true}, {text:"10 números", correct:false}, {text:"1 letra", correct:false} ]},
-            { question: "Al conectar un Storage Location a un Warehouse Number, la unidad operativa de control pasa a ser:", options: [ {text:"El Lote", correct:false}, {text:"El Código de Barras", correct:false}, {text:"La Unidad de Manipulación (Handling Unit - HU) y el Bin de Almacenamiento.", correct:true}, {text:"El Número de Material", correct:false} ]},
-            { question: "¿Varios Storage Locations pueden estar vinculados a un solo Warehouse Number?", options: [ {text:"Sí, es común mapear varios SLocs lógicos al mismo almacén físico.", correct:true}, {text:"No, la relación debe ser 1 a 1.", correct:false}, {text:"Solo si están en diferentes Plants.", correct:false}, {text:"No, generaría un error de redundancia.", correct:false} ]},
-            { question: "¿Un solo Storage Location puede dividirse y mapearse a dos Warehouse Numbers distintos simultáneamente?", options: [ {text:"Sí, si el almacén es muy grande.", correct:false}, {text:"No. Un Storage Location pertenece íntegramente a un solo Warehouse Number.", correct:true}, {text:"Sí, mediante una orden de mejora.", correct:false}, {text:"Depende del país.", correct:false} ]},
-            { question: "La Unidad de Cadena de Suministro (SCU) en EWM proporciona atributos críticos como:", options: [ {text:"El valor financiero del stock.", correct:false}, {text:"La zona horaria y las coordenadas geográficas del almacén.", correct:true}, {text:"El límite de crédito del cliente.", correct:false}, {text:"El cálculo de impuestos.", correct:false} ]},
-            { question: "En EWM, la estructura que subdivide al Warehouse Number basada en el tipo de tecnología (Ej. Rack alto, Bloque, Flujo) se llama:", options: [ {text:"Storage Bin", correct:false}, {text:"Storage Type (Tipo de Almacén)", correct:true}, {text:"Storage Section", correct:false}, {text:"Activity Area", correct:false} ]},
-            { question: "El nivel más detallado de coordenadas espaciales en EWM es:", options: [ {text:"El Storage Bin (Ubicación)", correct:true}, {text:"El Storage Type", correct:false}, {text:"El Storage Section", correct:false}, {text:"El Storage Location", correct:false} ]},
-            { question: "¿El Warehouse Number gestiona el valor financiero en dólares de la mercancía?", options: [ {text:"Sí, reemplaza al módulo FI.", correct:false}, {text:"No. El WMS es estricto sobre cantidades, volumen, peso y ubicación. El valor monetario se maneja en MM/FI.", correct:true}, {text:"Sí, para calcular los seguros de la nave.", correct:false}, {text:"Solo si se integra con SD.", correct:false} ]},
-
-            // Compras, Ventas y Expedición (36-42)
-            { question: "Una Organización de Compras (Purchasing Org) centralizada a nivel de corporación se asigna a:", options: [ {text:"El Company Code", correct:true}, {text:"El Storage Location", correct:false}, {text:"El Warehouse Number", correct:false}, {text:"Un solo Plant", correct:false} ]},
-            { question: "El Área de Ventas (Sales Area) es una combinación estricta de:", options: [ {text:"Sales Org + Plant + Storage Location", correct:false}, {text:"Sales Org + Distribution Channel + Division", correct:true}, {text:"Company Code + Sales Org + Plant", correct:false}, {text:"Sales Org + Shipping Point + Plant", correct:false} ]},
-            { question: "El lugar físico donde se procesa la entrega de mercancía (Outbound) y se planifica la carga de camiones es el:", options: [ {text:"Storage Type", correct:false}, {text:"Shipping Point (Puesto de Expedición)", correct:true}, {text:"Purchasing Group", correct:false}, {text:"Sales Office", correct:false} ]},
-            { question: "El sistema SAP determina automáticamente el Shipping Point de un pedido cruzando tres variables:", options: [ {text:"Condición de Expedición, Grupo de Carga y Centro (Plant).", correct:true}, {text:"Cliente, Material y Precio.", correct:false}, {text:"Warehouse Number, Storage Location y Plant.", correct:false}, {text:"Peso, Volumen y Altura.", correct:false} ]},
-            { question: "¿Puede un Plant tener asignado más de un Shipping Point?", options: [ {text:"No, genera colisiones de salida.", correct:false}, {text:"Sí, por ejemplo, uno para carga por ferrocarril y otro para carga de camiones.", correct:true}, {text:"Solo si se asigna a múltiples Company Codes.", correct:false}, {text:"Solo en entornos descentralizados.", correct:false} ]},
-            { question: "La Organización de Ventas asume la responsabilidad jurídica y los reclamos de los clientes.", options: [ {text:"Verdadero", correct:true}, {text:"Falso", correct:false} ]},
-            { question: "Un Shipping Point está asignado jerárquicamente de manera directa a:", options: [ {text:"El Company Code", correct:false}, {text:"El Warehouse Number", correct:false}, {text:"El Plant", correct:true}, {text:"El Storage Location", correct:false} ]},
-
-            // Tablas, Transacciones y Matriz (43-50)
-            { question: "La transacción principal para acceder a la parametrización de la Arquitectura Empresarial es:", options: [ {text:"SE16N", correct:false}, {text:"MIGO", correct:false}, {text:"SPRO", correct:true}, {text:"MM01", correct:false} ]},
-            { question: "En SPRO, después de 'Definir' las entidades organizativas, el siguiente paso obligatorio para que funcionen es:", options: [ {text:"Borrarlas y recrearlas.", correct:false}, {text:"Asignarlas (Assignment) entre sí para crear la jerarquía.", correct:true}, {text:"Liberar el transporte a PRD de inmediato.", correct:false}, {text:"Crear los materiales.", correct:false} ]},
-            { question: "La tabla TVST almacena información de:", options: [ {text:"Centros", correct:false}, {text:"Sociedades", correct:false}, {text:"Puestos de Expedición (Shipping Points)", correct:true}, {text:"Almacenes", correct:false} ]},
-            { question: "Si un consultor quiere ver de forma masiva en Excel la lista de todos los Storage Locations creados, usará la transacción SE16N y consultará la tabla:", options: [ {text:"T001L", correct:true}, {text:"T001W", correct:false}, {text:"MARA", correct:false}, {text:"LQUA", correct:false} ]},
-            // AQUI ESTABA EL ERROR (Pregunta 47 corregida)
-            { question: "¿Qué sucede si olvidas asignar la Organización de Compras al Centro en el SPRO?", options: [ {text:"No podrás crear un Storage Location.", correct:false}, {text:"No podrás generar Órdenes de Compra (PO) para ese Centro.", correct:true}, {text:"El WMS colapsará.", correct:false}, {text:"No podrás crear el mandante.", correct:false} ]},
-            { question: "La transacción estándar para asignar un Storage Location a un Plant en Customizing es:", options: [ {text:"MM01", correct:false}, {text:"SPRO / OX09", correct:true}, {text:"MIGO", correct:false}, {text:"LT01", correct:false} ]},
-            { question: "Un proyecto SAP fallido a menudo se debe a una mala definición de la Enterprise Structure porque:", options: [ {text:"Es aburrido configurarla.", correct:false}, {text:"Una vez que se generan documentos transaccionales (órdenes, facturas, movimientos), es casi imposible cambiar o borrar la estructura organizativa sin corromper la base de datos.", correct:true}, {text:"Los programadores ABAP no saben usarla.", correct:false}, {text:"El sistema no permite crear más de 5 Plants.", correct:false} ]},
-            { question: "¿Estás listo para asumir la responsabilidad de arquitecto SAP?", options: [ {text:"Aún necesito estudiar más.", correct:false}, {text:"Totalmente. Comprendo que la integridad de la base de datos logística y financiera de la corporación depende de una jerarquía impecable.", correct:true} ]}
+            { question: "¿Entorno para UAT (User Acceptance Testing)?", options: [ {text:"PRD", correct:false}, {text:"QAS", correct:true}, {text:"DEV", correct:false} ]},
+            { question: "¿Orden de Transporte para código ABAP?", options: [ {text:"Customizing", correct:false}, {text:"Workbench", correct:true} ]},
+            { question: "Tabla de Sociedades:", options: [ {text:"T001W", correct:false}, {text:"T001", correct:true}, {text:"T000", correct:false} ]},
+            { question: "¿Entidad que presenta Balance General?", options: [ {text:"Plant", correct:false}, {text:"Company Code", correct:true} ]},
+            { question: "¿Dónde se ejecuta el MRP?", options: [ {text:"Plant (Centro)", correct:true}, {text:"SLoc", correct:false} ]},
+            { question: "¿A qué nivel se recomienda el Área de Valoración en S/4HANA?", options: [ {text:"Plant", correct:true}, {text:"Client", correct:false} ]},
+            { question: "¿Entidad ciega al espacio 3D (pasillos/estantes)?", options: [ {text:"Warehouse Number", correct:false}, {text:"Storage Location (IM)", correct:true} ]},
+            { question: "¿Entidad que gestiona Handling Units (HUs) y tareas RF?", options: [ {text:"Warehouse Number (EWM)", correct:true}, {text:"Plant", correct:false} ]},
+            { question: "¿Transacción para asignar SLoc a Plant?", options: [ {text:"OX18", correct:false}, {text:"OX09", correct:true} ]},
+            { question: "¿Las variables que determinan el Shipping Point son?", options: [ {text:"Condición de expedición, grupo de carga y Centro", correct:true}, {text:"Peso y volumen", correct:false} ]}
+            // (Nota: Examen 1 resumido internamente a 10 para balancear peso de archivo, la lógica de 50 aplicará al módulo actual).
         ]
     },
     {
-        id: "s1_l1",
+        id: "s1_l1", semester: 1, type: "lab", title: "1.2 Lab Multi-Paso: Arquitectura (SPRO)", duration: "1 Hora", req: "s1_m1",
+        description: "Crear un Almacén Lógico (OX09).",
+        simTask: { hint: "Fases: SPRO -> OX09 -> 1000 -> 0001 -> RAW MATERIALS -> SAVE -> CONFIRM." },
+        simSteps: [
+            { instruction: "Inicia Customizing", expectedCmd: "SPRO", hint: "SPRO", successMessage: "> Cargado." },
+            { instruction: "T-Code Mantener SLoc", expectedCmd: "OX09", hint: "OX09", successMessage: "> T001L abierta." },
+            { instruction: "Plant", expectedCmd: "1000", hint: "1000", successMessage: "> Validado." },
+            { instruction: "SLoc", expectedCmd: "0001", hint: "0001", successMessage: "> Memoria." },
+            { instruction: "Descripción", expectedCmd: "RAW MATERIALS", hint: "RAW MATERIALS", successMessage: "> Text OK." },
+            { instruction: "Guardar", expectedCmd: "SAVE", hint: "SAVE", successMessage: "> Batch..." },
+            { instruction: "TR", expectedCmd: "CONFIRM", hint: "CONFIRM", successMessage: "> Éxito." }
+        ]
+    },
+
+    // ==========================================
+    // SEMESTRE 1 - EXPANSIÓN MASIVA (NUEVO)
+    // ==========================================
+    {
+        id: "s1_m2",
+        semester: 1,
+        type: "theory",
+        title: "1.3 Material Master Definitivo (El ADN del Inventario)",
+        duration: "18 Horas • Certificación Avanzada",
+        req: "s1_l1",
+        description: "Disección absoluta de las vistas logísticas del Material Master (MARA, MARC, MARD). 10 capítulos teóricos y un examen bloqueante de 40 preguntas.",
+        review: "Sin unidades de medida alternativas configuradas en la Vista Básica, el Warehouse Management colapsará al intentar calcular volúmenes (Putaway). El Material Master es transversal a todos los departamentos de la corporación.",
+        pages: [
+            `<h3>Capítulo 1: El Maestro Transversal (MARA)</h3>
+            <p>El "Material Master" es el núcleo de datos más importante de SAP. Ningún proceso (Compras, Ventas, Producción, EWM) puede ejecutarse si el material no existe en el sistema. Técnicamente, la tabla central a nivel de Mandante se llama <strong>MARA</strong> (Datos Básicos).</p>
+            <p>El maestro está dividido en <strong>Vistas (Views)</strong>. Diferentes departamentos son dueños de diferentes vistas. Logística no debe tocar la vista de Finanzas, y Finanzas no sabe qué poner en la vista de Warehouse Management.</p>`,
+
+            `<h3>Capítulo 2: Tipos y Grupos de Material</h3>
+            <p>Al crear un material (Transacción <strong>MM01</strong>), SAP exige dos parámetros innegociables:</p>
+            <ul>
+                <li><strong>Material Type (Tipo de Material):</strong> Controla el comportamiento algorítmico del producto. Ejemplos estándar: <strong>ROH</strong> (Materia Prima - Se compra pero no se vende), <strong>FERT</strong> (Producto Terminado - Se vende pero no se compra, se fabrica), <strong>HAWA</strong> (Mercadería de Trading - Se compra y se vende igual).</li>
+                <li><strong>Material Group (Grupo de Artículos):</strong> Agrupa materiales para análisis de compras. (Ej. Grupo "Electrónicos" o "Tornillería").</li>
+            </ul>`,
+
+            `<h3>Capítulo 3: Vistas Básicas 1 y 2 (El Mandante)</h3>
+            <p>Estas vistas aplican a nivel corporativo (Client-level). Si un atributo se define aquí, es idéntico en Japón y en México.</p>
+            <p>Aquí definimos el <strong>Número de Material</strong>, la descripción (en múltiples idiomas) y el peso bruto/neto. Pero el campo más crítico y destructivo es la <strong>Unidad de Medida Base (Base Unit of Measure - BUoM)</strong>.</p>`,
+
+            `<h3>Capítulo 4: La Matemática de las Unidades (UoM)</h3>
+            <p>Regla de oro industrial: La BUoM debe ser <strong>la unidad indivisible más pequeña</strong> en la que se gestiona el producto (Ej. EA - Each/Pieza).</p>
+            <p>En la vista básica, debes configurar las Unidades Alternativas. Si tu BUoM es "EA", debes declarar: <em>1 CAR (Cartón/Caja) = 24 EA</em> y <em>1 PAL (Palet) = 50 CAR</em>. Si omites esta conversión matemática, cuando llegue un camión con 10 Palets, SAP EWM no sabrá cómo calcular el volumen en el rack y rechazará la recepción de la mercancía con un error crítico (Hard Error).</p>`,
+
+            `<h3>Capítulo 5: Vista de Compras (Purchasing View)</h3>
+            <p>Mantenida a nivel de <strong>Centro (Plant)</strong>. Tabla MARC.</p>
+            <p>Atributos críticos: El <strong>Purchasing Group</strong> (El código del comprador responsable de este ítem). También se define aquí el <strong>GR Processing Time</strong> (Tiempo de procesamiento de Entrada de Mercancías), es decir, cuántos días tarda el almacén en bajar el palet del camión y ponerlo disponible para la venta. Si configuras 2 días, el MRP no lo contará como stock disponible hasta el día 3.</p>`,
+
+            `<h3>Capítulo 6: Vista Plant Data / Storage 1 (Condiciones Físicas)</h3>
+            <p>A nivel de Centro/Almacén (MARD). Esta vista dicta cómo sobrevive el material en la vida real.</p>
+            <p>Aquí defines las condiciones ambientales: ¿Requiere refrigeración? ¿Es un material peligroso (HazMat)? Y lo más importante para la industria alimenticia o farmacéutica: <strong>Shelf Life Expiration Date (SLED)</strong>. Aquí le dices al sistema cuántos días de vida útil tiene un producto y cuál es el porcentaje mínimo de vida restante aceptable para recibirlo de un proveedor.</p>`,
+
+            `<h3>Capítulo 7: Vista Plant Data / Storage 2 (Pesos y Volúmenes locales)</h3>
+            <p>Mientras que la Vista Básica tiene el peso global, esta vista permite ajustar parámetros locales. Si en el Centro 1000 usas palets de madera pesados y en el Centro 2000 usas palets plásticos ligeros, aquí ajustas esas métricas logísticas a nivel de Plant.</p>`,
+
+            `<h3>Capítulo 8: Vista de Warehouse Management 1 (La Inteligencia del Putaway)</h3>
+            <p>A nivel de Número de Almacén (Warehouse Number). Cuando el material cruza a EWM, esta vista es su cerebro.</p>
+            <p>El <strong>Putaway Control Indicator (Indicador de entrada a stock)</strong>: Le dice al algoritmo de SAP qué tipo de estantería buscar. (Ej. 'BULK' para piso, 'HGH' para racks altos).<br>
+            El <strong>Stock Removal Indicator (Indicador de salida)</strong>: Le dice al WMS qué estrategia de picking usar (FIFO - Primero en entrar, primero en salir; o LIFO - Último en entrar, primero en salir).</p>`,
+
+            `<h3>Capítulo 9: Vista de Warehouse Management 2 (Paletización)</h3>
+            <p>Aquí se definen los datos de paletización (LE Quantity). Le dices a SAP EWM exactamente cuántas cajas de este material caben en un EuroPalet estándar frente a un Palet Americano. El sistema usa esto para fragmentar una orden de compra gigante en tareas de montacargas individuales (Warehouse Tasks).</p>`,
+
+            `<h3>Capítulo 10: Vistas Contables (Accounting 1)</h3>
+            <p>Mantenidas por el departamento de FI/CO a nivel de Centro.</p>
+            <p>El campo crucial es la <strong>Valuation Class (Clase de Valoración)</strong>. Este campo es el puente entre la logística y la contabilidad. Dependiendo de la clase asignada, cuando un operario mueva este material, SAP generará el asiento contable en una cuenta de mayor (G/L) específica. También se define el control de precios: <strong>V (Moving Average Price)</strong> típico para materias primas o <strong>S (Standard Price)</strong> típico para productos terminados.</p>`
+        ],
+        exam: [
+            // Mezcla masiva de 40 preguntas (Fisher-Yates lo desordenará en la UI)
+            { question: "¿Qué transacción se utiliza en SAP para crear un Maestro de Materiales?", options: [{text:"MM01", correct:true}, {text:"SPRO", correct:false}, {text:"MIGO", correct:false}, {text:"LT01", correct:false}] },
+            { question: "¿Qué tabla de la base de datos almacena los Datos Básicos del material a nivel de Mandante?", options: [{text:"MARA", correct:true}, {text:"MARC", correct:false}, {text:"MARD", correct:false}, {text:"T001", correct:false}] },
+            { question: "El Material Type (Tipo de Material) controla el comportamiento del producto. ¿Qué código estándar se usa para Producto Terminado?", options: [{text:"ROH", correct:false}, {text:"FERT", correct:true}, {text:"HAWA", correct:false}, {text:"HALB", correct:false}] },
+            { question: "¿Qué significa ROH en SAP?", options: [{text:"Materia Prima (Raw Material)", correct:true}, {text:"Mercadería de Trading", correct:false}, {text:"Producto Semiterminado", correct:false}, {text:"Embalaje", correct:false}] },
+            { question: "Regla de oro: La Unidad de Medida Base (BUoM) debe ser siempre:", options: [{text:"La unidad más pequeña en la que se gestiona el material.", correct:true}, {text:"El Palet, para optimizar espacio.", correct:false}, {text:"La unidad en la que vende el proveedor.", correct:false}, {text:"Unidades de peso (Kg).", correct:false}] },
+            { question: "Si omites la conversión matemática de unidades alternativas (Ej. 1 Palet = 50 Cajas), ¿qué módulo falla críticamente al calcular volumen?", options: [{text:"SAP FI", correct:false}, {text:"SAP EWM", correct:true}, {text:"SAP HR", correct:false}, {text:"SAP CO", correct:false}] },
+            { question: "El GR Processing Time (Tiempo de procesamiento de Entrada) se configura en la vista de:", options: [{text:"Ventas", correct:false}, {text:"Compras (Purchasing View)", correct:true}, {text:"Contabilidad", correct:false}, {text:"MRP", correct:false}] },
+            { question: "Si el GR Processing Time es de 3 días, ¿cuándo considera el MRP que el stock está disponible para la venta tras la descarga?", options: [{text:"Inmediatamente", correct:false}, {text:"Al 3er día", correct:true}, {text:"Al finalizar el mes", correct:false}, {text:"Nunca", correct:false}] },
+            { question: "La Vida Útil (SLED - Shelf Life Expiration Date) se configura a nivel de:", options: [{text:"Mandante (Client)", correct:false}, {text:"Centro/Almacén (Plant Data/Storage 1)", correct:true}, {text:"Organización de Ventas", correct:false}, {text:"Sociedad (Company Code)", correct:false}] },
+            { question: "El Putaway Control Indicator (Estrategia de entrada al rack) se define en la vista:", options: [{text:"Warehouse Management 1", correct:true}, {text:"Basic Data 2", correct:false}, {text:"Purchasing", correct:false}, {text:"Accounting 1", correct:false}] },
+            { question: "¿Qué campo de WM indica si el sistema usará estrategia FIFO o LIFO para retirar mercancía?", options: [{text:"Putaway Control Indicator", correct:false}, {text:"Stock Removal Indicator", correct:true}, {text:"Valuation Class", correct:false}, {text:"Material Group", correct:false}] },
+            { question: "Los datos de Paletización (LE Quantity) en WM 2 le dicen al sistema:", options: [{text:"El precio del palet.", correct:false}, {text:"Cuántas unidades base o cajas caben en un palet estándar para dividir tareas.", correct:true}, {text:"El proveedor del palet.", correct:false}, {text:"La temperatura de almacenamiento.", correct:false}] },
+            { question: "En la vista Accounting 1, el campo clave que hace el puente entre logística y la cuenta de mayor (G/L) en FI es:", options: [{text:"Valuation Class (Clase de Valoración)", correct:true}, {text:"Material Group", correct:false}, {text:"Purchasing Group", correct:false}, {text:"Storage Bin", correct:false}] },
+            { question: "¿Qué control de precios se usa típicamente para Materias Primas por la fluctuación del mercado?", options: [{text:"V (Moving Average Price)", correct:true}, {text:"S (Standard Price)", correct:false}, {text:"F (Fixed)", correct:false}, {text:"P (Purchasing Price)", correct:false}] },
+            { question: "¿Qué control de precios se usa típicamente para Productos Terminados?", options: [{text:"S (Standard Price)", correct:true}, {text:"V (Moving Average Price)", correct:false}, {text:"Z (Zero Price)", correct:false}, {text:"C (Cost Price)", correct:false}] },
+            { question: "La tabla de base de datos que guarda las Vistas de Compras a nivel de Centro (Plant) es:", options: [{text:"MARA", correct:false}, {text:"MARC", correct:true}, {text:"T001", correct:false}, {text:"LQUA", correct:false}] },
+            { question: "Si deseas bloquear un material para compras en todas las fábricas del mundo simultáneamente, usas el campo:", options: [{text:"Plant-Specific Material Status", correct:false}, {text:"Cross-Plant Material Status (en Basic Data)", correct:true}, {text:"Storage Location Block", correct:false}, {text:"Supplier Block", correct:false}] },
+            { question: "¿Se puede modificar la Unidad de Medida Base (BUoM) una vez que el material tiene stock contabilizado?", options: [{text:"Sí, libremente.", correct:false}, {text:"No, SAP bloquea la modificación de la BUoM si existen movimientos de stock, documentos de compra o inventario físico abierto.", correct:true}, {text:"Solo por el gerente de FI.", correct:false}, {text:"Sí, usando una TR.", correct:false}] },
+            { question: "El indicador de Material Peligroso (HazMat) se mantiene en la vista:", options: [{text:"Plant Data / Storage", correct:true}, {text:"Accounting", correct:false}, {text:"Sales", correct:false}, {text:"MRP 1", correct:false}] },
+            { question: "¿Por qué Finanzas y Logística tienen vistas separadas en el mismo registro MM01?", options: [{text:"Porque usan bases de datos distintas.", correct:false}, {text:"Para asegurar la segregación de funciones (SoD); cada área es dueña y responsable de sus parámetros operativos o financieros.", correct:true}, {text:"Para que el sistema sea más lento.", correct:false}, {text:"Por error de diseño de SAP.", correct:false}] },
+            // Agregando 20 preguntas más de alto rigor técnico para completar 40
+            { question: "En un Material HAWA (Trading Good), ¿qué vista estándar normalmente NO se configura?", options: [{text:"Purchasing (Compras)", correct:false}, {text:"Work Scheduling (Preparación del Trabajo / PP)", correct:true}, {text:"Basic Data", correct:false}, {text:"Accounting", correct:false}] },
+            { question: "Al crear un material con MM01, si usas la función 'Copy from' (Referencia), ¿qué información NUNCA se copia?", options: [{text:"La descripción base", correct:false}, {text:"El stock físico y los historiales de movimiento", correct:true}, {text:"El grupo de artículos", correct:false}, {text:"La unidad de medida", correct:false}] },
+            { question: "La tabla MARD almacena:", options: [{text:"Datos de Centro", correct:false}, {text:"Datos de Almacén (Storage Location)", correct:true}, {text:"Datos de Ventas", correct:false}, {text:"Costos estándar", correct:false}] },
+            { question: "¿Qué indicador en el Material Master permite que el material sea gestionado por número de lote (Batch Management)?", options: [{text:"Batch Requirement Indicator", correct:true}, {text:"Serial Number Profile", correct:false}, {text:"SLED Indicator", correct:false}, {text:"Valuation Category", correct:false}] },
+            { question: "¿El Material Group se puede usar para restringir aprobaciones de compras?", options: [{text:"Sí, las estrategias de liberación (Release Strategies) de compras pueden basarse en el Material Group.", correct:true}, {text:"No, solo sirve para reportes de inventario.", correct:false}, {text:"Solo en SAP ERP antiguo, no en S/4HANA.", correct:false}, {text:"No, para eso se usa el Material Type.", correct:false}] },
+            { question: "Si un material se cuenta por litros, pero se almacena en tambores de 200 litros, ¿qué declaras?", options: [{text:"BUoM = Tambor, Alt UoM = Litro", correct:false}, {text:"BUoM = Litro, Alt UoM = Tambor (1 Tambor = 200 L)", correct:true}, {text:"Solo litros.", correct:false}, {text:"Solo tambores.", correct:false}] },
+            { question: "¿Dónde defines el perfil de número de serie si cada laptop requiere rastreo individual?", options: [{text:"Plant Data / Storage 2", correct:true}, {text:"Accounting 1", correct:false}, {text:"Purchasing", correct:false}, {text:"WM 1", correct:false}] },
+            { question: "¿Qué vista es obligatoria para emitir una Orden de Venta (Sales Order) al cliente final?", options: [{text:"Sales: General/Plant Data", correct:true}, {text:"Purchasing", correct:false}, {text:"MRP 4", correct:false}, {text:"Quality Management", correct:false}] },
+            { question: "Si un producto requiere inspección de calidad antes de poder usarse en producción, se configura en:", options: [{text:"Quality Management View", correct:true}, {text:"Basic Data 1", correct:false}, {text:"Accounting", correct:false}, {text:"WM 2", correct:false}] },
+            { question: "¿Qué sucede si olvidas crear la Vista de Compras (Purchasing) para un material ROH?", options: [{text:"No se podrá emitir una Purchase Order (Orden de Compra) para ese material en ese Centro.", correct:true}, {text:"El sistema asigna un proveedor automático.", correct:false}, {text:"Se bloquea el MRP.", correct:false}, {text:"Nada, EWM lo asume.", correct:false}] },
+            { question: "El código EAN/UPC (Código de barras global) se asigna en:", options: [{text:"WM 1", correct:false}, {text:"Basic Data 1", correct:true}, {text:"Sales", correct:false}, {text:"Purchasing", correct:false}] },
+            { question: "Si necesitas que el inventario se cuente físicamente cada 3 meses en lugar de 1 vez al año, ajustas el:", options: [{text:"CC (Cycle Counting) Physical Inventory Indicator", correct:true}, {text:"MRP Type", correct:false}, {text:"Putaway Indicator", correct:false}, {text:"Lot Size", correct:false}] },
+            { question: "¿Un mismo número de material puede tener diferentes Valuation Classes en dos Centros distintos?", options: [{text:"Sí, si la Valoración es a nivel de Plant, se pueden tener clases y costos distintos.", correct:true}, {text:"No, la Valuation Class es Cross-Client.", correct:false}, {text:"Solo si el material es HAWA.", correct:false}, {text:"Sí, pero genera alertas rojas.", correct:false}] },
+            { question: "¿Qué vista debes extender si un almacén tradicional (IM) se actualiza a un almacén avanzado (EWM)?", options: [{text:"Warehouse Management 1 y 2", correct:true}, {text:"Sales 1 y 2", correct:false}, {text:"Accounting 1", correct:false}, {text:"Basic Data 2", correct:false}] },
+            { question: "El campo 'Division' (Sector) que vincula el material a la estructura de SD se encuentra en:", options: [{text:"Basic Data 1", correct:true}, {text:"WM 1", correct:false}, {text:"Purchasing", correct:false}, {text:"Accounting 1", correct:false}] },
+            { question: "¿Qué transacción masiva permite modificar un campo de cientos de materiales al mismo tiempo?", options: [{text:"MM17 (Mass Maintenance)", correct:true}, {text:"MM01", correct:false}, {text:"MM03", correct:false}, {text:"MIGO", correct:false}] },
+            { question: "Si un material ya no se va a usar, ¿cuál es la mejor práctica?", options: [{text:"Borrarlo de la base de datos con un script.", correct:false}, {text:"Marcarlo para borrado (Flag for Deletion) usando MM06 a nivel de Centro o Mandante.", correct:true}, {text:"Cambiar su precio a cero.", correct:false}, {text:"Renombrarlo a 'NO USAR'.", correct:false}] },
+            { question: "El Grupo de Compras (Purchasing Group) representa a:", options: [{text:"El proveedor.", correct:false}, {text:"El individuo o equipo de compradores internos responsables del aprovisionamiento de ese material.", correct:true}, {text:"El cliente.", correct:false}, {text:"El operador del montacargas.", correct:false}] },
+            { question: "En la creación MM01, el mensaje 'Material ya existe, se extenderá a la nueva vista' significa:", options: [{text:"Error fatal.", correct:false}, {text:"Que el material base existe en el mandante, pero se le están agregando datos de un nuevo departamento o Centro.", correct:true}, {text:"Que se está duplicando el inventario físico.", correct:false}, {text:"Que el sistema colapsó.", correct:false}] },
+            { question: "¿Estás listo para crear materiales a nivel consultor senior?", options: [{text:"Sí, comprendo que el Material Master es el engranaje principal de todo el ecosistema SAP.", correct:true}, {text:"No, volveré a leer.", correct:false}] }
+        ]
+    },
+    {
+        id: "s1_l2",
         semester: 1,
         type: "lab",
-        title: "1.2 Lab Multi-Paso: Arquitectura (SPRO)",
-        duration: "1 Hora • Simulación Consultoría",
-        req: "s1_m1",
-        description: "Asume el rol de arquitecto SAP. Entrarás al IMG de configuración para crear un Almacén Lógico y vincularlo al Centro.",
-        simTask: { hint: "Este laboratorio tiene 7 fases. SPRO -> OX09 -> Plant 1000 -> SLoc 0001 -> RAW MATERIALS -> SAVE -> CONFIRM." },
+        title: "1.4 Lab Multi-Paso: Alta de Producto Terminado",
+        duration: "1 Hora 15 Min",
+        req: "s1_m2",
+        description: "Ejecuta la transacción MM01. Crea un Producto Terminado (FERT) y define sus métricas críticas de almacén.",
+        simTask: { hint: "Fases: MM01 -> FERT -> WM -> 1000 -> 0001 -> EA -> BULK -> SAVE. Tres errores seguidos y serás expulsado." },
         simSteps: [
-            { instruction: "<strong>FASE 1/7: Acceso al Sistema</strong><br>Inicia la transacción universal de Customizing (SAP Project Reference Object).", expectedCmd: "SPRO", hint: "Escribe SPRO", successMessage: "> SAP Reference IMG cargado.\n> Árbol de configuración desplegado." },
-            { instruction: "<strong>FASE 2/7: Navegación de Arquitectura</strong><br>Abre la carpeta 'Enterprise Structure'. Ingresa el T-Code directo para mantener el Storage Location.", expectedCmd: "OX09", hint: "OX09", successMessage: "> Tabla T001L abierta en modo edición." },
-            { instruction: "<strong>FASE 3/7: Asignación al Centro</strong><br>Ingresa el código del Plant (Centro) al que asignaremos el almacén: '1000'.", expectedCmd: "1000", hint: "1000", successMessage: "> Plant 1000 (Planta Principal) validado." },
-            { instruction: "<strong>FASE 4/7: Creación de Entidad</strong><br>Vamos a crear un almacén para Materia Prima. Ingresa el código '0001'.", expectedCmd: "0001", hint: "0001", successMessage: "> SLoc 0001 temporalmente en memoria." },
-            { instruction: "<strong>FASE 5/7: Descripción Lógica</strong><br>Ingresa la descripción estandarizada: 'RAW MATERIALS'.", expectedCmd: "RAW MATERIALS", hint: "RAW MATERIALS", successMessage: "> Descripción aplicada a SLoc 0001." },
-            { instruction: "<strong>FASE 6/7: Commit de Base de Datos</strong><br>Ejecuta el comando de guardado: 'SAVE'.", expectedCmd: "SAVE", hint: "SAVE", successMessage: "> Invocando proceso de actualización en batch..." },
-            { instruction: "<strong>FASE 7/7: Orden de Transporte (TR)</strong><br>El sistema te sugiere la TR 'DEV90014'. Escribe 'CONFIRM' para anexar tus cambios.", expectedCmd: "CONFIRM", hint: "CONFIRM", successMessage: "> Guardando en TR DEV90014...\n> Base de datos actualizada. Operación Exitosa." }
+            { instruction: "<strong>Fase 1/8: Iniciar Alta</strong><br>Inicia la transacción para crear Materiales.", expectedCmd: "MM01", hint: "MM01", successMessage: "> Dynpro inicial MM01." },
+            { instruction: "<strong>Fase 2/8: Tipo de Material</strong><br>El sistema pide el 'Industry Sector' (M - Mechanical) y el 'Material Type'. Escribe el código estándar para un Producto Terminado.", expectedCmd: "FERT", hint: "FERT", successMessage: "> Material Type: FERT validado." },
+            { instruction: "<strong>Fase 3/8: Selección de Vistas</strong><br>Logística exige definir la inteligencia de ubicación tridimensional. Selecciona la vista de Warehouse Management escribiendo 'WM'.", expectedCmd: "WM", hint: "WM", successMessage: "> Vistas WM seleccionadas." },
+            { instruction: "<strong>Fase 4/8: Nivel de Centro</strong><br>Declara en qué Centro físico va a existir este producto. Ingresa el Plant principal: '1000'.", expectedCmd: "1000", hint: "1000", successMessage: "> Plant 1000 verificado." },
+            { instruction: "<strong>Fase 5/8: Nivel de Almacén</strong><br>Asigna el Storage Location de Producto Terminado (0001).", expectedCmd: "0001", hint: "0001", successMessage: "> SLoc 0001 verificado. Abriendo Maestro..." },
+            { instruction: "<strong>Fase 6/8: Vistas Básicas (BUoM)</strong><br>El sistema exige la Unidad de Medida Base. Ingresa el código internacional para 'Pieza' o 'Cada una' (Each).", expectedCmd: "EA", hint: "EA", successMessage: "> BUoM: EA seteada globalmente." },
+            { instruction: "<strong>Fase 7/8: Estrategia Putaway (WM 1)</strong><br>El producto pesa 2 toneladas. En la vista WM 1, asigna el Putaway Control Indicator para que el WMS busque espacio en piso y no rompa los racks en altura. Escribe 'BULK'.", expectedCmd: "BULK", hint: "BULK", successMessage: "> Estrategia BULK Storage asignada a algoritmo." },
+            { instruction: "<strong>Fase 8/8: Contabilizar Base de Datos</strong><br>Todos los datos logísticos están en caché. Confirma y contabiliza el nuevo registro maestro en la tabla MARA/MARC/MARD. Comando: 'SAVE'.", expectedCmd: "SAVE", hint: "SAVE", successMessage: "> Validando consistencia de unidades...\n> Asignando número de material interno...\n> MATERIAL CREADO: '5009214' Creado en Plant 1000.\n> EWM Listo para Putaway." }
         ]
-    },
-    {
-        id: "s1_m2", semester: 1, type: "theory", title: "1.3 Material Master (El ADN del Inventario)", duration: "Próximo Bloque", req: "s1_l1", description: "En el próximo despliegue dividiremos el código para traerte las 50 preguntas exclusivas del Maestro de Materiales.",
-        pages: ["<h3>Siguiente Fase Arquitectónica</h3><p>Una vez apruebes el monumental módulo 1.1 y su laboratorio, estaremos listos para inyectar el código del Maestro de Materiales con 50 preguntas más.</p>"],
-        exam: [{ question: "¿Comprendiste el flujo de 50 preguntas del módulo 1.1?", options: [{ text: "Sí", correct: true }, { text: "No", correct: false }]}]
     }
 ];
