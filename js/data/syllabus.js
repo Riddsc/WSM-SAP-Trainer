@@ -375,4 +375,122 @@ const syllabusData = [
             { instruction: "Cierre Financiero", expectedCmd: "PGI", hint: "PGI", successMessage: "> CRISIS RESUELTA." }
         ]
     }
+,
+    // ==========================================
+    // SEMESTRE 4 - INGENIERÍA AVANZADA, MFS Y RESOURCE MANAGEMENT
+    // ==========================================
+    {
+        id: "s4_m1",
+        semester: 4,
+        type: "theory",
+        title: "4.1 Cross-Docking Avanzado y Material Flow System (MFS)",
+        duration: "30 Horas • Arquitectura Nivel Experto",
+        req: "s3_l2",
+        description: "Domina la automatización extrema. Desde el ruteo dinámico de Cross-Docking para evadir el almacenamiento, hasta la integración directa con PLCs, fajas transportadoras y grúas robóticas usando SAP MFS.",
+        review: "El Cross-Docking Opportunista intercepta palets en la puerta; MFS (Material Flow System) mueve esos palets físicamente a través de TCP/IP enviando Telegramas a los PLCs sin middleware de terceros.",
+        pages: [
+            `<h3>Capítulo 1: La Filosofía del Cross-Docking (CD)</h3><p>El almacenamiento es un desperdicio de tiempo y dinero. El CD busca que la mercancía fluya del muelle de entrada al de salida sin tocar un rack.</p>`,
+            `<h3>Capítulo 2: Planned vs Opportunistic CD</h3><p>Planned CD viene pre-calculado desde SAP TM o APO. Opportunistic CD es una decisión en tiempo real de EWM al detectar un Backorder (pedido atrasado) justo en el momento del PGR.</p>`,
+            `<h3>Capítulo 3: Merchandise Distribution (Push/Pull)</h3><p>Técnica Retail. Se recibe un camión consolidado del fabricante y se distribuye inmediatamente a nivel de caja para múltiples tiendas en la zona de Staging.</p>`,
+            `<h3>Capítulo 4: EWM CD Routes</h3><p>Si la puerta Inbound 1 está a 1 kilómetro de la puerta Outbound 50, el sistema genera WTs intermedias de traslado para no bloquear los montacargas.</p>`,
+            `<h3>Capítulo 5: Introducción a SAP MFS</h3><p>Material Flow System. Permite a EWM hablar directamente con los Controladores Lógicos Programables (PLCs) del hardware del almacén (fajas, transelevadores).</p>`,
+            `<h3>Capítulo 6: La Muerte del Middleware</h3><p>Históricamente, SAP hablaba con un WCS (Warehouse Control System) intermedio, y este al PLC. MFS elimina el WCS, reduciendo latencia y puntos de fallo.</p>`,
+            `<h3>Capítulo 7: Telegramas MFS</h3><p>EWM no envía WTs al hardware. Convierte la WT en una cadena de texto ultraligera llamada Telegrama, enviada vía Sockets TCP/IP.</p>`,
+            `<h3>Capítulo 8: Communication Channels</h3><p>Configuración de IP, Puerto y Handshake entre EWM y el PLC. Utiliza procesos ABAP Push Channel (APC) para streaming bidireccional en milisegundos.</p>`,
+            `<h3>Capítulo 9: Routing Points (Puntos de Ruteo)</h3><p>Sensores láser en la faja transportadora. Cuando un palet pasa por un escáner, el PLC envía un telegrama a EWM preguntando: "¿Hacia dónde desvío esta HU?".</p>`,
+            `<h3>Capítulo 10: Capacity Limits en MFS</h3><p>Si una faja transportadora solo soporta 10 palets, EWM pausa la liberación de nuevas WTs hacia esa zona hasta que el PLC confirme que la faja tiene espacio.</p>`,
+            `<h3>Capítulo 11: Exception Handling en Hardware</h3><p>¿Qué pasa si un palet se traba? El PLC envía un Telegrama de Error. EWM redirige el tráfico subsecuente a una faja de contingencia automáticamente.</p>`,
+            `<h3>Capítulo 12: Layout Orientado a MFS</h3><p>Los Storage Bins no son racks de piso, son coordenadas X,Y,Z exactas de un ASRS (Automated Storage and Retrieval System).</p>`,
+            `<h3>Capítulo 13: Monitorización MFS (/SCWM/MON)</h3><p>Nodo especial en el Monitor para ver el estado de los canales TCP/IP, leer telegramas crudos y resetear PLCs desde SAP.</p>`,
+            `<h3>Capítulo 14: Pick-by-Light y Pick-by-Voice</h3><p>Integraciones MFS donde SAP enciende luces en el rack físico para guiar al humano, o interactúa por auriculares RF.</p>`,
+            `<h3>Capítulo 15: Pruebas de Estrés MFS</h3><p>Uso del emulador interno de SAP para simular PLCs enviando 10,000 telegramas por minuto y probar la estabilidad del servidor S/4HANA.</p>`
+        ],
+        exam: [
+            { question: "¿Cuál es el objetivo principal del Cross-Docking?", options: [{text:"Evitar el almacenamiento físico y enviar la mercancía directo a salida.", correct:true}, {text:"Consolidar inventario en el fondo del almacén.", correct:false}, {text:"Hacer conteo cíclico rápido.", correct:false}] },
+            { question: "El Opportunistic Cross-Docking se gatilla generalmente por:", options: [{text:"La detección de un Backorder durante el proceso de entrada (PGR).", correct:true}, {text:"Una planificación de SAP APO 6 meses antes.", correct:false}, {text:"Un cierre de mes financiero.", correct:false}] },
+            { question: "¿Qué significa MFS en el ecosistema EWM?", options: [{text:"Material Flow System", correct:true}, {text:"Manual Forklift System", correct:false}, {text:"Master Financial Setup", correct:false}] },
+            { question: "La gran ventaja arquitectónica de SAP MFS es:", options: [{text:"Eliminar el middleware (WCS) y hablar directo con los PLCs.", correct:true}, {text:"Que funciona sin internet.", correct:false}, {text:"Que es gratis.", correct:false}] },
+            { question: "¿Cómo se comunican EWM y un PLC?", options: [{text:"A través de Telegramas mediante Sockets TCP/IP.", correct:true}, {text:"Por correos electrónicos automáticos.", correct:false}, {text:"Mediante impresiones PDF escaneadas.", correct:false}] },
+            { question: "Un 'Routing Point' en MFS representa:", options: [{text:"Un sensor de decisión en el hardware (ej. cruce de fajas).", correct:true}, {text:"El escritorio del supervisor.", correct:false}, {text:"Una puerta del camión.", correct:false}] },
+            { question: "Si una grúa robótica falla, ¿cómo se entera SAP EWM?", options: [{text:"El PLC envía un Telegrama de Excepción directo al Communication Channel.", correct:true}, {text:"Un operador debe hacer un MIGO.", correct:false}, {text:"EWM no se entera hasta el día siguiente.", correct:false}] },
+            { question: "Si el CD Opportunista detecta un pedido atrasado, la Warehouse Task (WT) de Inbound:", options: [{text:"Cambia su destino del Rack hacia la zona de Staging Outbound (920).", correct:true}, {text:"Se cancela y borra.", correct:false}, {text:"Se bloquea esperando un QA.", correct:false}] },
+            { question: "¿Qué protocolo de SAP S/4HANA moderno permite mantener Sockets abiertos para MFS?", options: [{text:"ABAP Push Channels (APC).", correct:true}, {text:"SOAP Web Services.", correct:false}, {text:"RFC sincrónico tradicional.", correct:false}] },
+            { question: "Para verificar si la conexión TCP/IP con el PLC está activa, se utiliza:", options: [{text:"El nodo MFS en el Warehouse Monitor (/SCWM/MON).", correct:true}, {text:"Transacción MMBE.", correct:false}, {text:"La dynpro de creación de material.", correct:false}] },
+            { question: "En Retail, cuando se recibe mercancía masiva para repartir directo a tiendas se usa:", options: [{text:"Merchandise Distribution (Push/Pull).", correct:true}, {text:"Discrete Picking manual.", correct:false}, {text:"Archiving.", correct:false}] },
+            { question: "¿Puede EWM detener el envío de telegramas si la faja está llena?", options: [{text:"Sí, mediante MFS Capacity Limits.", correct:true}, {text:"No, satura la faja obligatoriamente.", correct:false}] },
+            { question: "Un sistema ASRS interactúa con EWM MFS para:", options: [{text:"Movimiento automatizado en tres dimensiones (X,Y,Z).", correct:true}, {text:"Calcular impuestos corporativos.", correct:false}] },
+            { question: "Pick-by-Light es considerado:", options: [{text:"Una extensión de hardware integrada a los telegramas MFS o BAdIs RF.", correct:true}, {text:"Un módulo de Finanzas.", correct:false}] },
+            { question: "Para simular PLCs y probar la estabilidad MFS antes del Go-Live, SAP:", options: [{text:"Ofrece un emulador MFS interno.", correct:true}, {text:"Exige comprar hardware real.", correct:false}] }
+        ]
+    },
+    {
+        id: "s4_l1",
+        semester: 4,
+        type: "lab",
+        title: "4.2 Lab Multi-Paso: Opportunistic Cross-Docking",
+        duration: "2 Horas 15 Min",
+        req: "s4_m1",
+        description: "Hay un pedido atrasado urgiendo 50 Laptops. Acaba de llegar un camión con 100 Laptops. Ejecuta el PGR y observa cómo el algoritmo anula el Putaway y desvía 50 unidades directo al andén de salida.",
+        simTask: { hint: "Fases: /SCWM/PRDI -> PGR -> ALGORITMO-CD -> /SCWM/TO_CONF -> /SCWM/MON -> ODO-CONFIRM -> PGI." },
+        simSteps: [
+            { instruction: "Inbound Delivery EWM", expectedCmd: "/SCWM/PRDI", hint: "/SCWM/PRDI", successMessage: "> IBD Abierta." },
+            { instruction: "Ejecutar Recepción", expectedCmd: "PGR", hint: "PGR", successMessage: "> Alerta: Backorder Detectado." },
+            { instruction: "Forzar Ruteo CD", expectedCmd: "ALGORITMO-CD", hint: "ALGORITMO-CD", successMessage: "> WT dividida (50 Rack / 50 Salida)." },
+            { instruction: "Confirmar Movimiento", expectedCmd: "/SCWM/TO_CONF", hint: "/SCWM/TO_CONF", successMessage: "> Palet CD en Zona 920." },
+            { instruction: "Verificar Monitor", expectedCmd: "/SCWM/MON", hint: "/SCWM/MON", successMessage: "> Enlace CD-ODO activo." },
+            { instruction: "Cerrar Tarea ODO", expectedCmd: "ODO-CONFIRM", hint: "ODO-CONFIRM", successMessage: "> Picking marcado OK." },
+            { instruction: "Despachar", expectedCmd: "PGI", hint: "PGI", successMessage: "> CROSS-DOCKING COMPLETADO." }
+        ]
+    }
+,
+    {
+        id: "s4_m2",
+        semester: 4,
+        type: "theory",
+        title: "4.2 Resource Management y Task Interleaving Avanzado",
+        duration: "30 Horas • Optimización de Flota y Operarios",
+        req: "s4_l1",
+        description: "El arte de maximizar la productividad de la mano de obra y los montacargas. Aprende a configurar colas dinámicas, balanceo de turnos y el santo grial de la eficiencia: Task Interleaving.",
+        review: "Task Interleaving evita que un montacarguista regrese con las 'manos vacías' (Deadheading). Al dejar un palet en el rack (Putaway), EWM le asigna inmediatamente un picking cercano.",
+        pages: [
+            `<h3>Capítulo 1: El Desperdicio del Deadheading</h3><p>Un montacargas que camina vacío está quemando dinero. El objetivo del Resource Management es cero viajes en vacío.</p>`,
+            `<h3>Capítulo 2: Definición de Recursos</h3><p>Un recurso puede ser un operario pedestre, un montacargas de hombre a bordo, o una grúa ASRS. Se configuran con capacidades de peso y volumen.</p>`,
+            `<h3>Capítulo 3: Resource Queues (Colas de Trabajo)</h3><p>Los trabajos se agrupan en colas por zonas físicas (Ej: Cola de Pasillos Pares, Cola de Congelados). Los recursos se asignan a estas colas.</p>`,
+            `<h3>Capítulo 4: El Algoritmo de Asignación (RFUI)</h3><p>Cuando un operario pulsa 'Siguiente Tarea' en su terminal RF, el sistema evalúa su posición GPS/Warehouse y le asigna la tarea más óptima.</p>`,
+            `<h3>Capítulo 5: Task Interleaving (Entrelazado de Tareas)</h3><p>La técnica definitiva: fusionar flujos Inbound y Outbound. El operario hace Putaway de un palet que acaba de recibir y, al terminar, el sistema le asigna un Picking a 3 metros de distancia.</p>`,
+            `<h3>Capítulo 6: Queue Sequence</h3><p>Configuración en SPRO para definir qué colas puede atender un recurso y en qué orden de prioridad.</p>`,
+            `<h3>Capítulo 7: Shift Management (Turnos)</h3><p>Control de pausas, asignación de operarios por turnos rotativos y balanceo de carga de trabajo por hora.</p>`,
+            `<h3>Capítulo 8: Radio Frequency Framework (RFUI)</h3><p>Las pantallas de las pistolas RF se construyen mediante Dynpros móviles optimizadas para no requerir scroll ni teclado físico.</p>`,
+            `<h3>Capítulo 9: Exception Handling en Recursos</h3><p>Si un montacargas sufre una avería mecánica, el supervisor puede reasignar todas sus tareas activas a otro recurso con un solo clic en el monitor.</p>`,
+            `<h3>Capítulo 10: KPIs y Productividad en el Monitor</h3><p>Medición de segundos por tarea, porcentaje de tiempo en vacío vs cargado, y rendimiento por operario en tiempo real.</p>`
+        ],
+        exam: [
+            { question: "¿Qué significa 'Deadheading' en logística de almacenes?", options: [{text:"Un montacargas viajando sin carga (vacío).", correct:true}, {text:"Un error de sistema ABAP.", correct:false}, {text:"Una falla de red en la pistola RF.", correct:false}] },
+            { question: "¿Cuál es el propósito fundamental del Task Interleaving?", options: [{text:"Eliminar los viajes vacíos entrelazando tareas de entrada y salida.", correct:true}, {text:"Duplicar el inventario contable.", correct:false}, {text:"Acelerar el cierre contable financiero.", correct:false}] },
+            { question: "¿Cómo sabe el sistema qué tarea asignar a qué montacargas?", options: [{text:"A través de Resource Queues y la posición del recurso.", correct:true}, {text:"Mediante un sorteo aleatorio nocturno.", correct:false}] },
+            { question: "¿Qué transacción RF utiliza el operario para solicitar su siguiente trabajo?", options: [{text:"/RFUI (Radio Frequency User Interface).", correct:true}, {text:"MM01", correct:false}, {text:"MIGO", correct:false}] },
+            { question: "Si un montacargas se descompone a mitad de un turno, el supervisor puede:", options: [{text:"Reasignar sus tareas pendientes a otro recurso desde el Monitor.", correct:true}, {text:"Eliminar el almacén completo.", correct:false}] },
+            { question: "Las Resource Queues se estructuran típicamente por:", options: [{text:"Zonas físicas del almacén (Pasillos, Niveles o Áreas).", correct:true}, {text:"Apellidos de los operarios.", correct:false}] },
+            { question: "¿Qué métrica evalúa el éxito del Resource Management?", options: [{text:"Porcentaje de tiempo con tareas productivas vs viajes vacíos.", correct:true}, {text:"El costo de la electricidad.", correct:false}] }
+        ]
+    },
+    {
+        id: "s4_l2",
+        semester: 4,
+        type: "lab",
+        title: "4.3 Lab Multi-Paso: Configuración de Task Interleaving",
+        duration: "2 Horas",
+        req: "s4_m2",
+        description: "Configura el motor de Resource Management para que el montacargas de alta elevación (HGH-FORK) ejecute entrelazado dinámico entre tareas de Putaway y Picking.",
+        simTask: { hint: "Fases: SPRO -> QUEUE-DEF -> ASSIGN-RESOURCE -> INTERLEAVE-ON -> /RFUI -> TEST-RUN -> KPIS." },
+        simSteps: [
+            { instruction: "Acceso SPRO Recursos", expectedCmd: "SPRO", hint: "SPRO", successMessage: "> IMG de Resource Management." },
+            { instruction: "Definir Cola Unificada", expectedCmd: "QUEUE-DEF", hint: "QUEUE-DEF", successMessage: "> Cola HGH-MIX creada." },
+            { instruction: "Vincular Recurso", expectedCmd: "ASSIGN-RESOURCE", hint: "ASSIGN-RESOURCE", successMessage: "> Montacargas HGH-01 asignado." },
+            { instruction: "Activar Interleaving", expectedCmd: "INTERLEAVE-ON", hint: "INTERLEAVE-ON", successMessage: "> Algoritmo de enlace activo." },
+            { instruction: "Simular RF", expectedCmd: "/RFUI", hint: "/RFUI", successMessage: "> Operario logueado." },
+            { instruction: "Prueba de Flujo", expectedCmd: "TEST-RUN", hint: "/RFUI", successMessage: "> Putaway completado -> Siguiente: Picking a 2m." },
+            { instruction: "Validar Métricas", expectedCmd: "KPIS", hint: "KPIS", successMessage: "> EFICIENCIA DE FLOTA: 98.5% (CERO VACÍOS)." }
+        ]
+    }
 ];
