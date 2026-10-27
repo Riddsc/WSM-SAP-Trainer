@@ -1,0 +1,47 @@
+.sap-engine-ui {
+    background: var(--sap-term-bg);
+    border-radius: var(--radius-sm);
+    border: 1px solid #333;
+    overflow: hidden;
+    font-family: 'Fira Code', monospace;
+    box-shadow: inset 0 0 20px rgba(0,255,0,0.05);
+}
+
+.sap-topbar {
+    background: #111;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #333;
+}
+.sap-dot { width: 12px; height: 12px; border-radius: 50%; background: #555; margin-right: 8px; }
+.sap-dot:nth-child(1) { background: #FF5F56; }
+.sap-dot:nth-child(2) { background: #FFBD2E; }
+.sap-dot:nth-child(3) { background: #27C93F; }
+.sap-title { margin-left: 10px; color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+
+.sap-body { padding: 24px; }
+.sap-instruction { color: #AAA; font-size: 0.9rem; margin-bottom: 24px; border-left: 2px solid var(--cyan); padding-left: 12px; line-height: 1.5; }
+
+.sap-cmd-line { display: flex; align-items: center; margin-bottom: 24px; background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: var(--radius-sm); border: 1px solid #333; }
+.sap-prompt { color: var(--sap-term-text); font-weight: 800; margin-right: 12px; font-size: 1.1rem; }
+.sap-input {
+    background: transparent; border: none; color: #FFF; font-family: 'Fira Code', monospace; font-size: 1.2rem;
+    width: 100%; outline: none; text-transform: uppercase; caret-color: var(--sap-term-text);
+}
+
+.sap-btn-execute {
+    background: var(--sap-header); color: #FFF; border: 1px solid var(--cyan); padding: 16px; width: 100%;
+    border-radius: var(--radius-sm); font-family: 'Fira Code', monospace; font-weight: 800; cursor: pointer; transition: 0.2s;
+    letter-spacing: 2px;
+}
+.sap-btn-execute:active { background: var(--cyan); color: #000; }
+
+.sap-console-log {
+    margin-top: 24px;
+    color: var(--sap-term-text);
+    font-size: 0.9rem;
+    min-height: 60px;
+    line-height: 1.6;
+}
+.sap-error { color: var(--danger); }
