@@ -1,0 +1,6 @@
+{
+  "appId": "com.logisticapro.masterclass",
+  "appName": "Logística Pro",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
