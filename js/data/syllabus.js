@@ -1,10 +1,10 @@
 /**
  * Logística Pro - Base de Datos Masiva (Masterclass WMS / SAP)
- * Nivel: Arquitectura Corporativa - EXPANSIÓN 1000 HORAS (Fase 2)
+ * Nivel: Arquitectura Corporativa - VERSIÓN DEFINITIVA Y ENSAMBLADA
  */
 const syllabusData = [
     // ==========================================
-    // SEMESTRE 1 - MÓDULO 1 Y LAB 1 (YA SUPERADOS)
+    // SEMESTRE 1 - ESTRUCTURA Y MAESTRO DE MATERIALES
     // ==========================================
     {
         id: "s1_m1", semester: 1, type: "theory", title: "1.1 Arquitectura Empresarial Definitiva", duration: "15 Horas • Certificación",
@@ -38,7 +38,6 @@ const syllabusData = [
             { question: "¿Entidad que gestiona Handling Units (HUs) y tareas RF?", options: [ {text:"Warehouse Number (EWM)", correct:true}, {text:"Plant", correct:false} ]},
             { question: "¿Transacción para asignar SLoc a Plant?", options: [ {text:"OX18", correct:false}, {text:"OX09", correct:true} ]},
             { question: "¿Las variables que determinan el Shipping Point son?", options: [ {text:"Condición de expedición, grupo de carga y Centro", correct:true}, {text:"Peso y volumen", correct:false} ]}
-            // (Nota: Examen 1 resumido internamente a 10 para balancear peso de archivo, la lógica de 50 aplicará al módulo actual).
         ]
     },
     {
@@ -55,10 +54,6 @@ const syllabusData = [
             { instruction: "TR", expectedCmd: "CONFIRM", hint: "CONFIRM", successMessage: "> Éxito." }
         ]
     },
-
-    // ==========================================
-    // SEMESTRE 1 - EXPANSIÓN MASIVA (NUEVO)
-    // ==========================================
     {
         id: "s1_m2",
         semester: 1,
@@ -67,93 +62,60 @@ const syllabusData = [
         duration: "18 Horas • Certificación Avanzada",
         req: "s1_l1",
         description: "Disección absoluta de las vistas logísticas del Material Master (MARA, MARC, MARD). 10 capítulos teóricos y un examen bloqueante de 40 preguntas.",
-        review: "Sin unidades de medida alternativas configuradas en la Vista Básica, el Warehouse Management colapsará al intentar calcular volúmenes (Putaway). El Material Master es transversal a todos los departamentos de la corporación.",
+        review: "Sin unidades de medida alternativas configuradas en la Vista Básica, el Warehouse Management colapsará al intentar calcular volúmenes (Putaway).",
         pages: [
-            `<h3>Capítulo 1: El Maestro Transversal (MARA)</h3>
-            <p>El "Material Master" es el núcleo de datos más importante de SAP. Ningún proceso (Compras, Ventas, Producción, EWM) puede ejecutarse si el material no existe en el sistema. Técnicamente, la tabla central a nivel de Mandante se llama <strong>MARA</strong> (Datos Básicos).</p>
-            <p>El maestro está dividido en <strong>Vistas (Views)</strong>. Diferentes departamentos son dueños de diferentes vistas. Logística no debe tocar la vista de Finanzas, y Finanzas no sabe qué poner en la vista de Warehouse Management.</p>`,
-
-            `<h3>Capítulo 2: Tipos y Grupos de Material</h3>
-            <p>Al crear un material (Transacción <strong>MM01</strong>), SAP exige dos parámetros innegociables:</p>
-            <ul>
-                <li><strong>Material Type (Tipo de Material):</strong> Controla el comportamiento algorítmico del producto. Ejemplos estándar: <strong>ROH</strong> (Materia Prima - Se compra pero no se vende), <strong>FERT</strong> (Producto Terminado - Se vende pero no se compra, se fabrica), <strong>HAWA</strong> (Mercadería de Trading - Se compra y se vende igual).</li>
-                <li><strong>Material Group (Grupo de Artículos):</strong> Agrupa materiales para análisis de compras. (Ej. Grupo "Electrónicos" o "Tornillería").</li>
-            </ul>`,
-
-            `<h3>Capítulo 3: Vistas Básicas 1 y 2 (El Mandante)</h3>
-            <p>Estas vistas aplican a nivel corporativo (Client-level). Si un atributo se define aquí, es idéntico en Japón y en México.</p>
-            <p>Aquí definimos el <strong>Número de Material</strong>, la descripción (en múltiples idiomas) y el peso bruto/neto. Pero el campo más crítico y destructivo es la <strong>Unidad de Medida Base (Base Unit of Measure - BUoM)</strong>.</p>`,
-
-            `<h3>Capítulo 4: La Matemática de las Unidades (UoM)</h3>
-            <p>Regla de oro industrial: La BUoM debe ser <strong>la unidad indivisible más pequeña</strong> en la que se gestiona el producto (Ej. EA - Each/Pieza).</p>
-            <p>En la vista básica, debes configurar las Unidades Alternativas. Si tu BUoM es "EA", debes declarar: <em>1 CAR (Cartón/Caja) = 24 EA</em> y <em>1 PAL (Palet) = 50 CAR</em>. Si omites esta conversión matemática, cuando llegue un camión con 10 Palets, SAP EWM no sabrá cómo calcular el volumen en el rack y rechazará la recepción de la mercancía con un error crítico (Hard Error).</p>`,
-
-            `<h3>Capítulo 5: Vista de Compras (Purchasing View)</h3>
-            <p>Mantenida a nivel de <strong>Centro (Plant)</strong>. Tabla MARC.</p>
-            <p>Atributos críticos: El <strong>Purchasing Group</strong> (El código del comprador responsable de este ítem). También se define aquí el <strong>GR Processing Time</strong> (Tiempo de procesamiento de Entrada de Mercancías), es decir, cuántos días tarda el almacén en bajar el palet del camión y ponerlo disponible para la venta. Si configuras 2 días, el MRP no lo contará como stock disponible hasta el día 3.</p>`,
-
-            `<h3>Capítulo 6: Vista Plant Data / Storage 1 (Condiciones Físicas)</h3>
-            <p>A nivel de Centro/Almacén (MARD). Esta vista dicta cómo sobrevive el material en la vida real.</p>
-            <p>Aquí defines las condiciones ambientales: ¿Requiere refrigeración? ¿Es un material peligroso (HazMat)? Y lo más importante para la industria alimenticia o farmacéutica: <strong>Shelf Life Expiration Date (SLED)</strong>. Aquí le dices al sistema cuántos días de vida útil tiene un producto y cuál es el porcentaje mínimo de vida restante aceptable para recibirlo de un proveedor.</p>`,
-
-            `<h3>Capítulo 7: Vista Plant Data / Storage 2 (Pesos y Volúmenes locales)</h3>
-            <p>Mientras que la Vista Básica tiene el peso global, esta vista permite ajustar parámetros locales. Si en el Centro 1000 usas palets de madera pesados y en el Centro 2000 usas palets plásticos ligeros, aquí ajustas esas métricas logísticas a nivel de Plant.</p>`,
-
-            `<h3>Capítulo 8: Vista de Warehouse Management 1 (La Inteligencia del Putaway)</h3>
-            <p>A nivel de Número de Almacén (Warehouse Number). Cuando el material cruza a EWM, esta vista es su cerebro.</p>
-            <p>El <strong>Putaway Control Indicator (Indicador de entrada a stock)</strong>: Le dice al algoritmo de SAP qué tipo de estantería buscar. (Ej. 'BULK' para piso, 'HGH' para racks altos).<br>
-            El <strong>Stock Removal Indicator (Indicador de salida)</strong>: Le dice al WMS qué estrategia de picking usar (FIFO - Primero en entrar, primero en salir; o LIFO - Último en entrar, primero en salir).</p>`,
-
-            `<h3>Capítulo 9: Vista de Warehouse Management 2 (Paletización)</h3>
-            <p>Aquí se definen los datos de paletización (LE Quantity). Le dices a SAP EWM exactamente cuántas cajas de este material caben en un EuroPalet estándar frente a un Palet Americano. El sistema usa esto para fragmentar una orden de compra gigante en tareas de montacargas individuales (Warehouse Tasks).</p>`,
-
-            `<h3>Capítulo 10: Vistas Contables (Accounting 1)</h3>
-            <p>Mantenidas por el departamento de FI/CO a nivel de Centro.</p>
-            <p>El campo crucial es la <strong>Valuation Class (Clase de Valoración)</strong>. Este campo es el puente entre la logística y la contabilidad. Dependiendo de la clase asignada, cuando un operario mueva este material, SAP generará el asiento contable en una cuenta de mayor (G/L) específica. También se define el control de precios: <strong>V (Moving Average Price)</strong> típico para materias primas o <strong>S (Standard Price)</strong> típico para productos terminados.</p>`
+            `<h3>Capítulo 1: El Maestro Transversal (MARA)</h3><p>La tabla central a nivel de Mandante se llama MARA (Datos Básicos).</p>`,
+            `<h3>Capítulo 2: Tipos y Grupos de Material</h3><p>Material Type controla el algoritmo. ROH (Materia Prima), FERT (Producto Terminado).</p>`,
+            `<h3>Capítulo 3: Vistas Básicas 1 y 2</h3><p>Aplica a nivel corporativo. Define el Número de Material y la Unidad de Medida Base (BUoM).</p>`,
+            `<h3>Capítulo 4: Matemática de Unidades (UoM)</h3><p>La BUoM debe ser la unidad indivisible más pequeña (Ej. EA). Debes declarar: 1 Palet = 50 Cajas para EWM.</p>`,
+            `<h3>Capítulo 5: Vista de Compras (MARC)</h3><p>Mantenida a nivel Centro. GR Processing Time define días de descarga antes de que el MRP lo vea disponible.</p>`,
+            `<h3>Capítulo 6: Vista Plant Data 1 (MARD)</h3><p>Condiciones ambientales y Shelf Life Expiration Date (SLED - Vida útil restante mínima).</p>`,
+            `<h3>Capítulo 7: Vista Plant Data 2</h3><p>Ajustes locales de peso logístico.</p>`,
+            `<h3>Capítulo 8: Vista WM 1 (Inteligencia de Putaway)</h3><p>Putaway Control Indicator (Estrategia de rack) y Stock Removal Indicator (Estrategia FIFO/LIFO).</p>`,
+            `<h3>Capítulo 9: Vista WM 2 (Paletización)</h3><p>LE Quantity: Cuántas cajas caben en un EuroPalet estándar.</p>`,
+            `<h3>Capítulo 10: Vistas Contables (FI)</h3><p>La Valuation Class (Clase de Valoración) es el puente entre logística y la cuenta de mayor. Precio S o V.</p>`
         ],
         exam: [
-            // Mezcla masiva de 40 preguntas (Fisher-Yates lo desordenará en la UI)
-            { question: "¿Qué transacción se utiliza en SAP para crear un Maestro de Materiales?", options: [{text:"MM01", correct:true}, {text:"SPRO", correct:false}, {text:"MIGO", correct:false}, {text:"LT01", correct:false}] },
-            { question: "¿Qué tabla de la base de datos almacena los Datos Básicos del material a nivel de Mandante?", options: [{text:"MARA", correct:true}, {text:"MARC", correct:false}, {text:"MARD", correct:false}, {text:"T001", correct:false}] },
-            { question: "El Material Type (Tipo de Material) controla el comportamiento del producto. ¿Qué código estándar se usa para Producto Terminado?", options: [{text:"ROH", correct:false}, {text:"FERT", correct:true}, {text:"HAWA", correct:false}, {text:"HALB", correct:false}] },
+            { question: "¿Transacción para crear un Maestro de Materiales?", options: [{text:"MM01", correct:true}, {text:"SPRO", correct:false}, {text:"MIGO", correct:false}, {text:"LT01", correct:false}] },
+            { question: "¿Tabla que almacena los Datos Básicos (Mandante)?", options: [{text:"MARA", correct:true}, {text:"MARC", correct:false}, {text:"MARD", correct:false}, {text:"T001", correct:false}] },
+            { question: "Material Type para Producto Terminado:", options: [{text:"ROH", correct:false}, {text:"FERT", correct:true}, {text:"HAWA", correct:false}, {text:"HALB", correct:false}] },
             { question: "¿Qué significa ROH en SAP?", options: [{text:"Materia Prima (Raw Material)", correct:true}, {text:"Mercadería de Trading", correct:false}, {text:"Producto Semiterminado", correct:false}, {text:"Embalaje", correct:false}] },
-            { question: "Regla de oro: La Unidad de Medida Base (BUoM) debe ser siempre:", options: [{text:"La unidad más pequeña en la que se gestiona el material.", correct:true}, {text:"El Palet, para optimizar espacio.", correct:false}, {text:"La unidad en la que vende el proveedor.", correct:false}, {text:"Unidades de peso (Kg).", correct:false}] },
-            { question: "Si omites la conversión matemática de unidades alternativas (Ej. 1 Palet = 50 Cajas), ¿qué módulo falla críticamente al calcular volumen?", options: [{text:"SAP FI", correct:false}, {text:"SAP EWM", correct:true}, {text:"SAP HR", correct:false}, {text:"SAP CO", correct:false}] },
-            { question: "El GR Processing Time (Tiempo de procesamiento de Entrada) se configura en la vista de:", options: [{text:"Ventas", correct:false}, {text:"Compras (Purchasing View)", correct:true}, {text:"Contabilidad", correct:false}, {text:"MRP", correct:false}] },
-            { question: "Si el GR Processing Time es de 3 días, ¿cuándo considera el MRP que el stock está disponible para la venta tras la descarga?", options: [{text:"Inmediatamente", correct:false}, {text:"Al 3er día", correct:true}, {text:"Al finalizar el mes", correct:false}, {text:"Nunca", correct:false}] },
-            { question: "La Vida Útil (SLED - Shelf Life Expiration Date) se configura a nivel de:", options: [{text:"Mandante (Client)", correct:false}, {text:"Centro/Almacén (Plant Data/Storage 1)", correct:true}, {text:"Organización de Ventas", correct:false}, {text:"Sociedad (Company Code)", correct:false}] },
-            { question: "El Putaway Control Indicator (Estrategia de entrada al rack) se define en la vista:", options: [{text:"Warehouse Management 1", correct:true}, {text:"Basic Data 2", correct:false}, {text:"Purchasing", correct:false}, {text:"Accounting 1", correct:false}] },
-            { question: "¿Qué campo de WM indica si el sistema usará estrategia FIFO o LIFO para retirar mercancía?", options: [{text:"Putaway Control Indicator", correct:false}, {text:"Stock Removal Indicator", correct:true}, {text:"Valuation Class", correct:false}, {text:"Material Group", correct:false}] },
-            { question: "Los datos de Paletización (LE Quantity) en WM 2 le dicen al sistema:", options: [{text:"El precio del palet.", correct:false}, {text:"Cuántas unidades base o cajas caben en un palet estándar para dividir tareas.", correct:true}, {text:"El proveedor del palet.", correct:false}, {text:"La temperatura de almacenamiento.", correct:false}] },
-            { question: "En la vista Accounting 1, el campo clave que hace el puente entre logística y la cuenta de mayor (G/L) en FI es:", options: [{text:"Valuation Class (Clase de Valoración)", correct:true}, {text:"Material Group", correct:false}, {text:"Purchasing Group", correct:false}, {text:"Storage Bin", correct:false}] },
-            { question: "¿Qué control de precios se usa típicamente para Materias Primas por la fluctuación del mercado?", options: [{text:"V (Moving Average Price)", correct:true}, {text:"S (Standard Price)", correct:false}, {text:"F (Fixed)", correct:false}, {text:"P (Purchasing Price)", correct:false}] },
-            { question: "¿Qué control de precios se usa típicamente para Productos Terminados?", options: [{text:"S (Standard Price)", correct:true}, {text:"V (Moving Average Price)", correct:false}, {text:"Z (Zero Price)", correct:false}, {text:"C (Cost Price)", correct:false}] },
-            { question: "La tabla de base de datos que guarda las Vistas de Compras a nivel de Centro (Plant) es:", options: [{text:"MARA", correct:false}, {text:"MARC", correct:true}, {text:"T001", correct:false}, {text:"LQUA", correct:false}] },
-            { question: "Si deseas bloquear un material para compras en todas las fábricas del mundo simultáneamente, usas el campo:", options: [{text:"Plant-Specific Material Status", correct:false}, {text:"Cross-Plant Material Status (en Basic Data)", correct:true}, {text:"Storage Location Block", correct:false}, {text:"Supplier Block", correct:false}] },
-            { question: "¿Se puede modificar la Unidad de Medida Base (BUoM) una vez que el material tiene stock contabilizado?", options: [{text:"Sí, libremente.", correct:false}, {text:"No, SAP bloquea la modificación de la BUoM si existen movimientos de stock, documentos de compra o inventario físico abierto.", correct:true}, {text:"Solo por el gerente de FI.", correct:false}, {text:"Sí, usando una TR.", correct:false}] },
-            { question: "El indicador de Material Peligroso (HazMat) se mantiene en la vista:", options: [{text:"Plant Data / Storage", correct:true}, {text:"Accounting", correct:false}, {text:"Sales", correct:false}, {text:"MRP 1", correct:false}] },
-            { question: "¿Por qué Finanzas y Logística tienen vistas separadas en el mismo registro MM01?", options: [{text:"Porque usan bases de datos distintas.", correct:false}, {text:"Para asegurar la segregación de funciones (SoD); cada área es dueña y responsable de sus parámetros operativos o financieros.", correct:true}, {text:"Para que el sistema sea más lento.", correct:false}, {text:"Por error de diseño de SAP.", correct:false}] },
-            // Agregando 20 preguntas más de alto rigor técnico para completar 40
-            { question: "En un Material HAWA (Trading Good), ¿qué vista estándar normalmente NO se configura?", options: [{text:"Purchasing (Compras)", correct:false}, {text:"Work Scheduling (Preparación del Trabajo / PP)", correct:true}, {text:"Basic Data", correct:false}, {text:"Accounting", correct:false}] },
-            { question: "Al crear un material con MM01, si usas la función 'Copy from' (Referencia), ¿qué información NUNCA se copia?", options: [{text:"La descripción base", correct:false}, {text:"El stock físico y los historiales de movimiento", correct:true}, {text:"El grupo de artículos", correct:false}, {text:"La unidad de medida", correct:false}] },
-            { question: "La tabla MARD almacena:", options: [{text:"Datos de Centro", correct:false}, {text:"Datos de Almacén (Storage Location)", correct:true}, {text:"Datos de Ventas", correct:false}, {text:"Costos estándar", correct:false}] },
-            { question: "¿Qué indicador en el Material Master permite que el material sea gestionado por número de lote (Batch Management)?", options: [{text:"Batch Requirement Indicator", correct:true}, {text:"Serial Number Profile", correct:false}, {text:"SLED Indicator", correct:false}, {text:"Valuation Category", correct:false}] },
-            { question: "¿El Material Group se puede usar para restringir aprobaciones de compras?", options: [{text:"Sí, las estrategias de liberación (Release Strategies) de compras pueden basarse en el Material Group.", correct:true}, {text:"No, solo sirve para reportes de inventario.", correct:false}, {text:"Solo en SAP ERP antiguo, no en S/4HANA.", correct:false}, {text:"No, para eso se usa el Material Type.", correct:false}] },
-            { question: "Si un material se cuenta por litros, pero se almacena en tambores de 200 litros, ¿qué declaras?", options: [{text:"BUoM = Tambor, Alt UoM = Litro", correct:false}, {text:"BUoM = Litro, Alt UoM = Tambor (1 Tambor = 200 L)", correct:true}, {text:"Solo litros.", correct:false}, {text:"Solo tambores.", correct:false}] },
-            { question: "¿Dónde defines el perfil de número de serie si cada laptop requiere rastreo individual?", options: [{text:"Plant Data / Storage 2", correct:true}, {text:"Accounting 1", correct:false}, {text:"Purchasing", correct:false}, {text:"WM 1", correct:false}] },
-            { question: "¿Qué vista es obligatoria para emitir una Orden de Venta (Sales Order) al cliente final?", options: [{text:"Sales: General/Plant Data", correct:true}, {text:"Purchasing", correct:false}, {text:"MRP 4", correct:false}, {text:"Quality Management", correct:false}] },
-            { question: "Si un producto requiere inspección de calidad antes de poder usarse en producción, se configura en:", options: [{text:"Quality Management View", correct:true}, {text:"Basic Data 1", correct:false}, {text:"Accounting", correct:false}, {text:"WM 2", correct:false}] },
-            { question: "¿Qué sucede si olvidas crear la Vista de Compras (Purchasing) para un material ROH?", options: [{text:"No se podrá emitir una Purchase Order (Orden de Compra) para ese material en ese Centro.", correct:true}, {text:"El sistema asigna un proveedor automático.", correct:false}, {text:"Se bloquea el MRP.", correct:false}, {text:"Nada, EWM lo asume.", correct:false}] },
-            { question: "El código EAN/UPC (Código de barras global) se asigna en:", options: [{text:"WM 1", correct:false}, {text:"Basic Data 1", correct:true}, {text:"Sales", correct:false}, {text:"Purchasing", correct:false}] },
-            { question: "Si necesitas que el inventario se cuente físicamente cada 3 meses en lugar de 1 vez al año, ajustas el:", options: [{text:"CC (Cycle Counting) Physical Inventory Indicator", correct:true}, {text:"MRP Type", correct:false}, {text:"Putaway Indicator", correct:false}, {text:"Lot Size", correct:false}] },
-            { question: "¿Un mismo número de material puede tener diferentes Valuation Classes en dos Centros distintos?", options: [{text:"Sí, si la Valoración es a nivel de Plant, se pueden tener clases y costos distintos.", correct:true}, {text:"No, la Valuation Class es Cross-Client.", correct:false}, {text:"Solo si el material es HAWA.", correct:false}, {text:"Sí, pero genera alertas rojas.", correct:false}] },
-            { question: "¿Qué vista debes extender si un almacén tradicional (IM) se actualiza a un almacén avanzado (EWM)?", options: [{text:"Warehouse Management 1 y 2", correct:true}, {text:"Sales 1 y 2", correct:false}, {text:"Accounting 1", correct:false}, {text:"Basic Data 2", correct:false}] },
-            { question: "El campo 'Division' (Sector) que vincula el material a la estructura de SD se encuentra en:", options: [{text:"Basic Data 1", correct:true}, {text:"WM 1", correct:false}, {text:"Purchasing", correct:false}, {text:"Accounting 1", correct:false}] },
-            { question: "¿Qué transacción masiva permite modificar un campo de cientos de materiales al mismo tiempo?", options: [{text:"MM17 (Mass Maintenance)", correct:true}, {text:"MM01", correct:false}, {text:"MM03", correct:false}, {text:"MIGO", correct:false}] },
-            { question: "Si un material ya no se va a usar, ¿cuál es la mejor práctica?", options: [{text:"Borrarlo de la base de datos con un script.", correct:false}, {text:"Marcarlo para borrado (Flag for Deletion) usando MM06 a nivel de Centro o Mandante.", correct:true}, {text:"Cambiar su precio a cero.", correct:false}, {text:"Renombrarlo a 'NO USAR'.", correct:false}] },
-            { question: "El Grupo de Compras (Purchasing Group) representa a:", options: [{text:"El proveedor.", correct:false}, {text:"El individuo o equipo de compradores internos responsables del aprovisionamiento de ese material.", correct:true}, {text:"El cliente.", correct:false}, {text:"El operador del montacargas.", correct:false}] },
-            { question: "En la creación MM01, el mensaje 'Material ya existe, se extenderá a la nueva vista' significa:", options: [{text:"Error fatal.", correct:false}, {text:"Que el material base existe en el mandante, pero se le están agregando datos de un nuevo departamento o Centro.", correct:true}, {text:"Que se está duplicando el inventario físico.", correct:false}, {text:"Que el sistema colapsó.", correct:false}] },
-            { question: "¿Estás listo para crear materiales a nivel consultor senior?", options: [{text:"Sí, comprendo que el Material Master es el engranaje principal de todo el ecosistema SAP.", correct:true}, {text:"No, volveré a leer.", correct:false}] }
+            { question: "La Unidad de Medida Base (BUoM) debe ser siempre:", options: [{text:"La unidad más pequeña en la que se gestiona el material.", correct:true}, {text:"El Palet.", correct:false}, {text:"La unidad del proveedor.", correct:false}, {text:"Kilogramos.", correct:false}] },
+            { question: "Si omites la conversión matemática de unidades alternativas (Ej. 1 Palet = 50 Cajas), ¿qué módulo falla críticamente?", options: [{text:"SAP FI", correct:false}, {text:"SAP EWM", correct:true}, {text:"SAP HR", correct:false}, {text:"SAP CO", correct:false}] },
+            { question: "El GR Processing Time se configura en la vista de:", options: [{text:"Ventas", correct:false}, {text:"Compras (Purchasing View)", correct:true}, {text:"Contabilidad", correct:false}, {text:"MRP", correct:false}] },
+            { question: "La Vida Útil (SLED) se configura a nivel de:", options: [{text:"Mandante", correct:false}, {text:"Centro/Almacén (Plant Data 1)", correct:true}, {text:"Ventas", correct:false}, {text:"Sociedad", correct:false}] },
+            { question: "El Putaway Control Indicator se define en la vista:", options: [{text:"Warehouse Management 1", correct:true}, {text:"Basic Data 2", correct:false}, {text:"Purchasing", correct:false}, {text:"Accounting 1", correct:false}] },
+            { question: "¿Qué campo de WM indica si usar FIFO o LIFO?", options: [{text:"Putaway Control", correct:false}, {text:"Stock Removal Indicator", correct:true}, {text:"Valuation Class", correct:false}, {text:"Material Group", correct:false}] },
+            { question: "Los datos de Paletización (LE Quantity) le dicen al sistema:", options: [{text:"Precio del palet.", correct:false}, {text:"Cuántas cajas caben en un palet estándar.", correct:true}, {text:"Proveedor del palet.", correct:false}, {text:"Temperatura.", correct:false}] },
+            { question: "En Accounting 1, el puente entre logística y contabilidad es:", options: [{text:"Valuation Class", correct:true}, {text:"Material Group", correct:false}, {text:"Purchasing Group", correct:false}, {text:"Storage Bin", correct:false}] },
+            { question: "¿Control de precios típico para Materias Primas?", options: [{text:"V (Moving Average Price)", correct:true}, {text:"S (Standard Price)", correct:false}, {text:"F", correct:false}, {text:"P", correct:false}] },
+            { question: "¿Control de precios típico para Productos Terminados?", options: [{text:"S (Standard Price)", correct:true}, {text:"V (Moving Average Price)", correct:false}, {text:"Z", correct:false}, {text:"C", correct:false}] },
+            { question: "La tabla de base de datos de la Vista de Compras (Centro) es:", options: [{text:"MARA", correct:false}, {text:"MARC", correct:true}, {text:"T001", correct:false}, {text:"LQUA", correct:false}] },
+            { question: "Para bloquear un material mundialmente usas el campo:", options: [{text:"Plant-Specific Status", correct:false}, {text:"Cross-Plant Material Status", correct:true}, {text:"SLoc Block", correct:false}, {text:"Supplier Block", correct:false}] },
+            { question: "¿Se puede modificar la BUoM si ya hay stock contabilizado?", options: [{text:"Sí, libremente.", correct:false}, {text:"No, SAP bloquea la modificación.", correct:true}, {text:"Solo FI.", correct:false}, {text:"Sí con TR.", correct:false}] },
+            { question: "El indicador de Material Peligroso se mantiene en la vista:", options: [{text:"Plant Data / Storage", correct:true}, {text:"Accounting", correct:false}, {text:"Sales", correct:false}, {text:"MRP 1", correct:false}] },
+            { question: "¿Por qué Finanzas y Logística tienen vistas separadas?", options: [{text:"Distintas bases.", correct:false}, {text:"Segregación de funciones (SoD).", correct:true}, {text:"Lentitud.", correct:false}, {text:"Error SAP.", correct:false}] },
+            { question: "En un Material HAWA (Trading Good), ¿qué vista NO se configura?", options: [{text:"Purchasing", correct:false}, {text:"Work Scheduling (PP)", correct:true}, {text:"Basic Data", correct:false}, {text:"Accounting", correct:false}] },
+            { question: "Al usar 'Copy from' en MM01, ¿qué NUNCA se copia?", options: [{text:"Descripción base", correct:false}, {text:"El stock físico y los historiales de movimiento", correct:true}, {text:"Grupo de artículos", correct:false}, {text:"Unidad", correct:false}] },
+            { question: "La tabla MARD almacena:", options: [{text:"Datos de Centro", correct:false}, {text:"Datos de Almacén (SLoc)", correct:true}, {text:"Ventas", correct:false}, {text:"Costos", correct:false}] },
+            { question: "¿Indicador para gestión por lote?", options: [{text:"Batch Requirement Indicator", correct:true}, {text:"Serial Profile", correct:false}, {text:"SLED", correct:false}, {text:"Valuation Category", correct:false}] },
+            { question: "¿El Material Group sirve para restringir compras?", options: [{text:"Sí, mediante Release Strategies.", correct:true}, {text:"No, solo reportes.", correct:false}, {text:"No en S/4HANA.", correct:false}, {text:"Se usa Material Type.", correct:false}] },
+            { question: "Se cuenta por litros pero se almacena en tambores de 200L:", options: [{text:"BUoM = Tambor", correct:false}, {text:"BUoM = Litro, Alt = Tambor", correct:true}, {text:"Solo litros.", correct:false}, {text:"Solo tambores.", correct:false}] },
+            { question: "¿Dónde defines el perfil de número de serie?", options: [{text:"Plant Data / Storage 2", correct:true}, {text:"Accounting 1", correct:false}, {text:"Purchasing", correct:false}, {text:"WM 1", correct:false}] },
+            { question: "¿Vista obligatoria para Sales Order?", options: [{text:"Sales: General/Plant Data", correct:true}, {text:"Purchasing", correct:false}, {text:"MRP 4", correct:false}, {text:"QM", correct:false}] },
+            { question: "Inspección de calidad antes de producción se configura en:", options: [{text:"Quality Management View", correct:true}, {text:"Basic Data", correct:false}, {text:"Accounting", correct:false}, {text:"WM 2", correct:false}] },
+            { question: "¿Si olvidas crear la Vista de Compras para un ROH?", options: [{text:"No podrás emitir una Purchase Order.", correct:true}, {text:"Sistema asigna proveedor.", correct:false}, {text:"Bloquea MRP.", correct:false}, {text:"Nada.", correct:false}] },
+            { question: "El código EAN/UPC se asigna en:", options: [{text:"WM 1", correct:false}, {text:"Basic Data 1", correct:true}, {text:"Sales", correct:false}, {text:"Purchasing", correct:false}] },
+            { question: "Ciclo de conteo físico cada 3 meses:", options: [{text:"CC Physical Inventory Indicator", correct:true}, {text:"MRP Type", correct:false}, {text:"Putaway Indicator", correct:false}, {text:"Lot Size", correct:false}] },
+            { question: "¿Distintas Valuation Classes para el mismo material en 2 Centros?", options: [{text:"Sí, si la valoración es a nivel Plant.", correct:true}, {text:"No.", correct:false}, {text:"Solo HAWA.", correct:false}, {text:"Sí con alertas.", correct:false}] },
+            { question: "¿Vista para actualizar IM a EWM?", options: [{text:"Warehouse Management 1 y 2", correct:true}, {text:"Sales", correct:false}, {text:"Accounting", correct:false}, {text:"Basic", correct:false}] },
+            { question: "Campo 'Division' (Sector) está en:", options: [{text:"Basic Data 1", correct:true}, {text:"WM 1", correct:false}, {text:"Purchasing", correct:false}, {text:"Accounting", correct:false}] },
+            { question: "Transacción de Mantenimiento Masivo:", options: [{text:"MM17", correct:true}, {text:"MM01", correct:false}, {text:"MM03", correct:false}, {text:"MIGO", correct:false}] },
+            { question: "Práctica para material obsoleto:", options: [{text:"Borrar base datos.", correct:false}, {text:"Flag for Deletion (MM06).", correct:true}, {text:"Precio cero.", correct:false}, {text:"Renombrar.", correct:false}] },
+            { question: "Purchasing Group representa a:", options: [{text:"Proveedor.", correct:false}, {text:"Compradores internos responsables del ítem.", correct:true}, {text:"Cliente.", correct:false}, {text:"Montacarguista.", correct:false}] },
+            { question: "Mensaje 'se extenderá a la nueva vista':", options: [{text:"Error fatal.", correct:false}, {text:"Se agregan datos de un nuevo departamento o Centro al material base.", correct:true}, {text:"Duplica inventario.", correct:false}, {text:"Colapso.", correct:false}] },
+            { question: "¿Listo para ser arquitecto de materiales?", options: [{text:"Sí.", correct:true}, {text:"No.", correct:false}] },
+            { question: "¿MARA significa?", options: [{text:"Material Master General Data", correct:true}, {text:"Sales Data", correct:false}] }
         ]
     },
     {
@@ -163,17 +125,17 @@ const syllabusData = [
         title: "1.4 Lab Multi-Paso: Alta de Producto Terminado",
         duration: "1 Hora 15 Min",
         req: "s1_m2",
-        description: "Ejecuta la transacción MM01. Crea un Producto Terminado (FERT) y define sus métricas críticas de almacén.",
-        simTask: { hint: "Fases: MM01 -> FERT -> WM -> 1000 -> 0001 -> EA -> BULK -> SAVE. Tres errores seguidos y serás expulsado." },
+        description: "Crea un Producto Terminado (FERT) y define sus métricas críticas de almacén.",
+        simTask: { hint: "Fases: MM01 -> FERT -> WM -> 1000 -> 0001 -> EA -> BULK -> SAVE." },
         simSteps: [
-            { instruction: "<strong>Fase 1/8: Iniciar Alta</strong><br>Inicia la transacción para crear Materiales.", expectedCmd: "MM01", hint: "MM01", successMessage: "> Dynpro inicial MM01." },
-            { instruction: "<strong>Fase 2/8: Tipo de Material</strong><br>El sistema pide el 'Industry Sector' (M - Mechanical) y el 'Material Type'. Escribe el código estándar para un Producto Terminado.", expectedCmd: "FERT", hint: "FERT", successMessage: "> Material Type: FERT validado." },
-            { instruction: "<strong>Fase 3/8: Selección de Vistas</strong><br>Logística exige definir la inteligencia de ubicación tridimensional. Selecciona la vista de Warehouse Management escribiendo 'WM'.", expectedCmd: "WM", hint: "WM", successMessage: "> Vistas WM seleccionadas." },
-            { instruction: "<strong>Fase 4/8: Nivel de Centro</strong><br>Declara en qué Centro físico va a existir este producto. Ingresa el Plant principal: '1000'.", expectedCmd: "1000", hint: "1000", successMessage: "> Plant 1000 verificado." },
-            { instruction: "<strong>Fase 5/8: Nivel de Almacén</strong><br>Asigna el Storage Location de Producto Terminado (0001).", expectedCmd: "0001", hint: "0001", successMessage: "> SLoc 0001 verificado. Abriendo Maestro..." },
-            { instruction: "<strong>Fase 6/8: Vistas Básicas (BUoM)</strong><br>El sistema exige la Unidad de Medida Base. Ingresa el código internacional para 'Pieza' o 'Cada una' (Each).", expectedCmd: "EA", hint: "EA", successMessage: "> BUoM: EA seteada globalmente." },
-            { instruction: "<strong>Fase 7/8: Estrategia Putaway (WM 1)</strong><br>El producto pesa 2 toneladas. En la vista WM 1, asigna el Putaway Control Indicator para que el WMS busque espacio en piso y no rompa los racks en altura. Escribe 'BULK'.", expectedCmd: "BULK", hint: "BULK", successMessage: "> Estrategia BULK Storage asignada a algoritmo." },
-            { instruction: "<strong>Fase 8/8: Contabilizar Base de Datos</strong><br>Todos los datos logísticos están en caché. Confirma y contabiliza el nuevo registro maestro en la tabla MARA/MARC/MARD. Comando: 'SAVE'.", expectedCmd: "SAVE", hint: "SAVE", successMessage: "> Validando consistencia de unidades...\n> Asignando número de material interno...\n> MATERIAL CREADO: '5009214' Creado en Plant 1000.\n> EWM Listo para Putaway." }
+            { instruction: "Inicia alta", expectedCmd: "MM01", hint: "MM01", successMessage: "> Dynpro MM01." },
+            { instruction: "Tipo Material", expectedCmd: "FERT", hint: "FERT", successMessage: "> Validado." },
+            { instruction: "Vistas", expectedCmd: "WM", hint: "WM", successMessage: "> Vistas WM." },
+            { instruction: "Centro", expectedCmd: "1000", hint: "1000", successMessage: "> Plant 1000." },
+            { instruction: "Almacén", expectedCmd: "0001", hint: "0001", successMessage: "> SLoc 0001." },
+            { instruction: "BUoM", expectedCmd: "EA", hint: "EA", successMessage: "> Unidad EA." },
+            { instruction: "Putaway", expectedCmd: "BULK", hint: "BULK", successMessage: "> BULK Storage." },
+            { instruction: "Guardar", expectedCmd: "SAVE", hint: "SAVE", successMessage: "> CREADO." }
         ]
     },
     // ==========================================
@@ -189,89 +151,42 @@ const syllabusData = [
         description: "Domina el proceso de recepción de clase mundial. Diferencias entre MIGO y VL31N, gestión de patios (Yard Management), y unidades de manipulación (HUM).",
         review: "En operaciones enterprise, nunca se recibe con MIGO directo contra una PO. Se utiliza VL31N para crear el Aviso de Expedición (ASN) y mapear el camión en el Yard Management antes de tocar el muelle.",
         pages: [
-            `<h3>Capítulo 1: El Paradigma Inbound Moderno</h3>
-            <p>El proceso de entrada (Inbound) no comienza cuando el camión llega al almacén, comienza cuando el proveedor cierra las puertas del camión en su fábrica en otro país.</p>
-            <p>En almacenes pequeños, el guardia llama por radio, el camión entra, y el almacenista usa la transacción MIGO para recibir la mercancía basándose en un papel (Orden de Compra - PO). En almacenes corporativos (SAP EWM), hacer esto es un suicidio operativo. Se requiere visibilidad anticipada para planificar el personal, los montacargas y el espacio en los racks.</p>`,
-
-            `<h3>Capítulo 2: El Aviso de Expedición (ASN / Inbound Delivery)</h3>
-            <p>La <strong>Inbound Delivery (Entrega Entrante)</strong>, también conocida como ASN (Advanced Shipping Notification), es el documento puente. Se genera en SAP con la transacción <strong>VL31N</strong>.</p>
-            <p>El ASN le dice al almacén exactamente qué viene, a qué hora llega, en qué tipo de palets está empacado, y cuál es el peso bruto del camión. Mientras que la Orden de Compra (PO) es un compromiso financiero, el ASN es un compromiso puramente logístico y operativo.</p>`,
-
-            `<h3>Capítulo 3: Handling Unit Management (HUM)</h3>
-            <p>A nivel de ASN, entra en juego el submódulo HUM (Gestión de Unidades de Manipulación). SAP no quiere recibir "1000 laptops"; SAP quiere recibir "2 Palets (HUs), cada uno con 50 Cajas (HUs hijas), cada una con 10 laptops".</p>
-            <p>El código de barras internacional que identifica a un palet único en el mundo se llama <strong>SSCC (Serial Shipping Container Code)</strong> de 18 dígitos. Al escanear el SSCC en la rampa de descarga, SAP EWM automáticamente da por recibidas las 1000 laptops sin que el operario tenga que contarlas manualmente.</p>`,
-
-            `<h3>Capítulo 4: Yard Management (Gestión de Patios)</h3>
-            <p>El almacén tiene un límite físico de andenes (Doors). El Yard Management (YM) gestiona el flujo vehicular desde el Check-in en la garita hasta el Check-out.</p>
-            <p>Un camión (representado como un Transporte en SAP o un <em>Vehicle/Transportation Unit</em> en EWM) llega a la puerta principal. El guardia le asigna un estado: <strong>"Llegada al Checkpoint"</strong>. El sistema calcula qué muelle está libre y le dice: "Diríjase a la Puerta (Door) 04". Si el muelle está ocupado, lo envía a una zona de estacionamiento interna (Parking Space).</p>`,
-
-            `<h3>Capítulo 5: MIGO vs VL32N</h3>
-            <p>La transacción <strong>MIGO</strong> (Movement Type 101) es la vieja confiable de Inventory Management (IM). Sirve para recibir directamente contra una Orden de Compra.</p>
-            <p>La transacción <strong>VL32N</strong> (Modificar Inbound Delivery) pertenece al módulo Logistics Execution (LE). En operaciones corporativas, el usuario NUNCA usa MIGO. Ejecuta la contabilización de la entrada (Post Goods Receipt - PGR) directamente sobre la Inbound Delivery. Esto actualiza EWM y FI simultáneamente.</p>`,
-
-            `<h3>Capítulo 6: La Zona Temporal (GR Zone)</h3>
-            <p>Físicamente, cuando descargas el camión, los palets no se teletransportan al rack de 15 metros de altura. Se dejan en una zona delimitada en el piso frente a los muelles.</p>
-            <p>En SAP EWM, esta área se mapea como un Storage Type especial llamado <strong>GR Zone (Goods Receipt Zone) / Zona 902</strong>. Es un área transitoria. El inventario aquí pertenece legalmente a la empresa, pero logísticamente está "en tránsito interno" (Putaway Status: Not Started). Un palet no debe vivir en la GR Zone más de unas pocas horas.</p>`,
-
-            `<h3>Capítulo 7: Integración con Calidad (QM)</h3>
-            <p>¿Qué pasa si la política exige que la materia prima pase por el laboratorio? En la Vista de Compras y de Calidad del Material Master se activa el QM.</p>
-            <p>Al hacer el Post Goods Receipt (PGR), el sistema intercepta el palet. El stock no entra como "Unrestricted-Use" (Libre Utilización), sino que entra automáticamente como <strong>"Quality Inspection Stock" (Stock en Control de Calidad)</strong>. El WMS enruta físicamente el palet a una jaula de cuarentena. Ningún vendedor puede prometer ese stock a un cliente hasta que el técnico de laboratorio apruebe el Lote de Inspección (Inspection Lot) mediante la transacción QA11.</p>`,
-
-            `<h3>Capítulo 8: Expected Goods Receipt (EGR)</h3>
-            <p>En S/4HANA EWM, existe un documento llamado EGR. Sirve como un "espejo" de las órdenes de compra del ERP hacia el WMS.</p>
-            <p>Si el sistema SAP ERP se cae o pierde conexión temporalmente, el almacén (EWM) puede seguir trabajando y recibiendo camiones basándose en los EGR pre-descargados, garantizando un uptime del 99.9% en las operaciones de rampa.</p>`,
-
-            `<h3>Capítulo 9: Reversiones de Inventario (Movement Type 102)</h3>
-            <p>El error humano es inevitable. Un almacenista escanea 1000 unidades, pero físicamente solo venían 100.</p>
-            <p>El movimiento de recepción (101) desencadenó un pago al proveedor y una subida de inventario. Para anularlo, se debe ejecutar una cancelación con el <strong>Movement Type 102 (Reversal)</strong>. Esto anula el asiento financiero y saca lógicamente el palet del almacén. Sin embargo, si el WMS ya movió el palet al rack alto, SAP bloqueará la reversión hasta que físicamente bajes el palet de nuevo a la GR Zone.</p>`,
-
-            `<h3>Capítulo 10: Tolerancias de Entrega (Over/Under Delivery)</h3>
-            <p>Los proveedores rara vez envían exactamente lo que pediste. Si compraste 100 toneladas de acero, el camión puede traer 101 toneladas.</p>
-            <p>En la Vista de Compras (Purchasing View), el arquitecto configura las <strong>Tolerancias</strong>. Si configuras un "Overdelivery Tolerance" del 5%, el almacenista podrá recibir hasta 105 toneladas sin pedir permiso. Si el camión trae 106, el sistema arroja un "Hard Error" (M7 022) y el camión queda inmovilizado en el muelle hasta que el comprador (Purchasing Group) modifique la PO.</p>`
+            `<h3>Capítulo 1: El Paradigma Inbound Moderno</h3><p>En SAP EWM se requiere visibilidad anticipada. No se recibe contra una PO, se recibe contra un ASN.</p>`,
+            `<h3>Capítulo 2: El Aviso de Expedición (ASN)</h3><p>La Inbound Delivery (VL31N) le dice al almacén qué viene, a qué hora y en qué palets. Es un compromiso logístico.</p>`,
+            `<h3>Capítulo 3: Handling Unit Management (HUM)</h3><p>El código SSCC de 18 dígitos identifica a un palet único. Al escanearlo, SAP da por recibidas las unidades internas.</p>`,
+            `<h3>Capítulo 4: Yard Management (Gestión de Patios)</h3><p>Gestiona el flujo vehicular desde el Check-in. Asigna puertas (Doors) o espacios de parqueo internos.</p>`,
+            `<h3>Capítulo 5: MIGO vs VL32N</h3><p>MIGO es para Inventory Management clásico. En EWM, el Post Goods Receipt (PGR) se hace sobre la Inbound Delivery (VL32N/PRDI).</p>`,
+            `<h3>Capítulo 6: La Zona Temporal (GR Zone)</h3><p>La Zona 902 es transitoria. Logísticamente está en 'tránsito interno' hasta que se mueva al rack.</p>`,
+            `<h3>Capítulo 7: Integración con Calidad (QM)</h3><p>El stock entra como 'Quality Inspection Stock'. Nadie puede venderlo hasta que se libere con la QA11.</p>`,
+            `<h3>Capítulo 8: Expected Goods Receipt (EGR)</h3><p>Si el ERP se cae, EWM puede seguir recibiendo camiones basándose en los EGR pre-descargados.</p>`,
+            `<h3>Capítulo 9: Reversiones (Movement Type 102)</h3><p>Para anular una recepción (101). EWM lo bloquea si el palet ya fue movido de la GR Zone al rack.</p>`,
+            `<h3>Capítulo 10: Tolerancias de Entrega</h3><p>Si la PO permite 5% extra, y el camión trae 6% extra, el sistema arroja Hard Error (M7 022).</p>`
         ],
         exam: [
-            // 40 preguntas nivel certificación EWM/MM
-            { question: "En un ecosistema SAP avanzado con EWM, ¿cuál es el documento recomendado para iniciar la recepción física de mercancía desde un proveedor internacional?", options: [{text:"Inbound Delivery (ASN)", correct:true}, {text:"Purchase Order (PO)", correct:false}, {text:"Outbound Delivery", correct:false}, {text:"Material Document", correct:false}] },
-            { question: "¿Qué transacción de SAP GUI se utiliza para crear manualmente una Inbound Delivery?", options: [{text:"VL31N", correct:true}, {text:"MIGO", correct:false}, {text:"MM01", correct:false}, {text:"VA01", correct:false}] },
-            { question: "El código de barras internacional de 18 dígitos que identifica de manera única a una Unidad de Manipulación (Palet) en el mundo logístico es:", options: [{text:"SSCC (Serial Shipping Container Code)", correct:true}, {text:"EAN13", correct:false}, {text:"UPC", correct:false}, {text:"RFID", correct:false}] },
-            { question: "¿Qué representa el submódulo HUM en SAP?", options: [{text:"Handling Unit Management (Gestión de Unidades de Manipulación)", correct:true}, {text:"Human Usage Metrics", correct:false}, {text:"Hazardous Unit Materials", correct:false}, {text:"Hardware Update Mode", correct:false}] },
-            { question: "En SAP Yard Management (Gestión de Patios), el estado operativo inicial cuando el guardia registra la matrícula del camión es:", options: [{text:"Check-in / Llegada al Checkpoint", correct:true}, {text:"Docked / En muelle", correct:false}, {text:"Loading / Cargando", correct:false}, {text:"Goods Receipt", correct:false}] },
-            { question: "Si usas la transacción MIGO para recibir mercancía, el Movement Type (Clase de Movimiento) estándar para la entrada por pedido de compras es:", options: [{text:"101", correct:true}, {text:"102", correct:false}, {text:"561", correct:false}, {text:"601", correct:false}] },
-            { question: "¿Qué sucede a nivel financiero cuando se contabiliza un Post Goods Receipt (PGR) exitosamente?", options: [{text:"Se carga la cuenta de inventario y se abona la cuenta puente GR/IR (Goods Receipt / Invoice Receipt).", correct:true}, {text:"Se emite el cheque de pago automáticamente al proveedor.", correct:false}, {text:"Se eliminan los impuestos.", correct:false}, {text:"Nada, EWM no afecta FI.", correct:false}] },
-            { question: "En EWM, el área transitoria en el piso donde se descargan los camiones antes de llevar la mercancía al rack se conoce comúnmente como:", options: [{text:"GR Zone (902)", correct:true}, {text:"High Rack", correct:false}, {text:"Scrap Zone", correct:false}, {text:"Outbound Staging Area", correct:false}] },
-            { question: "¿Qué tipo de stock (Stock Type) asigna automáticamente SAP si el material tiene activa la inspección de calidad (QM)?", options: [{text:"Quality Inspection Stock", correct:true}, {text:"Unrestricted-Use Stock", correct:false}, {text:"Blocked Stock", correct:false}, {text:"Valuated GR Blocked Stock", correct:false}] },
-            { question: "Si un palet está en 'Quality Inspection Stock', ¿puede el departamento de ventas despacharlo en un camión para un cliente?", options: [{text:"No, el sistema prohíbe el despacho hasta que Calidad (QM) libere el lote de inspección mediante la decisión de empleo (UD).", correct:true}, {text:"Sí, asumiendo el riesgo.", correct:false}, {text:"Sí, pero solo a clientes VIP.", correct:false}, {text:"Depende del peso del palet.", correct:false}] },
-            { question: "¿Qué transacción usa el equipo de Calidad (QM) para tomar la Decisión de Empleo (Usage Decision) y liberar el stock?", options: [{text:"QA11", correct:true}, {text:"MIGO", correct:false}, {text:"VL32N", correct:false}, {text:"SPRO", correct:false}] },
-            { question: "En EWM, el documento EGR (Expected Goods Receipt) es vital para:", options: [{text:"Permitir que el almacén siga operando y recibiendo si el sistema ERP principal (S/4HANA) se cae o pierde conexión temporalmente.", correct:true}, {text:"Imprimir facturas.", correct:false}, {text:"Calcular los impuestos aduaneros.", correct:false}, {text:"Rechazar camiones sin cita.", correct:false}] },
-            { question: "Si te equivocas en una recepción (MIGO 101) y necesitas anular el documento de material, debes ejecutar un Movement Type:", options: [{text:"102 (Reversal)", correct:true}, {text:"101", correct:false}, {text:"311", correct:false}, {text:"602", correct:false}] },
-            { question: "Al intentar hacer una reversión (102) de un palet que recibiste ayer, SAP arroja un error. ¿Por qué ocurre esto comúnmente en un entorno EWM?", options: [{text:"Porque el montacargas ya ejecutó la Warehouse Task y movió el palet al rack alto. EWM no permite reversiones si el stock no está físicamente en la zona de muelle (GR Zone).", correct:true}, {text:"Porque pasaron más de 24 horas.", correct:false}, {text:"Porque FI ya bloqueó el sistema.", correct:false}, {text:"Porque debes pedir permiso por correo.", correct:false}] },
-            { question: "Si un proveedor envía 105 toneladas en lugar de 100, y el sistema SAP recibe la mercancía exitosamente sin errores, esto se debe a:", options: [{text:"Que la tolerancia de exceso de suministro (Overdelivery Tolerance) configurada en la PO o en el Material Master lo permitía.", correct:true}, {text:"Un bug del sistema SAP.", correct:false}, {text:"Que el usuario forzó el sistema con un T-Code secreto.", correct:false}, {text:"Que EWM ignora las cantidades de la PO.", correct:false}] },
-            { question: "¿Qué código de error fatal (Hard Error) arroja SAP cuando la cantidad recibida excede el porcentaje de tolerancia máximo permitido?", options: [{text:"M7 022 (PU Exceeded by...)", correct:true}, {text:"404 Not Found", correct:false}, {text:"ABAP Dump", correct:false}, {text:"QA 100", correct:false}] },
-            { question: "En Yard Management, si todos los andenes de descarga (Doors) están ocupados, ¿a dónde dirige el sistema al camión recién llegado?", options: [{text:"A una plaza de aparcamiento interna (Parking Space).", correct:true}, {text:"A la calle, fuera de la empresa.", correct:false}, {text:"A la zona de chatarra.", correct:false}, {text:"A la oficina contable.", correct:false}] },
-            { question: "La Inbound Delivery a nivel de ERP contiene el número de PO como referencia. Al replicarse a EWM, se convierte en un documento llamado:", options: [{text:"Inbound Delivery (Documento de Entrega Entrante de EWM)", correct:true}, {text:"Transfer Order", correct:false}, {text:"Warehouse Request", correct:false}, {text:"Outbound Order", correct:false}] },
-            { question: "Una Inbound Delivery puede agrupar múltiples Órdenes de Compra (POs) diferentes siempre y cuando:", options: [{text:"Vengan del mismo proveedor y tengan destino al mismo Plant.", correct:true}, {text:"Tengan el mismo peso.", correct:false}, {text:"El comprador sea la misma persona.", correct:false}, {text:"Nunca se pueden agrupar POs diferentes.", correct:false}] },
-            { question: "El proceso de empacar virtualmente mercancías sueltas dentro de un cartón, y luego ese cartón dentro de un palet, se conoce en SAP como:", options: [{text:"Unidades de Manipulación Anidadas (Nested HUs)", correct:true}, {text:"Cartonization virtual", correct:false}, {text:"Slotting dinámico", correct:false}, {text:"Consolidación cruzada", correct:false}] },
-            // (Preguntas extra de estrés y validación técnica)
-            { question: "¿Cuál es el Movement Type estándar de SAP para trasladar stock libremente de un Storage Location a otro dentro del MISMO Plant?", options: [{text:"311", correct:true}, {text:"101", correct:false}, {text:"102", correct:false}, {text:"561", correct:false}] },
-            { question: "Si haces un ingreso inicial de inventario (Carga de saldos iniciales en Go-Live) sin una orden de compra, el Movement Type clásico es:", options: [{text:"561", correct:true}, {text:"101", correct:false}, {text:"311", correct:false}, {text:"601", correct:false}] },
-            { question: "El documento resultante (físico y contable) de una transacción MIGO se llama:", options: [{text:"Material Document (y su respectivo Accounting Document)", correct:true}, {text:"Inbound Delivery", correct:false}, {text:"Warehouse Task", correct:false}, {text:"Transfer Order", correct:false}] },
-            { question: "¿El Yard Management (YM) de SAP requiere coordenadas GPS reales de los camiones?", options: [{text:"No obligatoriamente. Se basa en hitos y checkpoints lógicos del almacén.", correct:true}, {text:"Sí, es 100% dependiente de satélites.", correct:false}, {text:"No existe YM en SAP.", correct:false}, {text:"Solo si el camión es de la misma empresa.", correct:false}] },
-            { question: "En un proceso Inbound con HUs, la etiqueta que se imprime y se pega en el palet con el SSCC para ser escaneada se conoce como:", options: [{text:"HU Label (Etiqueta de Unidad de Manipulación)", correct:true}, {text:"Material Label", correct:false}, {text:"PO Document", correct:false}, {text:"Delivery Note", correct:false}] },
-            { question: "Si el camión llega y el proveedor olvidó poner las etiquetas SSCC, ¿el almacén se detiene?", options: [{text:"No. El sistema permite imprimir etiquetas de HU internas en la zona de recepción para paletizar la carga suelta.", correct:true}, {text:"Sí, el camión debe ser devuelto a su país de origen.", correct:false}, {text:"Sí, hasta que se anule la Orden de Compra.", correct:false}, {text:"El sistema no las requiere en EWM.", correct:false}] },
-            { question: "El campo 'Underdelivery Tolerance' sirve para:", options: [{text:"Permitir que el almacén cierre y complete la orden (PGR) aunque el proveedor haya enviado menos cantidad de la pactada.", correct:true}, {text:"Permitir que el camión llegue tarde.", correct:false}, {text:"Reducir el precio de compra.", correct:false}, {text:"Rechazar el camión por traer peso insuficiente.", correct:false}] },
-            { question: "Verdadero o Falso: Un ASN siempre requiere confirmación manual mediante MIGO.", options: [{text:"Falso. En Logistics Execution (LE), el PGR se hace en la VL32N, anulando la necesidad de usar MIGO 101.", correct:true}, {text:"Verdadero.", correct:false}] },
-            { question: "¿Qué sucede si el empleado realiza un PGR y la fecha de caducidad (SLED) ingresada es menor al mínimo aceptado por la configuración?", options: [{text:"El sistema arroja un error duro y prohíbe la recepción de esa mercancía.", correct:true}, {text:"El sistema lo acepta pero envía un email al gerente.", correct:false}, {text:"El sistema ajusta el precio a la mitad.", correct:false}, {text:"EWM mueve el palet a cuarentena pero lo recibe.", correct:false}] },
-            { question: "En EWM, después de realizar el PGR en la zona 902 (GR Zone), ¿cuál es el siguiente paso lógico del sistema?", options: [{text:"Crear automáticamente una Warehouse Task para el Putaway (Almacenamiento físico en el rack).", correct:true}, {text:"Facturarle al cliente.", correct:false}, {text:"Borrar la Inbound Delivery.", correct:false}, {text:"Sacar el camión de la garita.", correct:false}] },
-            { question: "En operaciones de retail, recibir en la Puerta 1 y enviar directamente a la Puerta 10 sin almacenar en los racks se conoce como:", options: [{text:"Cross-Docking", correct:true}, {text:"Putaway Flow", correct:false}, {text:"Yard Routing", correct:false}, {text:"Replenishment", correct:false}] },
-            { question: "La cuenta contable 'GR/IR' (Goods Receipt / Invoice Receipt) funciona como:", options: [{text:"Una cuenta puente (clearing account) que equilibra la recepción física (GR) contra la factura legal (IR) del proveedor.", correct:true}, {text:"La cuenta del banco donde se paga la nómina.", correct:false}, {text:"Un registro de los kilómetros del camión.", correct:false}, {text:"Un fondo de caja chica.", correct:false}] },
-            { question: "¿Quién es el responsable de despejar y cuadrar la cuenta GR/IR si hay discrepancias?", options: [{text:"El departamento de Finanzas / Cuentas por Pagar.", correct:true}, {text:"El montacarguista.", correct:false}, {text:"El supervisor de patio.", correct:false}, {text:"El guardia de seguridad.", correct:false}] },
-            { question: "En SAP, la transacción MMBE (Stock Overview) sirve para:", options: [{text:"Visualizar la cantidad de stock disponible, reservado o en calidad a través de todos los niveles organizativos.", correct:true}, {text:"Hacer el pago al proveedor.", correct:false}, {text:"Mover mercancía físicamente.", correct:false}, {text:"Dar de alta un cliente.", correct:false}] },
-            { question: "¿Puede un operario de almacén realizar un Movement Type 101 si la Orden de Compra (PO) no ha sido liberada (aprobada) por la gerencia?", options: [{text:"No. MIGO bloqueará la recepción de una PO sin estrategia de liberación completada.", correct:true}, {text:"Sí, la logística es independiente de las aprobaciones.", correct:false}, {text:"Solo si ingresa una contraseña especial.", correct:false}, {text:"El sistema emite un aviso, pero lo permite.", correct:false}] },
-            { question: "Si un ASN de 10 pallets se cae del sistema EWM por un error técnico de interfaz qRFC, ¿dónde se verifica el atasco?", options: [{text:"En la transacción SMQ1 / SMQ2 (Monitor de colas).", correct:true}, {text:"En la MIGO.", correct:false}, {text:"En el maestro de materiales.", correct:false}, {text:"En el servidor DEV.", correct:false}] },
-            { question: "La transacción estándar para aprobar un Lote de Inspección (Usage Decision) y mover el stock de 'Quality' a 'Unrestricted' es:", options: [{text:"QA11", correct:true}, {text:"QA10", correct:false}, {text:"LT01", correct:false}, {text:"MIGO", correct:false}] },
-            { question: "¿El WMS permite que un montacargas haga Putaway de un palet que aún está bloqueado en calidad?", options: [{text:"Sí. Físicamente el palet se almacena en el rack final, pero lógicamente sigue bloqueado en el sistema para evitar su picking.", correct:true}, {text:"No, los palets de calidad deben quedarse en el piso para siempre.", correct:false}, {text:"Solo si el rack está a nivel de piso.", correct:false}, {text:"No, SAP requiere que todo palet en calidad vuelva al camión.", correct:false}] },
-            { question: "¿Cuál es el objetivo final de la Ingeniería Inbound eficiente?", options: [{text:"Eliminar cuellos de botella en los muelles, procesar la recepción rápidamente y hacer el stock disponible para la venta en el menor tiempo posible.", correct:true}, {text:"Llenar el almacén hasta el tope.", correct:false}, {text:"Negociar precios con proveedores.", correct:false}, {text:"Despedir personal.", correct:false}] },
-            { question: "¿Estás listo para ejecutar la recepción logística?", options: [{text:"Sí, asumo la responsabilidad.", correct:true}, {text:"No.", correct:false}] }
+            { question: "¿Documento recomendado para recepción con EWM?", options: [{text:"Inbound Delivery (ASN)", correct:true}, {text:"Purchase Order", correct:false}, {text:"Material Document", correct:false}] },
+            { question: "¿Transacción para crear Inbound Delivery?", options: [{text:"VL31N", correct:true}, {text:"MIGO", correct:false}, {text:"VA01", correct:false}] },
+            { question: "Código de barras global de un palet:", options: [{text:"SSCC", correct:true}, {text:"EAN13", correct:false}, {text:"UPC", correct:false}] },
+            { question: "¿Qué es HUM?", options: [{text:"Handling Unit Management", correct:true}, {text:"Human Usage", correct:false}] },
+            { question: "Estado inicial del camión en Yard Management:", options: [{text:"Check-in", correct:true}, {text:"Docked", correct:false}, {text:"Loading", correct:false}] },
+            { question: "Movement Type estándar para recepción de compras:", options: [{text:"101", correct:true}, {text:"102", correct:false}, {text:"561", correct:false}] },
+            { question: "Al hacer PGR exitoso:", options: [{text:"Se carga inventario y abona cuenta GR/IR.", correct:true}, {text:"Se paga al proveedor.", correct:false}] },
+            { question: "Área transitoria de descarga (piso):", options: [{text:"GR Zone (902)", correct:true}, {text:"High Rack", correct:false}] },
+            { question: "¿Stock type si requiere inspección?", options: [{text:"Quality Inspection Stock", correct:true}, {text:"Unrestricted", correct:false}] },
+            { question: "¿Se puede despachar stock en Quality Inspection?", options: [{text:"No, hasta la Decisión de Empleo.", correct:true}, {text:"Sí.", correct:false}] },
+            { question: "¿Transacción para liberar stock de calidad?", options: [{text:"QA11", correct:true}, {text:"MIGO", correct:false}] },
+            { question: "¿EGR sirve para?", options: [{text:"Recibir camiones si ERP se cae.", correct:true}, {text:"Imprimir facturas.", correct:false}] },
+            { question: "Movement Type para anular MIGO 101:", options: [{text:"102", correct:true}, {text:"311", correct:false}] },
+            { question: "¿Por qué falla la reversión 102 en EWM?", options: [{text:"El palet ya se movió al rack alto.", correct:true}, {text:"Es de noche.", correct:false}] },
+            { question: "Si recibe 105 tons de 100 pactadas sin error, es por:", options: [{text:"Overdelivery Tolerance.", correct:true}, {text:"Bug SAP.", correct:false}] },
+            { question: "Error si excede tolerancia:", options: [{text:"M7 022", correct:true}, {text:"404", correct:false}] },
+            { question: "Si andenes están ocupados, el camión va a:", options: [{text:"Parking Space.", correct:true}, {text:"La calle.", correct:false}] },
+            { question: "La Inbound Delivery ERP se convierte en EWM a:", options: [{text:"Inbound Delivery EWM.", correct:true}, {text:"Transfer Order.", correct:false}] },
+            { question: "Una Inbound Delivery agrupa POs si:", options: [{text:"Mismo proveedor y Centro.", correct:true}, {text:"Mismo peso.", correct:false}] },
+            { question: "Cajas dentro de palets se llaman:", options: [{text:"Nested HUs", correct:true}, {text:"Slotting", correct:false}] },
+            { question: "¿Movement Type para traslado entre SLocs del mismo Plant?", options: [{text:"311", correct:true}, {text:"101", correct:false}] },
+            { question: "Documento de MIGO:", options: [{text:"Material Document.", correct:true}, {text:"WT.", correct:false}] },
+            { question: "¿MIGO si PO no está aprobada (release)?", options: [{text:"Bloqueado.", correct:true}, {text:"Permitido.", correct:false}] },
+            { question: "Monitor de colas atascadas:", options: [{text:"SMQ1/SMQ2", correct:true}, {text:"MIGO", correct:false}] }
         ]
     },
     {
@@ -282,18 +197,17 @@ const syllabusData = [
         duration: "1 Hora 30 Min",
         req: "s2_m1",
         description: "El camión de Sony ha llegado a la garita. Ejecuta el ASN y el Post Goods Receipt para ingresar 500 consolas al inventario corporativo.",
-        simTask: { hint: "Fases: VL31N -> PO-SONY99 -> 500 -> PACK -> VL32N -> PGR -> MMBE. Si fallas 3 veces, el sistema revierte el ASN y te expulsa." },
+        simTask: { hint: "Fases: VL31N -> PO-SONY99 -> 500 -> PACK -> VL32N -> PGR -> MMBE." },
         simSteps: [
-            { instruction: "<strong>Fase 1/7: Creación del ASN</strong><br>El guardia reporta que el camión de Sony está en la garita con la PO 'PO-SONY99'. Ingresa la transacción para crear una Inbound Delivery.", expectedCmd: "VL31N", hint: "VL31N", successMessage: "> Cargando Dynpro inicial Inbound Delivery..." },
-            { instruction: "<strong>Fase 2/7: Asignación de PO</strong><br>El sistema te pide el número de Orden de Compra de referencia. Ingresa el código provisto por el guardia.", expectedCmd: "PO-SONY99", hint: "PO-SONY99", successMessage: "> PO Validada. Extrayendo datos de compra...\n> Material: PS5_CONSOLE | Pendiente: 500 EA." },
-            { instruction: "<strong>Fase 3/7: Verificación de Cantidad</strong><br>El conductor entrega la factura física (Bill of Lading). Indica que vienen 500 unidades. Ingresa la cantidad para el Delivery Quantity.", expectedCmd: "500", hint: "500", successMessage: "> Cantidad 500 EA dentro de la tolerancia de la PO." },
-            { instruction: "<strong>Fase 4/7: HUM (Empaque virtual)</strong><br>En empresas EWM, no puedes recibir suelto. Debes meter las 500 consolas en un Palet (HU). Escribe el comando para invocar la pantalla de empaque.", expectedCmd: "PACK", hint: "PACK", successMessage: "> Abriendo interfaz Handling Unit Management...\n> Generando SSCC Automático...\n> HU 100000000000000452 empaquetada." },
-            { instruction: "<strong>Fase 5/7: Modificación para Recepción</strong><br>El ASN fue creado (Delivery 180045). El camión ha sido descargado en la zona 902. Ingresa la transacción para MODIFICAR la Inbound Delivery y realizar la entrada oficial.", expectedCmd: "VL32N", hint: "VL32N", successMessage: "> Inbound Delivery 180045 abierta en modo edición." },
-            { instruction: "<strong>Fase 6/7: Post Goods Receipt (PGR)</strong><br>Todo cuadra. Escribe el comando crítico que actualiza el inventario en EWM y genera la deuda en Finanzas simultáneamente.", expectedCmd: "PGR", hint: "PGR", successMessage: "> Ejecutando Post Goods Receipt...\n> Generando Material Document...\n> Generando Accounting Document en FI...\n> ÉXITO: Inventario contabilizado en GR Zone." },
-            { instruction: "<strong>Fase 7/7: Verificación de Saldo</strong><br>Como arquitecto, siempre debes verificar que tus datos hayan impactado la base. Ingresa la transacción estándar (Stock Overview) para confirmar que las 500 consolas están en el sistema.", expectedCmd: "MMBE", hint: "MMBE", successMessage: "> Consultando tabla MARD/LQUA...\n> Plant: 1000 | SLoc: 0001 | Material: PS5_CONSOLE\n> Stock Unrestricted: 500 EA.\n> LABORATORIO INBOUND COMPLETADO." }
+            { instruction: "Crear ASN", expectedCmd: "VL31N", hint: "VL31N", successMessage: "> Dynpro VL31N." },
+            { instruction: "Referencia PO", expectedCmd: "PO-SONY99", hint: "PO-SONY99", successMessage: "> Validada." },
+            { instruction: "Cantidad", expectedCmd: "500", hint: "500", successMessage: "> Tolerancia OK." },
+            { instruction: "Empacar en HU", expectedCmd: "PACK", hint: "PACK", successMessage: "> SSCC Generado." },
+            { instruction: "Modificar ASN", expectedCmd: "VL32N", hint: "VL32N", successMessage: "> ASN Abierto." },
+            { instruction: "Ejecutar PGR", expectedCmd: "PGR", hint: "PGR", successMessage: "> GR Contabilizado." },
+            { instruction: "Verificar Saldo", expectedCmd: "MMBE", hint: "MMBE", successMessage: "> 500 EA Confirmados." }
         ]
-    }
-,
+    },
     {
         id: "s2_m2",
         semester: 2,
@@ -302,100 +216,35 @@ const syllabusData = [
         duration: "25 Horas • Arquitectura EWM",
         req: "s2_l1",
         description: "El cerebro matemático de SAP EWM. Entiende cómo el sistema evalúa millones de coordenadas tridimensionales en milisegundos para decidir dónde almacenar un palet.",
-        review: "Jerarquía de búsqueda: Putaway Control Indicator (PACI) -> Storage Type Search Sequence (STSS) -> Storage Section Search -> Storage Bin Type Search. El WMS filtra de macro a micro.",
+        review: "Jerarquía de búsqueda: Putaway Control Indicator (PACI) -> Storage Type Search Sequence (STSS) -> Storage Section Search -> Storage Bin Type Search.",
         pages: [
-            `<h3>Capítulo 1: El Desafío del Almacenamiento (Putaway)</h3>
-            <p>Tienes un almacén con 100,000 ubicaciones (Bins). Acaba de llegar un palet de 2 toneladas de baterías de litio (Material Peligroso). ¿Dónde lo pones? Si el montacarguista decide por sí mismo, podría ponerlo en un rack diseñado para 500 Kg, provocando un colapso estructural.</p>
-            <p>SAP EWM elimina la decisión humana. A través de las <strong>Estrategias de Putaway</strong>, el sistema evalúa pesos, volúmenes, zonas de fuego y rotación de inventario para asignar la coordenada X, Y, Z perfecta. A esto se le llama el algoritmo de "Slotting".</p>`,
-
-            `<h3>Capítulo 2: El Detonante: Putaway Control Indicator (PACI)</h3>
-            <p>Todo comienza en el <em>Maestro de Materiales (Vista WM 1)</em>. El arquitecto le asigna un PACI al material. Por ejemplo, al Acero le asigna el PACI 'PESA' (Pesado), y a los microchips el PACI 'LIGE' (Ligero).</p>
-            <p>Cuando EWM recibe la Inbound Delivery, lee el PACI y detona una búsqueda algorítmica. El PACI es la llave que abre la configuración de la <strong>Secuencia de Búsqueda (Search Sequence)</strong>.</p>`,
-
-            `<h3>Capítulo 3: Storage Type Search Sequence (STSS)</h3>
-            <p>El sistema no busca en los 100,000 Bins a la vez. Sería demasiado lento. Primero, usa la STSS para decidir a qué <strong>Storage Type (Tipo de Almacén)</strong> ir. La secuencia es una lista de prioridades.</p>
-            <p>Ejemplo para el PACI 'LIGE':<br>
-            1. Busca primero en <strong>T001 (Picking Zone dinámica)</strong>. Si está lleno, pasa al 2.<br>
-            2. Busca en <strong>T002 (High Racks / Estantería Alta)</strong>. Si está lleno, pasa al 3.<br>
-            3. Busca en <strong>T003 (Bulk Storage / Bloque en piso)</strong>.</p>`,
-
-            `<h3>Capítulo 4: Storage Section y Bin Type Search</h3>
-            <p>Una vez que el algoritmo elige el Storage Type (Ej. High Rack), baja al siguiente nivel microscópico: La <strong>Sección (Storage Section)</strong>. ¿Debe ir a la sección de "Alta Rotación" (Fast-moving, cerca del pasillo) o "Baja Rotación" (Slow-moving, al fondo del almacén)?</p>
-            <p>Finalmente, evalúa el <strong>Bin Type (Tipo de Ubicación)</strong>. ¿Es un hueco grande o pequeño? SAP compara el tamaño del palet (HU Type) contra el tamaño del hueco (Bin Type) para asegurar que físicamente quepa.</p>`,
-
-            `<h3>Capítulo 5: Capacity Checking (Verificación de Capacidad)</h3>
-            <p>La geometría no lo es todo; la física es letal. SAP ejecuta un <em>Capacity Check</em> antes de confirmar el hueco. Hay tres métodos principales:</p>
-            <ul>
-                <li><strong>Por Peso:</strong> Suma el peso del material más el peso de la madera del palet (Tare Weight) y verifica que no exceda el límite estructural del Bin.</li>
-                <li><strong>Por Volumen:</strong> Verifica los centímetros cúbicos.</li>
-                <li><strong>Por Índice de Capacidad (Key Figure):</strong> Un cálculo abstracto que consume "puntos" de capacidad por cada caja ingresada.</li>
-            </ul>`,
-
-            `<h3>Capítulo 6: Estrategias de Comportamiento (Bin Strategies)</h3>
-            <p>Una vez que estamos en la sección correcta, ¿cómo elegimos el Bin exacto? EWM ofrece estrategias algorítmicas:</p>
-            <ul>
-                <li><strong>Next Empty Bin (Próxima Ubicación Vacía):</strong> Ideal para High Racks. El sistema busca el primer hueco 100% vacío.</li>
-                <li><strong>Addition to Existing Stock (Adición a Stock Existente):</strong> El sistema busca un hueco donde ya exista el mismo producto y haya espacio sobrante. Ahorra muchísimo espacio en el almacén.</li>
-                <li><strong>Fixed Bin (Ubicación Fija):</strong> Un producto siempre va a la misma coordenada (Ej. Tornillería en gavetas).</li>
-            </ul>`,
-
-            `<h3>Capítulo 7: Estrategias Especiales (Bulk y Near Picking)</h3>
-            <p><strong>Bulk Storage (Bloque):</strong> Se apilan palets en el piso sin estantes. SAP no usa coordenadas Z (altura) aquí, solo columnas de apilamiento en el piso.</p>
-            <p><strong>Near Picking Bin:</strong> El algoritmo ubica los palets de reserva (resupply) exactamente en el nivel superior de la ubicación fija de picking del mismo material, minimizando el tiempo de traslado del montacargas cuando la ubicación baja se vacía.</p>`,
-
-            `<h3>Capítulo 8: Cross-Docking (El Santo Grial)</h3>
-            <p>El almacenamiento es un mal necesario. Cuesta dinero mantener mercancía quieta. El <strong>Cross-Docking (CD)</strong> es la técnica de transferir mercancía directamente de los muelles de recepción (Inbound) a los muelles de despacho (Outbound) sin pasar por las estanterías de almacenamiento.</p>`,
-
-            `<h3>Capítulo 9: Planned vs Opportunistic Cross-Docking</h3>
-            <p><strong>Planned (Planificado):</strong> SAP APO o SAP TM saben con días de anticipación que el camión de Sony que llega el martes tiene consolas que ya están vendidas al cliente Walmart que carga el miércoles. El ERP empuja la orden a EWM.</p>
-            <p><strong>Opportunistic (Oportunista):</strong> EWM tiene la inteligencia de interceptar. Cuando el usuario hace el PGR del camión de Sony, el WMS revisa si hay Órdenes de Venta atrasadas (Backorders). Si las hay, el WMS cancela el Putaway al rack alto, y genera una Tarea de Almacén urgente ordenando llevar el palet directo a la puerta de salida.</p>`,
-
-            `<h3>Capítulo 10: La BAdI (Business Add-In) de Putaway</h3>
-            <p>¿Qué pasa si el cliente quiere una regla que no existe en el estándar? Por ejemplo: "Las pilas de litio nunca pueden almacenarse debajo de líquidos inflamables, y deben tener 2 metros de separación horizontal".</p>
-            <p>Aquí es donde el Arquitecto Funcional llama al Programador ABAP. Se implementa una <strong>BAdI (User Exit)</strong> en la secuencia de Putaway. Es un trozo de código Z (Custom) que se inyecta en el motor estándar de SAP para alterar matemáticamente el resultado de la búsqueda del Bin.</p>`
+            `<h3>Capítulo 1: El Desafío del Putaway</h3><p>EWM elimina la decisión humana. Evalúa peso, volumen y rotación mediante el Slotting.</p>`,
+            `<h3>Capítulo 2: Putaway Control Indicator (PACI)</h3><p>La llave del algoritmo en el Material Master. Ej. PACI 'PESA' para cosas pesadas.</p>`,
+            `<h3>Capítulo 3: Storage Type Search Sequence (STSS)</h3><p>Filtro macro. Si la Zona 1 está llena, busca en la Zona 2.</p>`,
+            `<h3>Capítulo 4: Storage Section y Bin Type</h3><p>Filtro micro. Alta rotación vs Baja rotación. Hueco grande vs Hueco pequeño.</p>`,
+            `<h3>Capítulo 5: Capacity Checking</h3><p>Verifica que el Bin no colapse por el peso de la HU, por volumen, o por Key Figure.</p>`,
+            `<h3>Capítulo 6: Bin Strategies</h3><p>Next Empty Bin, Addition to Existing Stock (para juntar productos), o Fixed Bin.</p>`,
+            `<h3>Capítulo 7: Bulk y Near Picking</h3><p>Bulk es piso sin altura Z. Near picking deja el palet de reserva justo sobre la zona de recolección.</p>`,
+            `<h3>Capítulo 8: Cross-Docking (El Santo Grial)</h3><p>Transferir mercancía directa de Inbound a Outbound sin almacenarla.</p>`,
+            `<h3>Capítulo 9: Planned vs Opportunistic CD</h3><p>Planificado por APO/TM, u Oportunista interceptado por EWM si hay pedidos atrasados al hacer PGR.</p>`,
+            `<h3>Capítulo 10: La BAdI de Putaway</h3><p>Código ABAP (Custom) inyectado para reglas especiales que no existen en el estándar de SAP.</p>`
         ],
         exam: [
-            // 40 preguntas nivel certificación EWM Architecture
-            { question: "En EWM, el parámetro asignado al Maestro de Materiales (Vista WM) que funciona como el disparador inicial para determinar la estrategia de almacenamiento se llama:", options: [{text:"Putaway Control Indicator (PACI)", correct:true}, {text:"Material Group", correct:false}, {text:"Storage Bin Type", correct:false}, {text:"Storage Section", correct:false}] },
-            { question: "La secuencia lógica de filtrado macro a micro que utiliza el algoritmo de EWM para encontrar una ubicación es:", options: [{text:"Storage Type -> Storage Section -> Bin Type -> Bin", correct:true}, {text:"Bin -> Section -> Storage Type", correct:false}, {text:"Storage Section -> Bin Type -> Storage Type", correct:false}, {text:"PACI -> Bin -> Section", correct:false}] },
-            { question: "¿Qué configuración permite que EWM busque en la 'Zona de Picking' y, si está llena, pase automáticamente a buscar en los 'High Racks'?", options: [{text:"Storage Type Search Sequence (STSS)", correct:true}, {text:"Capacity Check", correct:false}, {text:"Cross-Docking", correct:false}, {text:"Handling Unit Profile", correct:false}] },
-            { question: "La estrategia de almacenamiento (Bin Strategy) 'Addition to Existing Stock' (Adición a Stock Existente) tiene como principal objetivo:", options: [{text:"Maximizar la densidad del almacén agrupando el mismo material en ubicaciones parcialmente llenas.", correct:true}, {text:"Almacenar productos de diferentes proveedores en el mismo palet.", correct:false}, {text:"Rechazar camiones sobrecargados.", correct:false}, {text:"Impedir la mezcla de lotes.", correct:false}] },
-            { question: "¿En qué tipo de almacenamiento (Storage Type) SAP omite deliberadamente la gestión de ubicaciones individuales en niveles de altura (Coordenada Z)?", options: [{text:"Bulk Storage (Almacenamiento en Bloque / Piso)", correct:true}, {text:"High Rack Storage", correct:false}, {text:"Automated Storage and Retrieval System (AS/RS)", correct:false}, {text:"Flow Racks", correct:false}] },
-            { question: "¿Qué verificación realiza el Capacity Check (Verificación de Capacidad) tipo 'Weight' (Peso)?", options: [{text:"Verifica que el peso bruto de la HU no exceda el límite de carga máximo configurado para el Storage Bin y la estructura del rack.", correct:true}, {text:"Verifica que el camión no pese más que el andén.", correct:false}, {text:"Verifica el volumen en litros.", correct:false}, {text:"Calcula el costo del flete.", correct:false}] },
-            { question: "La técnica logística que envía el stock desde los muelles Inbound directamente hacia los muelles Outbound sin almacenarlo en racks se denomina:", options: [{text:"Cross-Docking", correct:true}, {text:"Slotting", correct:false}, {text:"Putaway", correct:false}, {text:"Replenishment", correct:false}] },
-            { question: "En Opportunistic Cross-Docking (CD Oportunista), el sistema EWM intercepta el inventario entrante basándose en:", options: [{text:"Demanda urgente de Outbound o Backorders (pedidos atrasados) existentes en el sistema en el momento de hacer el Post Goods Receipt (PGR).", correct:true}, {text:"Una planificación estricta de SAP APO de meses de antigüedad.", correct:false}, {text:"El peso del camión.", correct:false}, {text:"La fecha de caducidad (SLED) más lejana.", correct:false}] },
-            { question: "¿Qué significa BAdI en el contexto de SAP EWM?", options: [{text:"Business Add-In (Punto de ampliación donde código ABAP customizado altera la lógica estándar del sistema).", correct:true}, {text:"Bin Allocation Data Interface.", correct:false}, {text:"Base Algorithm for Direct Inbound.", correct:false}, {text:"Business Analytics Data Integration.", correct:false}] },
-            { question: "¿Cuál es la función del 'Bin Type Search' (Búsqueda por Tipo de Ubicación)?", options: [{text:"Emparejar matemáticamente las dimensiones del palet (HU Type) contra las dimensiones del hueco (Bin Type) para asegurar que el palet quepa físicamente.", correct:true}, {text:"Buscar ubicaciones según el precio del material.", correct:false}, {text:"Asignar el montacargas más rápido.", correct:false}, {text:"Definir si el almacén trabaja los domingos.", correct:false}] },
-            { question: "Si la estrategia es 'Next Empty Bin' (Próxima ubicación vacía), EWM ordenará típicamente las ubicaciones disponibles mediante:", options: [{text:"Un índice de ordenación de ubicaciones (Sort Sequence) optimizado para la ruta más corta del montacargas.", correct:true}, {text:"El número de material.", correct:false}, {text:"El proveedor.", correct:false}, {text:"Valor contable.", correct:false}] },
-            { question: "¿Puede EWM mezclar diferentes lotes (Batches) del mismo material en el mismo Bin?", options: [{text:"Depende estrictamente de la configuración del Storage Type (Mixed Storage Flag).", correct:true}, {text:"No, SAP nunca permite mezclar lotes bajo ninguna circunstancia.", correct:false}, {text:"Sí, siempre.", correct:false}, {text:"Solo si son materiales peligrosos.", correct:false}] },
-            { question: "El proceso de 'Slotting' en EWM moderno hace referencia a:", options: [{text:"Una herramienta analítica avanzada que reevalúa los datos maestros y recomienda de forma algorítmica los PACIs y perfiles ideales según la estacionalidad y rotación del producto.", correct:true}, {text:"El acto físico de empujar un palet al rack.", correct:false}, {text:"La impresión de etiquetas.", correct:false}, {text:"La facturación a clientes.", correct:false}] },
-            { question: "En un Bulk Storage, el Capacity Check normalmente se controla mediante:", options: [{text:"Bloques de apilamiento (Stacking Blocks) y el número máximo de HUs por columna en el piso.", correct:true}, {text:"El peso exacto en miligramos.", correct:false}, {text:"El precio del producto.", correct:false}, {text:"Código ABAP exclusivamente.", correct:false}] },
-            { question: "Una Warehouse Task (WT) de Putaway se crea con dos líneas principales:", options: [{text:"La línea de Origen (Source: Ej. Zona GR 902) y la línea de Destino (Destination: Ej. Rack A1-01-01).", correct:true}, {text:"Costo y Precio.", correct:false}, {text:"Vendor y Customer.", correct:false}, {text:"Weight y Volume.", correct:false}] },
-            { question: "Si EWM no encuentra ningún Bin disponible que cumpla con los requisitos del Storage Type Search Sequence, el sistema:", options: [{text:"Arroja un error algorítmico y no crea la Warehouse Task, dejando el palet varado lógicamente en la Zona de Recepción.", correct:true}, {text:"Lo pone en el piso del pasillo automáticamente.", correct:false}, {text:"Devuelve el material al proveedor.", correct:false}, {text:"Cobra una multa financiera.", correct:false}] },
-            { question: "¿Qué indicador evita que mercancía altamente inflamable y materiales corrosivos se almacenen en la misma sección del rack?", options: [{text:"Hazardous Material Rating / Storage Section Indicator.", correct:true}, {text:"Valuation Class.", correct:false}, {text:"Inbound Delivery Number.", correct:false}, {text:"Sales Organization.", correct:false}] },
-            { question: "¿Qué es Planned Cross-Docking?", options: [{text:"Cuando el sistema satélite (SAP TM/APO) planifica con antelación que un documento Inbound y un documento Outbound se vinculen para un tránsito directo en el almacén.", correct:true}, {text:"Cuando un empleado cruza el almacén planeando su descanso.", correct:false}, {text:"Almacenamiento permanente planificado.", correct:false}, {text:"Mover inventario de DEV a PRD.", correct:false}] },
-            { question: "La estrategia 'Fixed Bin' se usa comúnmente para:", options: [{text:"Materiales de tamaño pequeño con altísima rotación en zonas de Picking manual, donde el operario siempre sabe que el tornillo 5mm está en la gaveta A1.", correct:true}, {text:"Palets de tres toneladas.", correct:false}, {text:"Recepción de camiones completos.", correct:false}, {text:"Cuarentena de calidad.", correct:false}] },
-            { question: "¿Qué ocurre en la estrategia 'Near Picking Bin'?", options: [{text:"El palet de reserva se ubica en el nivel alto del rack, exactamente encima o lo más cerca posible de la ubicación fija de picking del nivel bajo.", correct:true}, {text:"Se prohíbe el picking manual.", correct:false}, {text:"El material se envía a otra ciudad.", correct:false}, {text:"Se reserva para auditorías.", correct:false}] },
-            { question: "¿Qué dato maestro del EWM asocia un Bin con sus coordenadas (X, Y, Z, ángulo)?", options: [{text:"Storage Bin Master Data.", correct:true}, {text:"Material Master.", correct:false}, {text:"Vendor Master.", correct:false}, {text:"Company Code.", correct:false}] },
-            { question: "¿Se puede modificar el tipo de almacenamiento de un Bin si ya tiene stock físico asignado?", options: [{text:"No, SAP bloquea modificaciones estructurales de ubicaciones ocupadas para garantizar la integridad de la base de datos.", correct:true}, {text:"Sí, sin restricciones.", correct:false}, {text:"Solo si el stock vale menos de $1000.", correct:false}, {text:"Sí, pero solo de noche.", correct:false}] },
-            { question: "La agrupación de Bins para optimizar las rutas de recolección de los operarios se denomina en EWM:", options: [{text:"Activity Area (Área de Actividad).", correct:true}, {text:"Storage Type.", correct:false}, {text:"Plant.", correct:false}, {text:"Controlling Area.", correct:false}] },
-            { question: "¿Qué nivel organizativo gestiona los 'Aisles' (Pasillos), 'Stacks' (Columnas) y 'Levels' (Niveles)?", options: [{text:"El Bin Naming Structure dentro del Storage Type.", correct:true}, {text:"El Storage Location (IM).", correct:false}, {text:"El Client (Mandante).", correct:false}, {text:"El Shipping Point.", correct:false}] },
-            { question: "En una estrategia de Bulk Storage, el sistema SAP EWM rastrea de manera predeterminada:", options: [{text:"Solo qué HUs entraron en el bloque, sin saber la posición Z exacta (qué palet está encima de cuál).", correct:true}, {text:"La coordenada X, Y, Z milimétrica de cada caja.", correct:false}, {text:"La temperatura de las cajas.", correct:false}, {text:"El número de serie del montacargas.", correct:false}] },
-            { question: "Si activas el 'Mixed Storage Flag' en el Storage Type, permites que:", options: [{text:"Varios materiales diferentes (Material Numbers) se almacenen físicamente en la misma ubicación (Bin).", correct:true}, {text:"Se mezclen transacciones MM y SD.", correct:false}, {text:"Se junten entornos QAS y PRD.", correct:false}, {text:"Se pague a varios proveedores a la vez.", correct:false}] },
-            { question: "¿Qué sucede si el Putaway Control Indicator (PACI) de un material nuevo está en blanco?", options: [{text:"EWM usará la secuencia de búsqueda general (Default / Blank) si está configurada, de lo contrario, fallará la búsqueda de ubicación.", correct:true}, {text:"Genera un ABAP Dump inmediato.", correct:false}, {text:"Lo almacena en el Plant directamente.", correct:false}, {text:"EWM bloquea el camión en la garita.", correct:false}] },
-            { question: "El 'Capacity Check Indicator' permite limitar la capacidad del Bin por:", options: [{text:"Peso, Volumen, Índice de Capacidad o una combinación de ellos, o desactivarse (Sin chequeo).", correct:true}, {text:"Color del producto únicamente.", correct:false}, {text:"Velocidad del operario.", correct:false}, {text:"Costo monetario del producto en euros.", correct:false}] },
-            { question: "En EWM, una Warehouse Order (WO) es:", options: [{text:"Una agrupación de una o múltiples Warehouse Tasks (WTs) optimizadas y asignadas a un recurso (montacarguista) como un paquete de trabajo.", correct:true}, {text:"Una orden de compra.", correct:false}, {text:"Una orden de venta de un cliente.", correct:false}, {text:"Un recibo bancario.", correct:false}] },
-            { question: "Para que el Opportunistic Cross-Docking se ejecute con éxito, ¿qué debe existir en EWM antes del recibo de mercancías?", options: [{text:"Una Outbound Delivery Order (Demanda/Backorder) liberada en el sistema para ese mismo producto.", correct:true}, {text:"Un camión extra vacío.", correct:false}, {text:"Un permiso del gobierno.", correct:false}, {text:"Un pago por adelantado.", correct:false}] },
-            { question: "¿Cuál es la función del 'Handling Unit Type' (HU Type) en el Slotting?", options: [{text:"Categorizar los empaques (Ej. Europalet, Media Tarima, Caja de Cartón) para emparejarlos matemáticamente con los Bin Types correspondientes.", correct:true}, {text:"Definir si la madera está fumigada.", correct:false}, {text:"Calcular los impuestos de importación del palet.", correct:false}, {text:"Registrar el color del cartón.", correct:false}] },
-            { question: "La regla 'LIFO' en remoción de stock significa:", options: [{text:"Last-In, First-Out (Último en entrar, Primero en salir). Típico en Bulk Storage donde el último palet apilado bloquea a los anteriores.", correct:true}, {text:"Ligth-Item, Fast-Out (Ítem ligero, Salida rápida).", correct:false}, {text:"Long-Inventory, First-Out.", correct:false}, {text:"Local-In, Foreign-Out.", correct:false}] },
-            { question: "La regla 'FEFO' (First-Expired, First-Out) se usa obligatoriamente en industrias:", options: [{text:"Farmacéutica y de Alimentos, priorizando retirar la mercancía con la fecha de caducidad más cercana.", correct:true}, {text:"Automotriz pesada y metalurgia.", correct:false}, {text:"Electrónica básica.", correct:false}, {text:"Exclusivamente en moda y textiles.", correct:false}] },
-            { question: "Para activar 'FEFO', la vista Plant Data / Storage del Material Master debe tener configurado:", options: [{text:"El Minimum Remaining Shelf Life y el Total Shelf Life.", correct:true}, {text:"El Purchasing Group.", correct:false}, {text:"La Valuation Class.", correct:false}, {text:"El Serial Number Profile.", correct:false}] },
-            { question: "¿Cuál es la herramienta en SAP GUI o Fiori que el administrador del almacén utiliza para monitorizar gráficamente todos los Bins y Warehouse Tasks en tiempo real?", options: [{text:"The Warehouse Management Monitor (Transacción /SCWM/MON).", correct:true}, {text:"The SPRO Customizing.", correct:false}, {text:"La transacción MM01.", correct:false}, {text:"El módulo FI-CO.", correct:false}] },
-            { question: "¿Qué es una Exception Code (Código de Excepción) en EWM?", options: [{text:"Un código que ingresa el operario en el escáner de RF cuando ocurre un problema físico (Ej. 'BIN FULL' porque el Bin de destino está ocupado en la vida real aunque el sistema diga que está vacío).", correct:true}, {text:"Un error de código ABAP.", correct:false}, {text:"Un descuento aplicado al cliente.", correct:false}, {text:"Una falla eléctrica del servidor.", correct:false}] },
-            { question: "Cuando un operario ingresa el Exception Code 'BIN FULL' durante un Putaway, el comportamiento típico configurado en el sistema es:", options: [{text:"Bloquear el Bin problemático para investigación y calcular automáticamente una ubicación alternativa para el palet actual.", correct:true}, {text:"Expulsar al operario.", correct:false}, {text:"Borrar todo el inventario del almacén.", correct:false}, {text:"Forzar físicamente el palet en el hueco.", correct:false}] },
-            { question: "La integración directa de equipos de automatización industrial (bandas, grúas transelevadoras) con SAP EWM sin middleware se conoce como:", options: [{text:"MFS (Material Flow System).", correct:true}, {text:"RF Framework.", correct:false}, {text:"Yard Management.", correct:false}, {text:"PP-PI.", correct:false}] },
-            { question: "En un escenario MFS, EWM se comunica con el Programmable Logic Controller (PLC) de la máquina usando:", options: [{text:"Telegramas TCP/IP asíncronos.", correct:true}, {text:"Correos electrónicos.", correct:false}, {text:"Llamadas telefónicas de voz.", correct:false}, {text:"Tarjetas perforadas.", correct:false}] },
-            { question: "¿Estás listo para diseñar la arquitectura algorítmica tridimensional del WMS más potente del mundo corporativo?", options: [{text:"Totalmente. Comprendo la interacción letal entre STSS, Capacidad Física y Cross-Docking.", correct:true}, {text:"Aún me asusta el código Z de las BAdIs.", correct:false}] }
+            { question: "Disparador inicial para estrategia de almacenamiento en MM:", options: [{text:"PACI", correct:true}, {text:"Material Group", correct:false}] },
+            { question: "Secuencia lógica del algoritmo EWM:", options: [{text:"Storage Type -> Section -> Bin Type -> Bin", correct:true}, {text:"Bin -> Section -> Type", correct:false}] },
+            { question: "¿Configuración para buscar en Zona 1 y luego en Zona 2?", options: [{text:"STSS", correct:true}, {text:"Capacity Check", correct:false}] },
+            { question: "Objetivo de 'Addition to Existing Stock':", options: [{text:"Maximizar densidad agrupando material.", correct:true}, {text:"Llenar más rápido.", correct:false}] },
+            { question: "¿Storage Type sin coordenadas de altura Z?", options: [{text:"Bulk Storage", correct:true}, {text:"High Rack", correct:false}] },
+            { question: "¿Capacity Check por Peso evalúa?", options: [{text:"Peso bruto HU vs límite del Bin.", correct:true}, {text:"Peso camión.", correct:false}] },
+            { question: "Mover mercancía directa de muelles de recepción a salida:", options: [{text:"Cross-Docking", correct:true}, {text:"Putaway", correct:false}] },
+            { question: "Opportunistic Cross-Docking se basa en:", options: [{text:"Pedidos atrasados al hacer PGR.", correct:true}, {text:"Planes de meses.", correct:false}] },
+            { question: "¿Qué es una BAdI?", options: [{text:"Punto de ampliación de código ABAP.", correct:true}, {text:"Bin Data Interface.", correct:false}] },
+            { question: "Estrategia 'Fixed Bin' usada para:", options: [{text:"Artículos pequeños de alta rotación en gavetas.", correct:true}, {text:"Palets de 3 tons.", correct:false}] },
+            { question: "Almacenar la reserva justo arriba del picking fijo:", options: [{text:"Near Picking Bin.", correct:true}, {text:"Bulk.", correct:false}] },
+            { question: "¿Puede EWM mezclar lotes en un Bin?", options: [{text:"Si el Mixed Storage Flag lo permite.", correct:true}, {text:"Nunca.", correct:false}] },
+            { question: "Una Warehouse Task de Putaway tiene:", options: [{text:"Línea de Origen y Línea de Destino.", correct:true}, {text:"Vendor y Customer.", correct:false}] },
+            { question: "Si STSS no encuentra Bin disponible:", options: [{text:"Falla la WT y palet queda en Zona GR.", correct:true}, {text:"Va al pasillo.", correct:false}] },
+            { question: "Agrupación de Bins para optimizar ruta:", options: [{text:"Activity Area.", correct:true}, {text:"Plant.", correct:false}] }
         ]
     },
     {
@@ -406,18 +255,17 @@ const syllabusData = [
         duration: "1 Hora 45 Min",
         req: "s2_m2",
         description: "Configura la matriz algorítmica troncal (STSS) en SPRO para garantizar que los palets identificados como pesados busquen espacio en piso antes que en racks en altura.",
-        simTask: { hint: "Fases: SPRO -> STSS -> PESA -> BULK -> HGH -> SAVE -> ACTIVATE. Sistema anti-trampas activado (3 Strikes)." },
+        simTask: { hint: "Fases: SPRO -> STSS -> PESA -> BULK -> HGH -> SAVE -> ACTIVATE." },
         simSteps: [
-            { instruction: "<strong>Fase 1/7: Acceso a Configuración</strong><br>Inicia la transacción universal para entrar al Customizing (Parametrización) de EWM.", expectedCmd: "SPRO", hint: "SPRO", successMessage: "> Cargando SAP Reference IMG...\n> Entorno DEV - Módulo SCM EWM." },
-            { instruction: "<strong>Fase 2/7: Navegación Putaway</strong><br>En el árbol IMG, has navegado hasta 'Goods Receipt Processes -> Strategies'. Invoca la transacción directa para 'Storage Type Search Sequence' (STSS).", expectedCmd: "STSS", hint: "STSS", successMessage: "> Abriendo matriz relacional de secuencias (Tabla de Putaway)." },
-            { instruction: "<strong>Fase 3/7: Selección de PACI</strong><br>Vamos a parametrizar materiales pesados. Ingresa el Putaway Control Indicator asignado a cargas masivas: 'PESA'.", expectedCmd: "PESA", hint: "PESA", successMessage: "> Filtrando matriz para Indicador de Control 'PESA'." },
-            { instruction: "<strong>Fase 4/7: Prioridad Algorítmica 1</strong><br>El cliente exige que la primera opción sea siempre el suelo para no dañar estantes. Asigna como Prioridad 1 el Storage Type de 'Almacenamiento en Bloque'. (BULK).", expectedCmd: "BULK", hint: "BULK", successMessage: "> Regla 1: Buscar espacio vacío en Bulk Storage (Piso)." },
-            { instruction: "<strong>Fase 5/7: Prioridad Algorítmica 2 (Fallback)</strong><br>Si el suelo está lleno, la segunda opción deben ser los racks reforzados de acero pesado en altura media (High Racks). Asigna el Storage Type 'HGH'.", expectedCmd: "HGH", hint: "HGH", successMessage: "> Regla 2: Buscar espacio en High Rack Storage (HGH)." },
-            { instruction: "<strong>Fase 6/7: Commit SQL</strong><br>El algoritmo ha sido estructurado en caché. Ejecuta el comando de guardado para escribir la tabla de la base de datos.", expectedCmd: "SAVE", hint: "SAVE", successMessage: "> Invocando UPDATE SQL en matriz algorítmica...\n> Validando consistencia de capacidades." },
-            { instruction: "<strong>Fase 7/7: Activación y Transporte</strong><br>Activa la regla para el Mandante y envíala a la Orden de Transporte (TR) para su envío a PRD. Comando: 'ACTIVATE'.", expectedCmd: "ACTIVATE", hint: "ACTIVATE", successMessage: "> Compilando secuencia STSS...\n> Guardando en TR DEV90021...\n> LABORATORIO EWM COMPLETADO CON ÉXITO. El cerebro del WMS está online." }
+            { instruction: "Acceso Configuración", expectedCmd: "SPRO", hint: "SPRO", successMessage: "> SAP Reference IMG." },
+            { instruction: "Transacción STSS", expectedCmd: "STSS", hint: "STSS", successMessage: "> Matriz abierta." },
+            { instruction: "Control Indicator", expectedCmd: "PESA", hint: "PESA", successMessage: "> Filtrando PESA." },
+            { instruction: "Prioridad 1 (Piso)", expectedCmd: "BULK", hint: "BULK", successMessage: "> Prioridad BULK." },
+            { instruction: "Prioridad 2 (Rack)", expectedCmd: "HGH", hint: "HGH", successMessage: "> Prioridad HGH." },
+            { instruction: "Commit", expectedCmd: "SAVE", hint: "SAVE", successMessage: "> Update SQL." },
+            { instruction: "Activar TR", expectedCmd: "ACTIVATE", hint: "ACTIVATE", successMessage: "> Activo." }
         ]
-    }
-,
+    },
     // ==========================================
     // SEMESTRE 3 - OUTBOUND & WAVE MANAGEMENT
     // ==========================================
@@ -429,96 +277,32 @@ const syllabusData = [
         duration: "25 Horas • Especialización Outbound",
         req: "s2_l2",
         description: "El arte de sacar la mercancía. Desde la conversión de documentos ERP->EWM hasta los algoritmos de agrupación en Olas (Waves) para optimizar el picking masivo.",
-        review: "Sales Order (SD) -> Outbound Delivery (LE) -> Outbound Delivery Request (EWM) -> Outbound Delivery Order (ODO). El ODO es el documento sobre el que se ejecutan todas las tareas de salida en EWM.",
+        review: "Sales Order -> Outbound Delivery -> ODR -> ODO. El ODO es el documento sobre el que se ejecutan todas las tareas de salida en EWM.",
         pages: [
-            `<h3>Capítulo 1: El Flujo de Documentos Outbound</h3>
-            <p>El proceso de salida no nace en el almacén, nace en el departamento de Ventas. Un cliente llama y genera un <strong>Sales Order (Pedido de Ventas)</strong> en el módulo SAP SD. Este documento promete una fecha de entrega, pero no mueve cajas.</p>
-            <p>Cuando llega la fecha de preparación, el ERP genera una <strong>Outbound Delivery</strong> (Transacción VL01N o proceso de fondo). Este es el puente hacia el almacén. Al igual que en Inbound, el ERP no sabe de pasillos ni estantes; solo sabe que debes despachar 100 laptops al cliente Walmart.</p>`,
-
-            `<h3>Capítulo 2: La Metamorfosis en EWM (ODR y ODO)</h3>
-            <p>Cuando la Outbound Delivery viaja por la interfaz qRFC hacia SAP EWM, se divide en dos documentos técnicos:</p>
-            <ul>
-                <li><strong>Outbound Delivery Request (ODR):</strong> Es un documento técnico de recepción. Su única función es decirle a EWM "El ERP quiere que despaches esto, ¿aceptas el mensaje?". No es editable.</li>
-                <li><strong>Outbound Delivery Order (ODO):</strong> Es el documento operativo rey del almacén. Sobre el ODO se ejecutan el Picking, el Packing, el Staging y el Loading. Si un consultor EWM quiere ver qué se debe despachar hoy, consulta las ODOs mediante la transacción <em>/SCWM/PRDO</em>.</li>
-            </ul>`,
-
-            `<h3>Capítulo 3: El Caos del Picking Uno a Uno</h3>
-            <p>Imagina que tienes 50 ODOs (pedidos de clientes) para entregar hoy. Si imprimes una hoja por pedido y mandas a un operario a buscar la mercancía del Cliente 1, luego regresa y lo mandas a buscar lo del Cliente 2, el operario caminará 20 kilómetros diarios y el almacén será ineficiente. A esto se le llama <em>Discrete Picking</em> y solo se usa en almacenes minúsculos.</p>`,
-
-            `<h3>Capítulo 4: Wave Management (Gestión de Olas)</h3>
-            <p>Para evitar el caos, SAP EWM utiliza <strong>Wave Management</strong>. Una Ola (Wave) es un algoritmo que agrupa cientos de líneas de diferentes ODOs bajo criterios lógicos antes de enviarlas a los escáneres de radiofrecuencia (RF) de los operarios.</p>
-            <p>Criterios típicos de agrupación: Por ruta del camión (Ej. "Ola Ruta Norte"), por Zona de Almacén (Ej. "Ola de Frigoríficos"), o por transportista (Ej. "Ola FedEx 17:00 Hrs").</p>`,
-
-            `<h3>Capítulo 5: Wave Templates (Plantillas de Olas)</h3>
-            <p>El arquitecto no crea las olas a mano todos los días; diseña <strong>Wave Templates</strong>. Una plantilla define a qué hora exacta se corta la recepción de pedidos, a qué hora se liberan las tareas a los montacargas y a qué hora debe estar el palet en el muelle de carga.</p>
-            <p>Ejemplo: Plantilla "Carga Matutina". Cut-off time: 08:00 AM. Release time: 08:15 AM. Picking completion: 11:00 AM.</p>`,
-
-            `<h3>Capítulo 6: La Liberación de la Ola (Wave Release)</h3>
-            <p>Cuando el reloj marca la hora de <em>Release Time</em> (o si el usuario la libera manualmente en <em>/SCWM/WAVE</em>), EWM hace magia matemática: Rompe la Ola en <strong>Warehouse Tasks (WTs)</strong>, y luego agrupa esas WTs en <strong>Warehouse Orders (WOs)</strong>.</p>
-            <p>La Warehouse Order (Orden de Almacén) es el paquete de trabajo óptimo que se le asigna a un operario. El sistema se asegura de que una WO no pese más de lo que soporta el montacargas (Capacity Limit) y que la ruta de recolección forme una 'U' o una 'Z' perfecta para que el operario no retroceda sobre sus pasos.</p>`,
-
-            `<h3>Capítulo 7: Pick-HU (Unidad de Manipulación de Picking)</h3>
-            <p>En operaciones avanzadas, el operario no recolecta en las manos. Al iniciar su ruta en el escáner, el sistema le ordena tomar un palet vacío o una caja de cartón (Packaging Material). Esta caja vacía se bautiza instantáneamente como una <strong>Pick-HU</strong> con un código de barras SSCC.</p>
-            <p>A medida que el operario saca unidades de los estantes, las escanea y las "mete" lógicamente en la Pick-HU. Al terminar la ruta, la Pick-HU se convierte en el palet final de envío (Shipping HU).</p>`,
-
-            `<h3>Capítulo 8: Two-Step Picking (Picking de Dos Pasos)</h3>
-            <p>Si 50 clientes piden el mismo champú, mandar a 50 operarios al mismo pasillo causará un accidente. Solución: <strong>2-Step Picking</strong>.</p>
-            <p><strong>Paso 1 (Withdrawal):</strong> Un solo montacargas saca un palet entero de champú del rack alto y lo deja en una zona de empaque cruzado.</p>
-            <p><strong>Paso 2 (Allocation):</strong> Los empacadores distribuyen las botellas sueltas de ese palet en las cajas de los 50 clientes diferentes. Esto reduce el tráfico de montacargas en un 80%.</p>`,
-
-            `<h3>Capítulo 9: Staging y Loading (Andenes y Carga)</h3>
-            <p>Una vez finalizado el picking y el packing, la mercancía se mueve al <strong>Outbound Staging Area (Zona de Consolidación de Salida / 920)</strong>. Aquí, los palets esperan organizados por puerta de salida (Door).</p>
-            <p>Cuando el camión llega al muelle, los operarios usan el RF Scanner para ejecutar el <strong>Loading (Carga)</strong>, escaneando cada palet al subirlo al remolque para garantizar que ningún cliente reciba la caja equivocada.</p>`,
-
-            `<h3>Capítulo 10: Post Goods Issue (PGI) - El Cierre Financiero</h3>
-            <p>El camión cierra puertas. El gerente de tráfico ejecuta el botón final: <strong>Post Goods Issue (PGI)</strong> en la ODO.</p>
-            <p>Consecuencias del PGI:<br>
-            1. El inventario desaparece lógicamente de EWM.<br>
-            2. El ERP factura automáticamente al cliente.<br>
-            3. FI reduce la cuenta de activos de inventario y aumenta la cuenta de Costos de Bienes Vendidos (COGS - Cost of Goods Sold), registrando formalmente la rentabilidad de la venta.</p>`
+            `<h3>Capítulo 1: El Flujo Outbound</h3><p>El pedido nace en SAP SD. Al llegar a la fecha, se crea la Outbound Delivery, que viaja a EWM.</p>`,
+            `<h3>Capítulo 2: ODR y ODO</h3><p>ODR recibe el mensaje. ODO (Outbound Delivery Order) es el documento operativo del almacén.</p>`,
+            `<h3>Capítulo 3: Discrete Picking</h3><p>Recolectar pedido por pedido es ineficiente. El operario camina kilómetros innecesarios.</p>`,
+            `<h3>Capítulo 4: Wave Management (Olas)</h3><p>Agrupa líneas de diferentes ODOs bajo criterios lógicos (Ruta, Zona, Horario) para optimizar el picking.</p>`,
+            `<h3>Capítulo 5: Wave Templates</h3><p>Define Cut-off time y Release time. Automatiza la creación de olas.</p>`,
+            `<h3>Capítulo 6: Wave Release</h3><p>Al liberar la Ola, EWM crea Warehouse Tasks (WTs) y las agrupa en Warehouse Orders (WOs) según peso y ruta en U o Z.</p>`,
+            `<h3>Capítulo 7: Pick-HU</h3><p>El operario toma una caja vacía (Pick-HU), escanea los productos y los mete lógicamente en ella.</p>`,
+            `<h3>Capítulo 8: Two-Step Picking</h3><p>Paso 1: Withdrawal (Bajar palet entero). Paso 2: Allocation (Distribuir en cajas de clientes).</p>`,
+            `<h3>Capítulo 9: Staging y Loading</h3><p>Consolidación en andenes (920). Carga escaneando el SSCC al subirlo al camión.</p>`,
+            `<h3>Capítulo 10: Post Goods Issue (PGI)</h3><p>El botón final. Desaparece el inventario, detona la facturación en SD y registra el COGS en FI.</p>`
         ],
         exam: [
-            // 40 preguntas implacables sobre Outbound y Waves
-            { question: "En el flujo Outbound, ¿qué documento del ERP (SAP LE) funciona como el puente inicial hacia SAP EWM?", options: [{text:"Outbound Delivery", correct:true}, {text:"Sales Order", correct:false}, {text:"Purchase Order", correct:false}, {text:"Inbound Delivery", correct:false}] },
-            { question: "¿Cuál es el documento operativo central en EWM sobre el cual se ejecutan el picking, packing y loading?", options: [{text:"Outbound Delivery Order (ODO)", correct:true}, {text:"Outbound Delivery Request (ODR)", correct:false}, {text:"Sales Order", correct:false}, {text:"Warehouse Request", correct:false}] },
-            { question: "¿Qué rol juega el Outbound Delivery Request (ODR) en SAP EWM?", options: [{text:"Es un documento técnico no editable que recibe el mensaje de la interfaz (qRFC) del ERP y sirve de base para crear la ODO.", correct:true}, {text:"Es el documento que el montacarguista ve en su escáner.", correct:false}, {text:"Es la factura final que se imprime para el cliente.", correct:false}, {text:"Es un documento de control de calidad.", correct:false}] },
-            { question: "La transacción estándar y más importante para un gerente de almacén en EWM para gestionar los despachos (ODOs) es:", options: [{text:"/SCWM/PRDO", correct:true}, {text:"VL01N", correct:false}, {text:"MIGO", correct:false}, {text:"MM01", correct:false}] },
-            { question: "La técnica de agrupar múltiples pedidos de clientes (ODOs) mediante un algoritmo para optimizar rutas de picking masivo se llama:", options: [{text:"Wave Management (Gestión de Olas)", correct:true}, {text:"Discrete Picking", correct:false}, {text:"Cross-Docking", correct:false}, {text:"Slotting", correct:false}] },
-            { question: "¿Qué evita el Wave Management comparado con el Discrete Picking (Picking pedido por pedido)?", options: [{text:"Evita que los operarios caminen múltiples veces por el mismo pasillo para recolectar el mismo material para diferentes clientes.", correct:true}, {text:"Evita que los camiones se estacionen en la calle.", correct:false}, {text:"Evita las devoluciones de calidad.", correct:false}, {text:"Evita el uso de escáneres RF.", correct:false}] },
-            { question: "En un Wave Template (Plantilla de Ola), el 'Cut-off time' representa:", options: [{text:"La hora límite en la que el sistema deja de aceptar nuevas líneas de pedido para incluirlas en esa Ola específica.", correct:true}, {text:"La hora en que el operario sale a comer.", correct:false}, {text:"La hora en que el camión debe llegar.", correct:false}, {text:"El tiempo límite para cancelar la orden.", correct:false}] },
-            { question: "Cuando una Ola (Wave) se 'Libera' (Release) exitosamente, el sistema crea automáticamente:", options: [{text:"Warehouse Tasks (WTs) agrupadas en Warehouse Orders (WOs).", correct:true}, {text:"Inbound Deliveries.", correct:false}, {text:"Facturas (Billing Documents).", correct:false}, {text:"Órdenes de Producción.", correct:false}] },
-            { question: "La Warehouse Order (WO) en SAP EWM se define mejor como:", options: [{text:"Un paquete de trabajo ejecutable, optimizado en ruta y peso, asignado a un recurso específico (ej. un operario o montacargas).", correct:true}, {text:"El pedido legal firmado por el cliente.", correct:false}, {text:"Una orden de compra a proveedor.", correct:false}, {text:"El contrato de transporte.", correct:false}] },
-            { question: "Si la liberación de una Ola falla parcialmente (Ej. Faltó stock para un material), ¿qué estado adquiere esa línea en la Ola?", options: [{text:"Release Failed (Fallo de Liberación) - La WTs no se crean para el material faltante.", correct:true}, {text:"Se cancela el pedido de ventas entero.", correct:false}, {text:"El sistema compra la mercancía en Amazon automáticamente.", correct:false}, {text:"Se envía un camión vacío.", correct:false}] },
-            { question: "El concepto de Pick-HU (Unidad de Manipulación de Picking) consiste en:", options: [{text:"Una caja, tote o palet vacío con código de barras propio donde el operario introduce la mercancía lógicamente durante su ruta de picking.", correct:true}, {text:"Un robot autónomo.", correct:false}, {text:"La lista de papel impresa.", correct:false}, {text:"Un material peligroso.", correct:false}] },
-            { question: "¿Por qué el sistema agrupa WTs en una Warehouse Order (WO) mediante Reglas de Creación (WOCR)?", options: [{text:"Para asegurar límites lógicos: que la carga no exceda el peso del montacargas, el volumen del palet, o para agrupar WTs de un mismo pasillo.", correct:true}, {text:"Para cobrar más impuestos.", correct:false}, {text:"Para generar código ABAP.", correct:false}, {text:"Porque EWM no soporta tareas individuales.", correct:false}] },
-            { question: "El 'Two-Step Picking' (Picking de dos pasos) se utiliza típicamente cuando:", options: [{text:"Muchos clientes piden exactamente el mismo producto; permite retirar el total en bloque del rack y luego distribuirlo en la zona de empaque.", correct:true}, {text:"Hay pocos clientes.", correct:false}, {text:"El almacén es pequeño y no tiene racks.", correct:false}, {text:"El material está dañado.", correct:false}] },
-            { question: "En Two-Step Picking, el Paso 1 se conoce formalmente como:", options: [{text:"Withdrawal (Retiro masivo de la zona de almacenaje).", correct:true}, {text:"Allocation (Distribución a cajas).", correct:false}, {text:"Loading (Carga).", correct:false}, {text:"Staging (Consolidación).", correct:false}] },
-            { question: "El área física del almacén destinada a acomodar los palets listos para ser cargados en el camión, agrupados por puerta, se llama:", options: [{text:"Outbound Staging Area.", correct:true}, {text:"Goods Receipt Zone.", correct:false}, {text:"Bulk Storage.", correct:false}, {text:"Clarification Zone.", correct:false}] },
-            { question: "¿Qué acción de sistema realiza el operario en el andén para asegurar que un palet de Walmart no se suba al camión de Target?", options: [{text:"Loading (Carga guiada por RF), escaneando el SSCC del palet y el código de barras de la Puerta (Door).", correct:true}, {text:"Putaway.", correct:false}, {text:"Yard Check-in.", correct:false}, {text:"Cycle Counting.", correct:false}] },
-            { question: "El último paso operativo y transaccional de un despacho Outbound es presionar el botón de:", options: [{text:"Post Goods Issue (PGI).", correct:true}, {text:"Post Goods Receipt (PGR).", correct:false}, {text:"Release Wave.", correct:false}, {text:"Save Material.", correct:false}] },
-            { question: "Financieramente, ¿qué sucede en el módulo de FI/CO en el exacto milisegundo en que se contabiliza el Post Goods Issue (PGI)?", options: [{text:"El inventario disminuye en los activos y se registra el gasto en la cuenta Cost of Goods Sold (COGS).", correct:true}, {text:"Se le paga al empleado su salario.", correct:false}, {text:"Aumenta el activo de inventario.", correct:false}, {text:"Se genera una orden de compra.", correct:false}] },
-            { question: "¿Puede EWM facturar al cliente sin que se haya ejecutado el Post Goods Issue (PGI)?", options: [{text:"No. El ERP bloquea la facturación (Billing) hasta que EWM envíe la confirmación del PGI, asegurando que solo se cobre lo que realmente salió del almacén.", correct:true}, {text:"Sí, la factura se emite al crear la orden.", correct:false}, {text:"Sí, EWM no controla la facturación.", correct:false}, {text:"Solo si el pago es en efectivo.", correct:false}] },
-            { question: "Si un cliente cancela un pedido cuando el palet ya está en el Staging Area (Andén), antes del PGI, debes:", options: [{text:"Cancelar la ODO y ejecutar tareas de Putaway inverso para devolver el palet a los racks.", correct:true}, {text:"Hacer PGI y luego una nota de crédito.", correct:false}, {text:"Tirar el palet a la basura.", correct:false}, {text:"El sistema no permite cancelaciones en esta fase.", correct:false}] },
-            { question: "El Replenishment (Reabastecimiento) es crítico para el proceso Outbound porque:", options: [{text:"Asegura que los Bins de Picking manual (bajos) siempre tengan stock disponible rellenándolos desde el stock de reserva (racks altos), evitando que las Olas fallen.", correct:true}, {text:"Es como se compran lapiceros para la oficina.", correct:false}, {text:"Permite devolver camiones.", correct:false}, {text:"Optimiza el consumo de gasolina del montacargas.", correct:false}] },
-            { question: "¿Qué tipo de Wave Release ocurre si se configura para que el sistema lance el trabajo apenas la Inbound/Outbound interface recibe el documento?", options: [{text:"Immediate Release (Liberación Inmediata).", correct:true}, {text:"Automatic Release (basada en el Cut-off time de la plantilla).", correct:false}, {text:"Manual Release.", correct:false}, {text:"Delayed Release.", correct:false}] },
-            { question: "La transacción para gestionar Olas (Crear, Monitorear, Liberar) en SAP EWM es:", options: [{text:"/SCWM/WAVE", correct:true}, {text:"/SCWM/PRDO", correct:false}, {text:"MM01", correct:false}, {text:"VL01N", correct:false}] },
-            { question: "En un entorno complejo, ¿quién agrupa múltiples ODOs en Unidades de Flete (Freight Units) para optimizar el espacio del remolque antes del Wave Management?", options: [{text:"SAP TM (Transportation Management).", correct:true}, {text:"SAP HR.", correct:false}, {text:"El guardia de la puerta.", correct:false}, {text:"SAP FI.", correct:false}] },
-            { question: "Si una Ola tiene 500 WTs, pero el 'Max Limit' configurado en la Warehouse Order Creation Rule (WOCR) es de 50 WTs, ¿qué hace el sistema?", options: [{text:"Divide la Ola en 10 Warehouse Orders diferentes (50 WTs cada una) asignables a 10 operarios distintos.", correct:true}, {text:"Arroja un error y cancela la Ola.", correct:false}, {text:"Asigna las 500 a un solo operario.", correct:false}, {text:"Borra 450 WTs.", correct:false}] },
-            { question: "El Sort Sequence (Secuencia de Clasificación) de la WOCR se encarga de:", options: [{text:"Ordenar matemáticamente las WTs dentro de la WO para que la ruta de picking por los pasillos tenga forma de U o Z, minimizando el tiempo de viaje.", correct:true}, {text:"Clasificar a los operarios por sueldo.", correct:false}, {text:"Ordenar los clientes alfabéticamente.", correct:false}, {text:"Clasificar el peso total del camión.", correct:false}] },
-            { question: "¿Es posible reasignar una Warehouse Order de un operario enfermo a otro operario en el Warehouse Management Monitor?", options: [{text:"Sí. El supervisor puede desencolar y reasignar la WO a otro recurso a través del Monitor (/SCWM/MON).", correct:true}, {text:"No, se debe cancelar toda la Ola.", correct:false}, {text:"No, la WO es inmutable.", correct:false}, {text:"Solo usando código ABAP.", correct:false}] },
-            { question: "Si durante el picking de una WO, el operario llega al Bin y no hay mercancía (Discrepancia física), debe ingresar un:", options: [{text:"Exception Code (Código de Excepción) en el escáner RF, como 'BIDF' (Bin Denied), para que el sistema busque el stock en otra ubicación.", correct:true}, {text:"T-Code MIGO.", correct:false}, {text:"Documento de Word.", correct:false}, {text:"Mensaje de WhatsApp al gerente.", correct:false}] },
-            { question: "En un flujo de E-commerce B2C, donde los pedidos son de 1 sola unidad, la estrategia óptima de agrupación RF suele ser:", options: [{text:"Pick-and-Pack simultáneo usando un carrito multicubeta (Multi-Order Picking), donde cada cubeta es una Pick-HU/Shipping HU directa al cliente.", correct:true}, {text:"Manejo por pallets completos (Full Pallet Picking).", correct:false}, {text:"MIGO directa.", correct:false}, {text:"Two-Step Picking masivo sin empaque final.", correct:false}] },
-            { question: "La transacción para confirmar WTs o WOs en EWM desde la interfaz de escritorio GUI (sin usar el escáner RF) es:", options: [{text:"/SCWM/TO_CONF", correct:true}, {text:"/SCWM/WAVE", correct:false}, {text:"VL31N", correct:false}, {text:"SPRO", correct:false}] },
-            { question: "¿Qué indicador evita que un montacargas angosto (Narrow Aisle Truck) reciba una WO que requiere levantar 3 toneladas?", options: [{text:"Resource Management Indicator y los Capacity Limits de la regla WOCR.", correct:true}, {text:"El nombre del cliente.", correct:false}, {text:"El Storage Location.", correct:false}, {text:"El Company Code.", correct:false}] },
-            { question: "¿Puede EWM enviar a un operario a recolectar primero materiales pesados y luego ligeros en la misma ruta?", options: [{text:"Sí, de hecho es una mejor práctica usar el Sort Sequence para que las latas de metal pesadas vayan al fondo de la Pick-HU y las bolsas de papas ligeras queden arriba para no aplastarse.", correct:true}, {text:"No, EWM ordena aleatoriamente.", correct:false}, {text:"EWM siempre obliga a poner lo ligero abajo.", correct:false}, {text:"EWM no reconoce el peso durante el picking.", correct:false}] },
-            { question: "¿Qué es el Route Determination (Determinación de Ruta)?", options: [{text:"El cálculo que determina qué empresa de transporte, transit time y zona geográfica aplican al pedido para agruparlo en la Ola correcta.", correct:true}, {text:"El mapa de Google Maps para el camión.", correct:false}, {text:"La determinación de impuestos de importación.", correct:false}, {text:"La configuración de cables de red del almacén.", correct:false}] },
-            { question: "Si un palet final pesa 10,000 Kg y el andén tiene límite de 5,000 Kg, la restricción se maneja en:", options: [{text:"La definición estructural del Staging Area en los maestros de EWM.", correct:true}, {text:"El maestro del proveedor.", correct:false}, {text:"El SAP FI.", correct:false}, {text:"El SLED del material.", correct:false}] },
-            { question: "La etiqueta SSCC generada durante el Packing y pegada en el palet contiene un estándar global GS1 para que:", options: [{text:"Cualquier escáner en cualquier aduana, puerto o almacén del cliente final pueda leer su contenido sin integración directa de sistemas.", correct:true}, {text:"Sea bonito visualmente.", correct:false}, {text:"Solo SAP pueda leerlo.", correct:false}, {text:"Proteja contra el clima.", correct:false}] },
-            { question: "¿Cuál es el resultado de despachar stock bloqueado por calidad?", options: [{text:"El sistema no lo permite. EWM no genera WTs de salida para stock con categoría 'En Inspección' o 'Bloqueado'.", correct:true}, {text:"Una alerta en rojo pero permite el PGI.", correct:false}, {text:"Una factura descontada.", correct:false}, {text:"EWM asume el riesgo.", correct:false}] },
-            { question: "¿El Post Goods Issue (PGI) requiere imprimir algún documento físico obligatorio en muchos países?", options: [{text:"Sí, documentos legales como el Bill of Lading (BoL), Remisión (Delivery Note) y hojas de ruta para que el camión pueda circular.", correct:true}, {text:"No, en SAP S/4HANA todo es 100% digital sin excepciones locales.", correct:false}, {text:"Solo si el cliente lo pide.", correct:false}, {text:"Solo el maestro de materiales.", correct:false}] },
-            { question: "Verdadero o Falso: Un almacén sin Wave Management solo puede sobrevivir eficientemente si maneja menos de 50 pedidos diarios.", options: [{text:"Verdadero. En alto volumen (B2C, Retail), no usar olas garantiza el colapso operativo por tráfico de montacargas cruzado.", correct:true}, {text:"Falso. Discrete picking es superior en Amazon.", correct:false}] },
-            { question: "¿Estás listo para asumir el control del PGI y facturar la mercancía a los clientes?", options: [{text:"Totalmente. Comprendo el flujo ODO -> WAVE -> WO -> PGI y su impacto contable en SAP FI.", correct:true}, {text:"Todavía prefiero hacer Discrete Picking.", correct:false}] },
-            { question: "¿Reconoces que presionar PGI sin validar la carga del camión es un error causal de despido en corporaciones nivel Enterprise?", options: [{text:"Sí, la contabilidad es irreversible y el cliente recibirá discrepancias financieras.", correct:true}, {text:"No es para tanto, el cliente devuelve las cosas luego.", correct:false}] }
+            { question: "Documento puente desde ERP a EWM en salidas:", options: [{text:"Outbound Delivery", correct:true}, {text:"Sales Order", correct:false}] },
+            { question: "Documento operativo rey en EWM para salidas:", options: [{text:"Outbound Delivery Order (ODO)", correct:true}, {text:"ODR", correct:false}] },
+            { question: "Transacción para gestionar despachos (ODOs):", options: [{text:"/SCWM/PRDO", correct:true}, {text:"VL01N", correct:false}] },
+            { question: "Técnica para agrupar pedidos y optimizar rutas:", options: [{text:"Wave Management", correct:true}, {text:"Discrete Picking", correct:false}] },
+            { question: "¿Qué evita el Wave Management?", options: [{text:"Caminar múltiples veces por el mismo pasillo.", correct:true}, {text:"Usar escáneres RF.", correct:false}] },
+            { question: "Al liberar la Ola (Release), el sistema crea:", options: [{text:"WTs agrupadas en WOs.", correct:true}, {text:"Facturas.", correct:false}] },
+            { question: "Paquete de trabajo optimizado para el operario:", options: [{text:"Warehouse Order (WO)", correct:true}, {text:"Purchase Order", correct:false}] },
+            { question: "Caja vacía con SSCC para recolectar:", options: [{text:"Pick-HU", correct:true}, {text:"Cartonization", correct:false}] },
+            { question: "Two-Step Picking se usa cuando:", options: [{text:"Muchos clientes piden el mismo producto.", correct:true}, {text:"Hay pocos clientes.", correct:false}] },
+            { question: "Botón transaccional final de salida:", options: [{text:"Post Goods Issue (PGI)", correct:true}, {text:"Post Goods Receipt", correct:false}] },
+            { question: "Impacto financiero del PGI:", options: [{text:"Disminuye inventario y registra COGS.", correct:true}, {text:"Paga al proveedor.", correct:false}] },
+            { question: "¿EWM factura sin hacer PGI?", options: [{text:"No. Bloquea facturación hasta PGI.", correct:true}, {text:"Sí.", correct:false}] }
         ]
     },
     {
@@ -528,19 +312,18 @@ const syllabusData = [
         title: "3.2 Lab Multi-Paso: Wave Release & Picking",
         duration: "1 Hora 45 Min",
         req: "s3_m1",
-        description: "El cliente Amazon requiere 1,000 unidades urgentes. Libera la Ola (Wave), confirma la Tarea de Almacén de Picking, y ejecuta el Post Goods Issue (PGI).",
-        simTask: { hint: "Fases: /SCWM/WAVE -> 9901 -> RELEASE -> /SCWM/TO_CONF -> CONFIRM -> /SCWM/PRDO -> PGI. ¡3 Strikes activados!" },
+        description: "El cliente Amazon requiere 1,000 unidades. Libera la Ola y ejecuta el PGI.",
+        simTask: { hint: "Fases: /SCWM/WAVE -> 9901 -> RELEASE -> /SCWM/TO_CONF -> CONFIRM -> /SCWM/PRDO -> PGI." },
         simSteps: [
-            { instruction: "<strong>Fase 1/7: Consola de Olas</strong><br>El ERP ha creado el ODO para el cliente Amazon y el sistema lo ha asignado a la Ola urgente 9901. Ingresa a la transacción de gestión de olas (Wave Management).", expectedCmd: "/SCWM/WAVE", hint: "/SCWM/WAVE", successMessage: "> Cargando Consola de Gestión de Olas...\n> Entorno: Outbound Processing." },
-            { instruction: "<strong>Fase 2/7: Filtrar Ola</strong><br>Ingresa el número de Ola que vas a operar para el cliente Amazon: '9901'.", expectedCmd: "9901", hint: "9901", successMessage: "> Ola 9901 localizada.\n> Contiene 1 Outbound Delivery Order (ODO). 1,000 EA." },
-            { instruction: "<strong>Fase 3/7: Liberación (Wave Release)</strong><br>Faltan 10 minutos para el Cut-off time, pero el supervisor exige sacar el pedido ya. Ejecuta el comando de liberación manual.", expectedCmd: "RELEASE", hint: "RELEASE", successMessage: "> Calculando rutas óptimas...\n> Verificando límites de peso WOCR...\n> OLA LIBERADA. Warehouse Order (WO) 50000123 creada." },
-            { instruction: "<strong>Fase 4/7: Confirmación de Tarea</strong><br>El montacarguista reporta por radio que su escáner RF se quedó sin batería. Necesita que confirmes la recolección desde la PC de escritorio. Ingresa la transacción de confirmación de órdenes de almacén GUI.", expectedCmd: "/SCWM/TO_CONF", hint: "/SCWM/TO_CONF", successMessage: "> Interfaz de Confirmación Manual Abierta." },
-            { instruction: "<strong>Fase 5/7: Post de Confirmación</strong><br>Tienes la WO 50000123 en pantalla. El montacarguista indica que dejó el palet físicamente en el andén de salida (Zona 920). Ejecuta la confirmación del trabajo.", expectedCmd: "CONFIRM", hint: "CONFIRM", successMessage: "> Warehouse Order Confirmada.\n> Stock movido lógicamente al Outbound Staging Area (920)." },
-            { instruction: "<strong>Fase 6/7: Monitor de Despachos</strong><br>El palet está en el muelle y el camión fue cargado. Ingresa la transacción principal para procesar los despachos ODO.", expectedCmd: "/SCWM/PRDO", hint: "/SCWM/PRDO", successMessage: "> Monitor de ODOs abierto. Seleccionando ODO de Amazon..." },
-            { instruction: "<strong>Fase 7/7: Post Goods Issue (PGI)</strong><br>El camión acaba de cerrar las puertas y salió de la garita. Presiona el gatillo contable. Ejecuta el PGI para cobrar la mercancía.", expectedCmd: "PGI", hint: "PGI", successMessage: "> Iniciando COMMIT transaccional masivo...\n> Disminuyendo inventario en EWM...\n> Contabilizando COGS en SAP FI...\n> Trigger de Facturación en SAP SD...\n> ÉXITO: OPERACIÓN OUTBOUND CERRADA. ¡Buen trabajo!" }
+            { instruction: "Consola de Olas", expectedCmd: "/SCWM/WAVE", hint: "/SCWM/WAVE", successMessage: "> Gestión de Olas." },
+            { instruction: "Filtrar Ola", expectedCmd: "9901", hint: "9901", successMessage: "> Ola 9901 localizada." },
+            { instruction: "Liberación", expectedCmd: "RELEASE", hint: "RELEASE", successMessage: "> WO 50000123 creada." },
+            { instruction: "Confirmación Manual", expectedCmd: "/SCWM/TO_CONF", hint: "/SCWM/TO_CONF", successMessage: "> Interfaz abierta." },
+            { instruction: "Post Confirmación", expectedCmd: "CONFIRM", hint: "CONFIRM", successMessage: "> Stock en Staging (920)." },
+            { instruction: "Monitor Despachos", expectedCmd: "/SCWM/PRDO", hint: "/SCWM/PRDO", successMessage: "> ODO seleccionada." },
+            { instruction: "Ejecutar PGI", expectedCmd: "PGI", hint: "PGI", successMessage: "> OPERACIÓN CERRADA." }
         ]
-    }
-,
+    },
     {
         id: "s3_m2",
         semester: 3,
@@ -549,87 +332,47 @@ const syllabusData = [
         duration: "25 Horas • Arquitectura de Crisis",
         req: "s3_l1",
         description: "Domina el caos. Qué hacer cuando el sistema falla, cuando el rack está vacío (Pick Denial), y cómo el Reabastecimiento salva las Olas de Picking.",
-        review: "Un Exception Code como 'BIDF' no solo avisa del error, sino que dispara un flujo en background (Background Job) que bloquea el Bin, ajusta el inventario y recalcula la ruta.",
+        review: "Un Exception Code como 'BIDF' no solo avisa del error, sino que dispara un flujo en background para resolver la crisis.",
         pages: [
-            `<h3>Capítulo 1: La Realidad del Almacén</h3>
-            <p>El sistema EWM es matemáticamente perfecto, pero el mundo físico no lo es. El sistema dice que hay 100 laptops en el Bin A-01, pero cuando el operario llega, solo hay 80 porque ayer alguien robó o rompió 20 y no lo reportó en el sistema.</p>
-            <p>Si el operario simplemente ignora el problema, la Warehouse Order queda abierta, la Ola (Wave) no se cierra, el camión no se puede facturar y el cliente demanda a la empresa. Para esto existen las <strong>Excepciones Outbound</strong>.</p>`,
-
-            `<h3>Capítulo 2: Exception Codes (Códigos de Excepción)</h3>
-            <p>Un Exception Code es un código de 4 letras que el operario ingresa en su escáner (RF) para reportar una anomalía, detonando una acción automática correctiva.</p>
-            <p>Ejemplos clásicos:<br>
-            - <strong>BIDF (Bin Denied):</strong> El operario rechaza el Bin porque está físicamente bloqueado o vacío.<br>
-            - <strong>CHBA (Change Batch):</strong> El operario encuentra un lote diferente al que el sistema pidió, y el sistema evalúa si ese lote alternativo es válido para el cliente.<br>
-            - <strong>SPLT (Split):</strong> El palet es demasiado grande y el operario decide dividir la tarea en dos palets más pequeños.</p>`,
-
-            `<h3>Capítulo 3: Pick Denial (Negación de Picking)</h3>
-            <p>El Pick Denial ocurre cuando el operario ejecuta un BIDF por falta de stock. No es solo un mensaje de error; es un gatillo algorítmico. Cuando EWM recibe un Pick Denial, ejecuta tres acciones en milisegundos:</p>
-            <ul>
-                <li>1. <strong>Ajuste de Inventario:</strong> Congela el stock restante en ese Bin y genera un documento de inventario físico (Physical Inventory Document) para que un auditor vaya a investigar por qué se perdió la mercancía.</li>
-                <li>2. <strong>Búsqueda Alternativa:</strong> Vuelve a ejecutar el Storage Type Search Sequence (STSS) para buscar el faltante en otro Bin de reserva.</li>
-                <li>3. <strong>Creación de WT Auxiliar:</strong> Si encuentra el stock en otro lado, genera una nueva Warehouse Task (WT) y se la envía al operario para que complete el pedido en un pasillo diferente.</li>
-            </ul>`,
-
-            `<h3>Capítulo 4: Replenishment (Reabastecimiento)</h3>
-            <p>El Reabastecimiento es la técnica de mover stock de los Racks Altos (Reserva) a los Bins de Piso (Picking manual) ANTES de que el operario Outbound llegue y se encuentre el hueco vacío.</p>
-            <p>Existen 3 tipos principales de Replenishment en SAP EWM: <strong>Planned (Planificado), Order-Related (Relacionado a Pedido) y Automatic (Automático)</strong>.</p>`,
-
-            `<h3>Capítulo 5: Planned y Automatic Replenishment</h3>
-            <p><strong>Planned (Planificado):</strong> Se ejecuta como un Job nocturno (Background Job). El sistema analiza todos los Bins de picking, evalúa cuáles están por debajo de su umbral mínimo de seguridad y genera tareas de movimiento para que el turno de la noche los rellene.</p>
-            <p><strong>Automatic (Automático):</strong> Ocurre en tiempo real. En el momento en que un operario hace un picking y la cantidad en el Bin cae por debajo del límite mínimo (Minimum Quantity), EWM genera inmediatamente una tarea de reabastecimiento.</p>`,
-
-            `<h3>Capítulo 6: Order-Related Replenishment (El Salvador de Olas)</h3>
-            <p>Este es el más crítico para Outbound. Ocurre DURANTE la liberación de la Ola (Wave Release). Si la Ola requiere 500 unidades, y en la zona de picking solo hay 100, la Ola fallaría. El Order-Related Replenishment pausa la Ola, genera una tarea urgente para bajar 400 unidades del rack alto, y solo cuando se completa, libera las tareas de salida.</p>`,
-
-            `<h3>Capítulo 7: Cancelación de Outbound Deliveries</h3>
-            <p>¿Qué pasa si el cliente cancela la orden cuando el palet ya está en el muelle de carga? No puedes simplemente borrar el documento.</p>
-            <p>Debes ejecutar un <strong>Reverse Goods Issue</strong> (si ya habías hecho el PGI) y luego cancelar la Outbound Delivery Order (ODO). Al hacer esto, el sistema genera tareas de <strong>Putaway Reversa</strong>, ordenando a los montacargas devolver los palets del andén de salida (920) de vuelta a los racks de almacenamiento profundo.</p>`,
-
-            `<h3>Capítulo 8: Batch Determination (Gestión de Lotes en Salida)</h3>
-            <p>En industrias farmacéuticas o químicas, el cliente exige que los productos tengan al menos 6 meses de vida útil restante. Si el WMS hace picking de un lote que caduca mañana, el cliente rechazará el camión entero.</p>
-            <p>EWM usa la regla <strong>FEFO (First Expired, First Out)</strong> incrustada en el algoritmo de Batch Determination. Durante la liberación de la Ola, EWM busca el lote más antiguo que aún cumpla con las exigencias (Shelf Life) del cliente específico.</p>`,
-
-            `<h3>Capítulo 9: Cartonization (Empaque Avanzado)</h3>
-            <p>El <strong>Cartonization Planning (CAP)</strong> es una IA logística. Antes de que el operario empiece a recolectar, el sistema lee las dimensiones X, Y, Z de todos los productos del pedido y calcula matemáticamente qué tamaño exacto de caja de cartón necesitará el operario.</p>
-            <p>El escáner le dirá al operario: "Toma una caja Modelo B y empaca los 5 teclados y los 2 ratones". Esto elimina el desperdicio de cartón y el costo de despachar "aire" en los camiones.</p>`,
-
-            `<h3>Capítulo 10: Warehouse Management Monitor (/SCWM/MON)</h3>
-            <p>El Monitor es el panel de control maestro del Arquitecto EWM. Desde aquí puedes: desencolar Tareas de Almacén bloqueadas, reasignar Órdenes de Almacén de un operario inactivo a otro, monitorear los cuellos de botella en los andenes, y aprobar los conteos de inventario originados por un Pick Denial.</p>`
+            `<h3>Capítulo 1: La Realidad del Almacén</h3><p>El sistema dice que hay 100, pero físicamente hay 80. Aquí nacen las Excepciones.</p>`,
+            `<h3>Capítulo 2: Exception Codes</h3><p>Códigos de 4 letras. Ej: BIDF (Bin Denied), CHBA (Change Batch), SPLT (Split).</p>`,
+            `<h3>Capítulo 3: Pick Denial</h3><p>BIDF ajusta inventario, bloquea el Bin, y recalcula el STSS buscando stock en otra ubicación.</p>`,
+            `<h3>Capítulo 4: Replenishment</h3><p>Reabastecimiento de Racks Altos a Bins de Piso antes de que se queden vacíos.</p>`,
+            `<h3>Capítulo 5: Planned y Automatic</h3><p>Planned: Background Job nocturno. Automatic: Al caer bajo el mínimo durante un picking.</p>`,
+            `<h3>Capítulo 6: Order-Related Replenishment</h3><p>Pausa la liberación de la Ola, ordena reabastecer, y luego libera las tareas de salida.</p>`,
+            `<h3>Capítulo 7: Cancelaciones Outbound</h3><p>Requiere Reverse Goods Issue y tareas de Putaway inverso para devolver palets al rack.</p>`,
+            `<h3>Capítulo 8: Batch Determination (FEFO)</h3><p>First Expired, First Out. Busca el lote más antiguo que aún cumpla la vida útil exigida.</p>`,
+            `<h3>Capítulo 9: Cartonization</h3><p>IA que lee dimensiones (X,Y,Z) y recomienda la caja de cartón exacta para evitar flete de aire.</p>`,
+            `<h3>Capítulo 10: Warehouse Monitor</h3><p>Panel /SCWM/MON. Permite desencolar tareas, reasignar operarios y auditar inventario.</p>`
         ],
         exam: [
-            // 40 preguntas avanzadas (Arquitectura EWM / Outbound Exceptions)
-            { question: "Un 'Exception Code' en EWM se define mejor como:", options: [{text:"Un código de 4 caracteres que el operario usa en el escáner RF para reportar una desviación física y que gatilla una acción algorítmica de corrección en el sistema.", correct:true}, {text:"Un mensaje de error estático del sistema ABAP.", correct:false}, {text:"Un descuento aplicado al cliente por demoras.", correct:false}, {text:"Una falla del servidor de base de datos.", correct:false}] },
-            { question: "¿Cuál es el Exception Code estándar más crítico cuando el operario llega a una ubicación y no encuentra el producto (Pick Denial)?", options: [{text:"BIDF (Bin Denied)", correct:true}, {text:"CHBA (Change Batch)", correct:false}, {text:"SPLT (Split)", correct:false}, {text:"MIGO (Goods Receipt)", correct:false}] },
-            { question: "Cuando un operario ejecuta un BIDF (Pick Denial) en EWM, el sistema automáticamente:", options: [{text:"Ajusta el inventario, bloquea el Bin para investigación, y recalcula el STSS para buscar el stock faltante en otra ubicación.", correct:true}, {text:"Despide al operario mediante SAP HR.", correct:false}, {text:"Cancela la Orden de Venta completa.", correct:false}, {text:"Borra el Material Master.", correct:false}] },
-            { question: "¿Qué tipo de documento se genera en SAP (background) cuando ocurre un faltante por Pick Denial para obligar a una investigación contable?", options: [{text:"Physical Inventory Document (Documento de Inventario Físico)", correct:true}, {text:"Purchase Order (Orden de Compra)", correct:false}, {text:"Sales Order (Pedido de Ventas)", correct:false}, {text:"Inbound Delivery", correct:false}] },
-            { question: "La estrategia de mover inventario desde los racks de reserva altos hacia los Bins de picking a nivel de piso se llama:", options: [{text:"Replenishment (Reabastecimiento)", correct:true}, {text:"Cross-Docking", correct:false}, {text:"Slotting", correct:false}, {text:"Yard Management", correct:false}] },
-            { question: "¿Qué tipo de Replenishment se ejecuta en tiempo real durante la Liberación de la Ola (Wave Release) si el stock en la zona de picking es insuficiente para completar el pedido?", options: [{text:"Order-Related Replenishment (Relacionado a Pedido)", correct:true}, {text:"Automatic Replenishment (Automático)", correct:false}, {text:"Planned Replenishment (Planificado)", correct:false}, {text:"Manual Replenishment", correct:false}] },
-            { question: "El Planned Replenishment se ejecuta típicamente mediante:", options: [{text:"Un Background Job (Proceso de fondo) programado, por ejemplo, durante el turno nocturno.", correct:true}, {text:"El escáner RF del guardia de seguridad.", correct:false}, {text:"Un correo electrónico de Ventas.", correct:false}, {text:"Transacción MIGO.", correct:false}] },
-            { question: "En Cartonization Planning (CAP), ¿qué cálculo realiza el sistema ANTES del picking?", options: [{text:"Calcula el volumen y peso de los materiales para recomendar al operario el tamaño exacto y cantidad de cajas de cartón (Pick-HUs) necesarias.", correct:true}, {text:"Calcula el salario del operario.", correct:false}, {text:"Calcula el precio del producto.", correct:false}, {text:"Calcula la fecha de caducidad.", correct:false}] },
-            { question: "¿Qué beneficio principal ofrece el Cartonization en E-commerce?", options: [{text:"Reduce drásticamente el costo de flete al evitar despachar cajas medio vacías llenas de 'aire'.", correct:true}, {text:"Permite pintar las cajas de colores.", correct:false}, {text:"Evita usar código ABAP.", correct:false}, {text:"Aumenta el tráfico de montacargas.", correct:false}] },
-            { question: "¿Por qué el algoritmo de FEFO (First Expired, First Out) es crítico en el Batch Determination?", options: [{text:"Asegura que se despache el lote con la fecha de caducidad más próxima que aún cumpla el umbral exigido por el cliente, minimizando el desecho (Scrap).", correct:true}, {text:"Para que el camión salga primero.", correct:false}, {text:"Para pagar menos impuestos.", correct:false}, {text:"Porque así lo exige el módulo SAP FI.", correct:false}] },
-            { question: "Si un cliente cancela un pedido cuando el palet ya está consolidado en la puerta (Staging Area), el sistema generará:", options: [{text:"Tareas de Almacén de Putaway Inverso (Return to Stock) para regresar el palet a los racks de almacenamiento.", correct:true}, {text:"Una orden de compra automática.", correct:false}, {text:"Un recibo bancario.", correct:false}, {text:"Un Pick Denial.", correct:false}] },
-            { question: "La transacción maestra en SAP EWM que sirve como panel de control, consola de monitoreo, y resolución de atascos es:", options: [{text:"/SCWM/MON (Warehouse Management Monitor)", correct:true}, {text:"/SCWM/WAVE", correct:false}, {text:"MM01", correct:false}, {text:"MIGO", correct:false}] },
-            { question: "Si un operario se va a casa y deja su escáner encendido bloqueando una Warehouse Order, el supervisor usa /SCWM/MON para:", options: [{text:"Desasignar la WO del recurso bloqueado e inyectarla de nuevo en la cola de trabajo para que otro operario la recoja.", correct:true}, {text:"Despedir al operario.", correct:false}, {text:"Borrar la orden de venta.", correct:false}, {text:"Cerrar el almacén.", correct:false}] },
-            { question: "Un Replenishment 'Automático' se desencadena específicamente en el momento en que:", options: [{text:"Se confirma una Warehouse Task de salida y el stock del Bin cae por debajo del 'Minimum Quantity' configurado en los datos maestros.", correct:true}, {text:"Llega el turno de la noche.", correct:false}, {text:"Se libera una Ola.", correct:false}, {text:"Se crea el Maestro de Materiales.", correct:false}] },
-            { question: "¿Puede EWM obligar al sistema de rutas (SAP TM) a cambiar el camión asignado si el peso consolidado excede la capacidad?", options: [{text:"Sí, la integración EWM-TM permite recalcular el Freight Document dinámicamente según el peso y volumen final empaquetado.", correct:true}, {text:"No, SAP TM y EWM no se comunican.", correct:false}, {text:"Solo si el cliente lo autoriza por teléfono.", correct:false}, {text:"Sí, pero solo en el módulo FI.", correct:false}] },
-            { question: "En un Exception Code 'CHBA' (Change Batch), si el lote escaneado por el operario es diferente al lote ordenado por el sistema, ¿qué valida EWM?", options: [{text:"Valida si el nuevo lote cumple con la vida útil y las especificaciones del cliente antes de permitir el cambio.", correct:true}, {text:"Lo rechaza siempre sin importar qué.", correct:false}, {text:"Permite el cambio sin preguntar.", correct:false}, {text:"Cobra una multa al proveedor.", correct:false}] },
-            { question: "En EWM, el concepto 'Staging Area Planning' garantiza que:", options: [{text:"Los palets no colapsen los pasillos del andén, asignando espacios (Bins) exactos en el piso frente a la puerta del camión.", correct:true}, {text:"Los operarios tengan sillas para descansar.", correct:false}, {text:"Se laven los camiones.", correct:false}, {text:"Se imprima la factura en color.", correct:false}] },
-            { question: "El 'Post Goods Issue' (PGI) se considera un proceso irreversible a menos que:", options: [{text:"Se ejecute una transacción de Reversión (Reverse Goods Issue) estrictamente controlada antes de que el camión cruce la puerta física y antes de que se facture.", correct:true}, {text:"El cliente lo pida.", correct:false}, {text:"Se llame a SAP Alemania.", correct:false}, {text:"Es 100% irreversible sin excepciones.", correct:false}] },
-            { question: "Si ocurre un error de 'Locked Bin' (Bin Bloqueado por otro usuario), el sistema RF:", options: [{text:"Puede encolar la tarea temporalmente y dirigir al operario al siguiente pasillo para evitar un cuello de botella físico.", correct:true}, {text:"Fuerza el apagado del escáner.", correct:false}, {text:"Borra el Bin de la base de datos.", correct:false}, {text:"Genera un Pick Denial inmediato.", correct:false}] },
-            { question: "Al configurar Replenishment, la 'Maximum Quantity' (Cantidad Máxima) asegura que:", options: [{text:"El montacargas de reserva no intente empujar más mercancía de la que cabe físicamente en el Bin de picking manual.", correct:true}, {text:"No se compre demasiado al proveedor.", correct:false}, {text:"El operario no cargue más peso de lo permitido en sus brazos.", correct:false}, {text:"La factura no exceda el límite de crédito.", correct:false}] },
-            { question: "Una Warehouse Task (WT) de Replenishment es funcionalmente idéntica a una WT de Putaway en su estructura, excepto por:", options: [{text:"El Process Type (Clase de Proceso), que indica que es un movimiento interno y no una entrada de mercancías (GR).", correct:true}, {text:"Que no requiere escáner.", correct:false}, {text:"Que no afecta el inventario.", correct:false}, {text:"Que no tiene Bin destino.", correct:false}] },
-            { question: "La regla FIFO en Picking estricto significa que:", options: [{text:"El sistema obligará al operario a tomar el stock que entró primero al almacén (fecha de GR más antigua) independientemente de su fecha de caducidad.", correct:true}, {text:"Primero entra el camión, primero sale.", correct:false}, {text:"El primer operador en llegar es el primero en recolectar.", correct:false}, {text:"Financieramente impacta a la Inbound Delivery.", correct:false}] },
-            { question: "¿Qué sucede con el stock congelado (Congelado por Inventario Físico) al intentar liberar una Ola?", options: [{text:"El algoritmo STSS excluye esos Bins de la búsqueda para evitar enviar a un operario a un pasillo que está siendo auditado.", correct:true}, {text:"La Ola se cancela.", correct:false}, {text:"El sistema fuerza el conteo.", correct:false}, {text:"El stock se destruye lógicamente.", correct:false}] },
-            { question: "¿Qué significa 'Zero Stock Check' (Verificación de Stock Cero) durante el Picking?", options: [{text:"Cuando el operario saca la última caja de un Bin, el escáner le pregunta explícitamente '¿Queda el hueco vacío?' para confirmar la exactitud del inventario.", correct:true}, {text:"Una revisión para asegurar que no compramos mercancía inútil.", correct:false}, {text:"Validar que el camión esté vacío.", correct:false}, {text:"Una verificación de facturas con valor cero.", correct:false}] },
-            { question: "Si un operario contesta 'No' al 'Zero Stock Check' (Aún queda mercancía pero el sistema esperaba cero), el sistema:", options: [{text:"Registra una diferencia positiva de inventario y ajusta el saldo para reportar stock encontrado (Found Stock).", correct:true}, {text:"Suspende al operario.", correct:false}, {text:"Bloquea la Ola.", correct:false}, {text:"Genera un Pick Denial.", correct:false}] },
-            { question: "En EWM, el 'Loading Profile' (Perfil de Carga) garantiza que:", options: [{text:"Los palets más pesados se carguen primero (al fondo del remolque) y los ligeros al final, para equilibrar el eje del camión.", correct:true}, {text:"Se imprima el logotipo de la empresa.", correct:false}, {text:"El camión gaste menos combustible.", correct:false}, {text:"Se facture en la moneda correcta.", correct:false}] },
-            { question: "Si usas SAP Fiori en lugar de SAP GUI clásico, el Warehouse Monitor se ve:", options: [{text:"Como un Dashboard gráfico basado en HTML5 (SAPUI5), con indicadores de colores (KPIs) de los cuellos de botella del almacén.", correct:true}, {text:"Igual, como una pantalla azul de texto de los años 90.", correct:false}, {text:"Como una hoja de Excel estática.", correct:false}, {text:"Fiori no soporta EWM.", correct:false}] },
-            { question: "Un 'Handling Unit (HU) Requirement' (Obligación de HU) activo en el Storage Type de destino implica que:", options: [{text:"No puedes depositar mercancía suelta allí. Toda la mercancía debe estar empacada en un código SSCC válido (Palet/Caja).", correct:true}, {text:"Debes cobrar por el palet.", correct:false}, {text:"Solo personal humano puede entrar al pasillo.", correct:false}, {text:"El material es un líquido peligroso.", correct:false}] },
-            { question: "Si en la Outbound Delivery Order (ODO) la ruta es de 3 días, y el cliente pidió entrega para el viernes, el sistema SAP planifica el 'Material Staging Date' (Fecha de consolidación en andén) para el:", options: [{text:"Martes (Viernes menos 3 días de tránsito).", correct:true}, {text:"Viernes.", correct:false}, {text:"Miércoles.", correct:false}, {text:"Jueves.", correct:false}] },
-            { question: "La técnica de consolidar mercancías de múltiples ODOs en un solo palet (HU) para un mismo cliente se gestiona mediante:", options: [{text:"Consolidation Group (Grupo de Consolidación).", correct:true}, {text:"Company Code.", correct:false}, {text:"Storage Section.", correct:false}, {text:"Wave Template.", correct:false}] },
-            { question: "¿Por qué el 'Door Assignment' (Asignación de Puerta) es vital en Outbound?", options: [{text:"Si le asignas la puerta equivocada al palet, el operario de carga podría subir el producto de Walmart en el remolque de Amazon.", correct:true}, {text:"Para que el camión no se estacione en la calle.", correct:false}, {text:"Para pagarle al guardia.", correct:false}, {text:"Para evitar robos.", correct:false}] },
-            { question: "¿Se puede hacer un Replenishment desde un Storage Type a otro Storage Type diferente?", options: [{text:"Sí. Es el escenario clásico: Mover de T002 (Reserva Profunda/Bulk) a T001 (Zona de Picking Dinámico en Piso).", correct:true}, {text:"No, solo dentro del mismo pasillo.", correct:false}, {text:"No, eso requiere un STO.", correct:false}, {text:"Solo si el material es HazMat.", correct:false}] },
-            { question: "Si la red WiFi se cae y los escáneres RF se desconectan, ¿qué pierde el almacén en SAP EWM?", options: [{text:"La trazabilidad en tiempo real. Los operarios tendrían que imprimir Órdenes de Almacén en papel y el supervisor confirmarlas manualmente después en /SCWM/TO_CONF.", correct:true}, {text:"Se borra la base de datos de SAP.", correct:false}, {text:"Se cancelan las órdenes de venta.", correct:false}, {text:"El ERP se reinicia.", correct:false}] },
-            { question: "¿Un consultor EWM debe saber interactuar con FI/CO (Finanzas y Controlling)?", options: [{text:"Absolutamente. Todo Pick Denial, Diferencia de Inventario, o PGI impacta las cuentas de mayor del Balance corporativo.", correct:true}, {text:"No, Logística no maneja dinero.", correct:false}, {text:"Solo para pagar los palets.", correct:false}, {text:"No es su responsabilidad.", correct:false}] },
-            { question: "El código de transacción principal para procesar devoluciones de clientes (Customer Returns) en EWM es:", options: [{text:"Es un flujo Inbound avanzado (EGR u ODR de retorno) usando las mismas transacciones base (/SCWM/PRDI), pero con un Process Type y Control
+            { question: "¿Qué es un Exception Code?", options: [{text:"Código de 4 letras que reporta anomalía y gatilla acción algorítmica.", correct:true}, {text:"Error ABAP.", correct:false}] },
+            { question: "Código para Pick Denial (Rack vacío):", options: [{text:"BIDF (Bin Denied)", correct:true}, {text:"MIGO", correct:false}] },
+            { question: "Acción de EWM tras un BIDF:", options: [{text:"Ajusta inventario, bloquea Bin, busca alternativo.", correct:true}, {text:"Despide operario.", correct:false}] },
+            { question: "Documento generado para investigar faltantes:", options: [{text:"Physical Inventory Document", correct:true}, {text:"Purchase Order", correct:false}] },
+            { question: "¿Qué Replenishment ocurre durante el Wave Release?", options: [{text:"Order-Related Replenishment", correct:true}, {text:"Planned", correct:false}] },
+            { question: "Cálculo matemático del tamaño de caja de envío:", options: [{text:"Cartonization Planning", correct:true}, {text:"Slotting", correct:false}] },
+            { question: "FEFO significa:", options: [{text:"First Expired, First Out", correct:true}, {text:"First Empty, First Out", correct:false}] },
+            { question: "Consola maestra de monitoreo EWM:", options: [{text:"/SCWM/MON", correct:true}, {text:"/SCWM/WAVE", correct:false}] }
+        ]
+    },
+    {
+        id: "s3_l2",
+        semester: 3,
+        type: "lab",
+        title: "3.4 Lab Multi-Paso: Resolución Pick Denial",
+        duration: "2 Horas • Crisis Management",
+        req: "s3_m2",
+        description: "El operario llegó al Bin A-01 y reporta que el rack está vacío. Registra la excepción y dispara el reabastecimiento.",
+        simTask: { hint: "Fases: /RFUI -> BIDF -> /SCWM/MON -> LQUA -> REPLENISH -> CONFIRM -> PGI." },
+        simSteps: [
+            { instruction: "Simulador RF", expectedCmd: "/RFUI", hint: "/RFUI", successMessage: "> Emulador RF cargado." },
+            { instruction: "Excepción", expectedCmd: "BIDF", hint: "BIDF", successMessage: "> BIDF Registrado. Bin Bloqueado." },
+            { instruction: "Monitor", expectedCmd: "/SCWM/MON", hint: "/SCWM/MON", successMessage: "> Ola en riesgo detectada." },
+            { instruction: "Auditar", expectedCmd: "LQUA", hint: "LQUA", successMessage: "> Stock hallado en Reserva." },
+            { instruction: "Reabastecer", expectedCmd: "REPLENISH", hint: "REPLENISH", successMessage: "> WT Creada." },
+            { instruction: "Confirmar Rescate", expectedCmd: "CONFIRM", hint: "CONFIRM", successMessage: "> Stock en Staging." },
+            { instruction: "Cierre Financiero", expectedCmd: "PGI", hint: "PGI", successMessage: "> CRISIS RESUELTA." }
+        ]
+    }
+];
