@@ -1,9 +1,8 @@
 /**
- * Logística Pro - Motor UI (Paginación, Exámenes Anti-Trampas y Perfil)
+ * Logística Pro - Motor UI (Paginación, Exámenes Anti-Trampas, Perfil y Glosario)
  */
 let currentLessonState = { id: null, page: 0, answers: [], score: 0, activeExam: [] };
 
-// Algoritmo matemático para barajar arrays aleatoriamente (Fisher-Yates)
 function shuffleArray(array) {
     let newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -16,6 +15,8 @@ function shuffleArray(array) {
 const UIRenderer = {
     renderDashboard() {
         const container = document.getElementById('view-container');
+        if (!container) return;
+
         let html = `<span class="tag-subtitle">Ruta de Especialización EWM</span><h2 class="main-title">Módulos Universitarios</h2>`;
 
         syllabusData.forEach((mod, idx) => {
@@ -83,13 +84,11 @@ const UIRenderer = {
         container.scrollTop = 0;
     },
 
-    // MOTOR DE EXÁMENES MEJORADO (ANTI-TRAMPAS)
     startExam(itemId) {
         AudioEngine.play('click');
         const mod = syllabusData.find(i => i.id === itemId);
         const container = document.getElementById('view-container');
         
-        // 1. Barajar el orden de las preguntas del examen
         currentLessonState.activeExam = shuffleArray(mod.exam);
         currentLessonState.answers = new Array(currentLessonState.activeExam.length).fill(null);
         
@@ -101,7 +100,6 @@ const UIRenderer = {
         `;
 
         currentLessonState.activeExam.forEach((q, qIndex) => {
-            // 2. Barajar el orden de las opciones de respuesta (A, B, C, D)
             const shuffledOptions = shuffleArray(q.options);
             
             let optionsHtml = shuffledOptions.map((opt, oIndex) => `
@@ -171,24 +169,32 @@ const UIRenderer = {
         }
     },
 
-    renderProfile() { /* ... sin cambios en el perfil ... */
+    renderProfile() {
         const container = document.getElementById('view-container');
-        const pct = AppState.getProgressPercentage();
+        if (!container) return;
+
+        // Validamos que el progreso sea un número seguro
+        let pct = 0;
+        try { pct = AppState.getProgressPercentage(); } catch (e) { pct = 0; }
+
         container.innerHTML = `
             <span class="tag-subtitle">Administración de Cuenta</span>
             <h2 class="main-title">Mi Perfil Estudiantil</h2>
+            
             <div class="review-box">
                 <h4>Progreso Total Académico</h4>
                 <p>Has completado el <strong>${pct}%</strong> de la Maestría WMS.</p>
             </div>
+
             <div class="module-card" style="margin-top:30px; cursor:default;">
                 <h3 style="color:var(--cyan);">💾 Crear Copia de Seguridad</h3>
-                <p>Exporta tu progreso, puntajes y apuntes.</p>
+                <p>Exporta tu progreso, puntajes y apuntes. Si cambias de teléfono, podrás restaurar este archivo.</p>
                 <button class="btn btn-primary" onclick="AppState.exportBackup()">Descargar Backup (.json)</button>
             </div>
+
             <div class="module-card" style="margin-top:20px; cursor:default;">
                 <h3 style="color:var(--warning);">📥 Restaurar Copia</h3>
-                <p>Carga un archivo .json de Logística Pro para recuperar tu cuenta.</p>
+                <p>Carga un archivo .json de Logística Pro para recuperar tu cuenta. (Sobrescribirá el progreso actual).</p>
                 <input type="file" id="backup-file" accept=".json" style="display:none;" onchange="AppState.importBackup(event)">
                 <button class="btn btn-outline" onclick="document.getElementById('backup-file').click()">Seleccionar Archivo</button>
             </div>
@@ -198,12 +204,14 @@ const UIRenderer = {
     
     renderGlossary() {
         const container = document.getElementById('view-container');
+        if (!container) return;
+
         container.innerHTML = `
             <span class="tag-subtitle">Glosario Corporativo</span>
             <h2 class="main-title">Transacciones Clave</h2>
-            <div class="module-card"><div class="card-top"><span class="card-badge">MM / IM</span></div><h3>MIGO</h3><p>Movimiento general de mercancías.</p></div>
-            <div class="module-card"><div class="card-top"><span class="card-badge">WM / EWM</span></div><h3>LT01</h3><p>Creación de Orden de Transporte interna.</p></div>
-            <div class="module-card"><div class="card-top"><span class="card-badge">CUSTOMIZING</span></div><h3>OX09</h3><p>Mantenimiento de Storage Locations.</p></div>
+            <div class="module-card"><div class="card-top"><span class="card-badge">MM / IM</span></div><h3>MIGO</h3><p>Movimiento general de mercancías (Entradas, salidas, traslados).</p></div>
+            <div class="module-card"><div class="card-top"><span class="card-badge">WM / EWM</span></div><h3>LT01</h3><p>Creación manual de Orden de Transporte interna en el almacén.</p></div>
+            <div class="module-card"><div class="card-top"><span class="card-badge">CUSTOMIZING</span></div><h3>OX09</h3><p>Mantenimiento y creación de Storage Locations vinculados al Plant.</p></div>
         `;
         container.scrollTop = 0;
     }
