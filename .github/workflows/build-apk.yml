@@ -27,6 +27,22 @@ jobs:
       - name: Instalar Dependencias
         run: npm install
 
+      - name: Crear Ícono Nativo (Fallback)
+        run: |
+          mkdir -p assets
+          if [ ! -f assets/icon.png ]; then
+            cat << 'EOF' > assets/icon.svg
+            <svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1024" height="1024" fill="#0A192F"/>
+              <path d="M512 250L250 400v300l262 150 262-150V400L512 250z" fill="none" stroke="#00F0FF" stroke-width="40"/>
+              <path d="M512 250v300 M250 400l262 150 M774 400L512 550" stroke="#00F0FF" stroke-width="40"/>
+            </svg>
+            EOF
+            sudo apt-get update && sudo apt-get install -y librsvg2-bin
+            rsvg-convert -w 1024 -h 1024 assets/icon.svg -o assets/icon.png
+            cp assets/icon.png assets/splash.png
+          fi
+
       - name: Empaquetar Arquitectura Modular
         run: |
           mkdir -p www
@@ -38,24 +54,19 @@ jobs:
           npx capacitor-assets generate --android
           npx cap sync android
 
-      - name: Configurar Llave Fija para Actualizaciones (Firma Permanente)
+      - name: Generar Llave de Producción
         run: |
           cd android/app
-          # Generamos una llave criptográfica fija y automatizada
           keytool -genkey -v -keystore logistica.keystore -alias logistica_alias -keyalg RSA -keysize 2048 -validity 10000 -storepass logistica123 -keypass logistica123 -dname "CN=Logistica Pro, OU=Masterclass, O=Logistica, L=Armenia, S=Quindio, C=CO"
-          # Modificamos build.gradle para inyectar la firma al APK Release
-          sed -i '/buildTypes {/i \    signingConfigs {\n        release {\n            storeFile file("logistica.keystore")\n            storePassword "logistica123"\n            keyAlias "logistica_alias"\n            keyPassword "logistica123"\n        }\n    }' build.gradle
-          sed -i 's/release {/release {\n            signingConfig signingConfigs.release/g' build.gradle
 
-      - name: Compilar APK Final (Release)
+      - name: Compilar APK Final (Release Seguro)
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease -Pandroid.injected.signing.store.file=$(pwd)/app/logistica.keystore -Pandroid.injected.signing.store.password=logistica123 -Pandroid.injected.signing.key.alias=logistica_alias -Pandroid.injected.signing.key.password=logistica123
 
       - name: Subir APK
         uses: actions/upload-artifact@v4
         with:
           name: LogisticaPro-App
-          # Ahora extraemos la versión Release, firmada y optimizada
           path: android/app/build/outputs/apk/release/app-release.apk
