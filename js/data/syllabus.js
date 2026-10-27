@@ -1,148 +1,165 @@
 /**
- * Logística Pro - Base de Datos Masiva
- * Nivel: Maestría y Consultoría Corporativa
+ * Logística Pro - Base de Datos Masiva (Masterclass WMS / SAP)
+ * Nivel: Consultoría y Arquitectura Corporativa
  */
 const syllabusData = [
     {
         id: "s1_m1",
         semester: 1,
         type: "theory",
-        title: "1.1 La Arquitectura Empresarial (Enterprise Structure)",
-        duration: "1 Hora 30 Min • Teoría Core",
-        description: "Cómo mapear legal y logísticamente una corporación multinacional en SAP.",
-        content: `
-            <span class="tag-subtitle">Módulo 1.1 • Consultoría Nivel 1</span>
-            <h2>El Lienzo en Blanco de SAP</h2>
-            <p>Imagina que eres contratado por Tesla para implementar su logística en Alemania. No puedes simplemente abrir SAP y crear un "Almacén". El software exige que construyas una jerarquía legal, financiera y física exacta.</p>
+        title: "1.1 Arquitectura Empresarial (Enterprise Structure)",
+        duration: "3 Horas • Especialización",
+        description: "Aprende a mapear corporaciones multinacionales desde la sociedad financiera hasta el almacén físico.",
+        review: "La jerarquía inquebrantable de SAP: Client -> Company Code (Finanzas) -> Plant (Operaciones) -> Storage Location (MM) -> Warehouse Number (EWM). Todo movimiento de caja afecta a la contabilidad.",
+        pages: [
+            `<h3>El Lienzo Corporativo</h3>
+            <p>Un error común de los ingenieros junior es pensar que un almacén en SAP es solo un edificio. En la vida real, SAP requiere un mapeo <strong>legal y financiero</strong> antes de permitirte guardar una sola caja. Cuando implementas SAP en una empresa (ej. Coca-Cola), debes estructurar la compañía de Macro a Micro.</p>
+            <ul>
+                <li><strong>El Mandante (Client):</strong> Es el nivel de base de datos más alto. Los datos aquí se comparten en toda la corporación a nivel mundial.</li>
+                <li><strong>La Sociedad (Company Code - FI):</strong> Es la entidad legal. Emite balances y paga impuestos (Ej. Coca-Cola Colombia S.A.S). La logística no existe si no está amparada por un Company Code, ya que cada palet tiene un valor monetario.</li>
+            </ul>`,
             
-            <h2>1. La Sociedad (Company Code - FI)</h2>
-            <p>Es el nivel más alto. Representa una entidad legal independiente (Ej. Tesla GMBH). Todo el dinero, los balances financieros y los impuestos se calculan aquí. A la logística no le importa la Sociedad, pero <strong>ningún material puede comprarse sin pertenecer a una.</strong></p>
-
-            <h2>2. El Centro (Plant - Logística General)</h2>
-            <p>El "Centro" (Plant) es el corazón de la manufactura y la distribución corporativa. Un Plant puede ser una mega-fábrica o un centro de distribución regional. El ERP usa el Plant para calcular la planificación de la producción (MRP) y los costos de flete.</p>
-
-            <h2>3. Almacén MM (Storage Location - IM)</h2>
-            <p>Dentro de un Centro, puedes tener múltiples "Storage Locations" (Ej. SL01 para Producto Terminado, SL02 para Cuarentena, SL03 para Chatarra). Hasta aquí, SAP solo sabe <strong>cuántas</strong> cajas tienes y su valor contable, pero no tiene ni idea de en qué estante exacto están.</p>
-
-            <h2>4. Número de Almacén (Warehouse Number - EWM)</h2>
-            <p>Aquí entra la magia física. El "Storage Location" del ERP se enlaza umbilicalmente a un "Warehouse Number" en el sistema WMS. A partir de este nivel, dejamos de hablar de dinero y empezamos a hablar de <strong>Coordenadas X, Y, Z, volumen y peso</strong>.</p>
-        `,
-        review: "La jerarquía estricta es: Sociedad (Legal/Finanzas) ➔ Centro (Operaciones Macro) ➔ Storage Location (Inventario MM) ➔ Warehouse Number (Control Físico Tridimensional EWM).",
-        quiz: {
-            question: "En la jerarquía corporativa de SAP, ¿qué nivel organizativo es el responsable estricto de emitir los balances financieros y pagar impuestos, al cual se debe anclar cualquier operación logística?",
-            options: [
-                { text: "El Centro (Plant)", correct: false },
-                { text: "La Sociedad (Company Code)", correct: true },
-                { text: "El Número de Almacén (Warehouse Number)", correct: false }
-            ],
-            explanation: "El Company Code es la entidad legal suprema en SAP FI. Todo centro logístico debe pertenecer obligatoriamente a un Company Code para que los movimientos de inventario generen asientos contables reales.",
-            hint: "Piensa en el departamento de contabilidad. Ellos no gestionan fábricas, gestionan Entidades Legales."
-        }
+            `<h3>El Centro Logístico (Plant)</h3>
+            <p>El "Plant" es la unidad operativa fundamental. Representa una fábrica, un mega centro de distribución o incluso una sucursal corporativa de mantenimiento. Todo el módulo de <strong>Planificación de Producción (PP)</strong> y <strong>Gestión de Materiales (MM)</strong> gira en torno al Plant.</p>
+            <p>Dentro de un Plant, el inventario se divide en <strong>Storage Locations</strong> (Almacenes Lógicos). Estos no tienen geometría. Si tienes 1,000 laptops en el Storage Location 0001, SAP MM sabe que tienes 1,000 unidades y que valen $1,000,000 USD, pero <em>no tiene ni idea de en qué pasillo están</em>. Es un inventario ciego.</p>`,
+            
+            `<h3>El Cruce de la Frontera: Warehouse Number</h3>
+            <p>Para darle visión tridimensional al sistema, el Storage Location lógico de MM se "enchufa" a un <strong>Warehouse Number (Número de Almacén)</strong> en el módulo EWM.</p>
+            <p>En el instante en que la mercancía cruza al Warehouse Number, las reglas cambian. El dinero pasa a un segundo plano y el sistema empieza a calcular <strong>Volumen (M3), Peso (KG), Rutas de Montacargas, y Pasillos de Alta Rotación</strong>. EWM es un motor de ejecución física en tiempo real.</p>`
+        ],
+        exam: [
+            {
+                question: "¿Qué nivel de la estructura organizativa de SAP se encarga estrictamente de la presentación de balances financieros e impuestos legales?",
+                options: [
+                    { text: "El Centro (Plant)", correct: false },
+                    { text: "El Storage Location", correct: false },
+                    { text: "La Sociedad (Company Code)", correct: true },
+                    { text: "El Warehouse Number", correct: false }
+                ]
+            },
+            {
+                question: "Si el módulo SAP MM (Materials Management) conoce la cantidad total y el valor del inventario, ¿por qué necesitamos conectarlo a SAP EWM?",
+                options: [
+                    { text: "Porque MM no puede emitir órdenes de compra, solo EWM puede.", correct: false },
+                    { text: "Porque MM es ciego respecto a la geometría (Pasillos, Racks) y EWM mapea la ubicación exacta (Coordenadas X, Y, Z).", correct: true },
+                    { text: "Porque EWM calcula los impuestos de importación.", correct: false }
+                ]
+            },
+            {
+                question: "Verdadero o Falso: Un Storage Location puede existir sin estar asignado a un Plant.",
+                options: [
+                    { text: "Falso. Todo Storage Location debe pertenecer físicamente y lógicamente a un Plant.", correct: true },
+                    { text: "Verdadero. Son entidades independientes.", correct: false }
+                ]
+            }
+        ]
     },
     {
         id: "s1_l1",
         semester: 1,
         type: "lab",
-        title: "1.2 Lab: Vinculación de Centro y Almacén (OX09)",
-        duration: "25 Min • Simulador SAP",
+        title: "1.2 Lab Multi-Paso: Customizing de Estructura",
+        duration: "45 Min • Simulador SAP",
         req: "s1_m1",
-        description: "Ejecuta la transacción de parametrización (SPRO) para crear un Storage Location dentro de tu Plant.",
-        simTask: {
-            instruction: "Eres el consultor líder. Tu cliente ha construido una nueva nave logística anexa a la fábrica principal (Plant 1000). Para que el ERP pueda empezar a registrar mercancía ahí, debes ejecutar el T-Code estándar de Customizing para 'Mantener Almacenes' (Maintain Storage Location).",
-            expectedCmd: "OX09",
-            successMessage: "SUCCESS [SAP_RC: 00]:\n> Entrando a SPRO Customizing...\n> Entidad Creada: Storage Location '0001'\n> Vinculada exitosamente al Plant 1000.\n> La estructura IM está lista.",
-            hint: "El comando empieza con la letra 'O' y termina con 'X09'. En el mundo real, los consultores se aprenden estos códigos de memoria para evitar navegar por el inmenso árbol de SPRO."
-        }
+        description: "Entra al sistema troncal de parametrización y crea un Storage Location desde cero.",
+        simTask: { hint: "En la vida real, los consultores no usan los menús. Usan los T-Codes directamente. Sigue las instrucciones del simulador." },
+        simSteps: [
+            {
+                instruction: "<strong>FASE 1:</strong> Como consultor SAP, debes ingresar al menú principal de parametrización del sistema. Ingresa el T-Code universal de Customizing.",
+                expectedCmd: "SPRO",
+                hint: "S_ _ O",
+                successMessage: "> AUTORIZACIÓN VERIFICADA\n> Cargando SAP Reference IMG...\n> Árbol de configuración desplegado."
+            },
+            {
+                instruction: "<strong>FASE 2:</strong> Ahora que estás en el menú IMG, ejecuta la transacción directa para 'Mantener Almacenes' (Maintain Storage Location).",
+                expectedCmd: "OX09",
+                hint: "Empieza por O y termina con X09",
+                successMessage: "> Abriendo tabla T001L...\n> Bloqueando tabla para edición exclusiva...\n> Ingrese datos del nuevo almacén."
+            },
+            {
+                instruction: "<strong>FASE 3:</strong> El sistema pide el código de la nueva locación. Escribe 'SAVE' para guardar el Storage Location 0001 en el Plant 1000.",
+                expectedCmd: "SAVE",
+                hint: "Escribe SAVE",
+                successMessage: "> Generando orden de transporte (Transport Request)...\n> Guardando en base de datos de producción...\n> SUCCESS: Storage Location 0001 activado."
+            }
+        ]
     },
     {
         id: "s1_m2",
         semester: 1,
         type: "theory",
-        title: "1.3 El Maestro de Materiales (Material Master)",
-        duration: "1 Hora 45 Min • Teoría Core",
+        title: "1.3 Material Master (El ADN del Inventario)",
+        duration: "4 Horas • Especialización",
         req: "s1_l1",
-        description: "El ADN de la logística. Cómo definir los atributos físicos, de compra y de almacenamiento de un producto.",
-        content: `
-            <span class="tag-subtitle">Módulo 1.2 • Gestión de Datos Maestros</span>
-            <h2>El ADN del Inventario: Material Master</h2>
-            <p>En SAP, no puedes simplemente escribir "Laptop Dell" en una orden de compra. Tienes que crear un registro maestro que contiene más de 300 campos de información divididos en "Vistas" (Views). Diferentes departamentos mantienen diferentes vistas del mismo código de material.</p>
-
-            <h2>Las Vistas Críticas:</h2>
-            <ul>
-                <li><strong>Vistas Básicas (Basic Data 1 & 2):</strong> Información universal. Aquí se define el Número de Material, la Descripción global, la Unidad de Medida Base (ej. Unidad, Litro, Kg) y el peso bruto/neto. Esto lo ve toda la empresa.</li>
-                <li><strong>Vista de Compras (Purchasing):</strong> Mantenida por los compradores. Define si el producto requiere inspección de calidad obligatoria al llegar o quién es el grupo de compras responsable.</li>
-                <li><strong>Vistas Plant/Storage (Datos de Centro/Almacén):</strong> Define condiciones ambientales. ¿Este producto requiere refrigeración? ¿Es material peligroso (HazMat)? ¿Tiene fecha de caducidad (SLED)?</li>
-                <li><strong>Vista Warehouse Management (WM Execution):</strong> Aquí EWM toma el control. Define el <em>Putaway Control Indicator</em> (Estrategia de almacenamiento: ¿Va a estantería pesada o a zona de picking ligero?) y los perfiles de paletización (¿Cuántas cajas caben en un palet estándar de madera?).</li>
-            </ul>
-
-            <h2>Unidades de Medida Alternativas (UOM)</h2>
-            <p>Un error clásico es no definir las conversiones. En la <em>Basic Data</em> debes decirle a SAP: 1 Palet (PAL) = 50 Cajas (CAR) = 500 Unidades Base (EA). Si omites esto, el WMS no sabrá calcular el espacio necesario cuando llegue un camión.</p>
-        `,
-        review: "El Maestro de Materiales es transversal. Ventas, Finanzas, Compras y Logística comparten el mismo código, pero cada departamento llena su propia 'Vista' de información. EWM requiere la vista de Warehouse Management para saber cómo mover físicamente el objeto.",
-        quiz: {
-            question: "Si necesitas configurar el sistema para que sepa que 1 Palet contiene 120 cajas, y que esas cajas deben almacenarse en la zona de 'Alta Rotación', ¿qué vistas del Maestro de Materiales debes configurar?",
-            options: [
-                { text: "La vista de Ventas y la vista de Finanzas.", correct: false },
-                { text: "Vistas Básicas (para la conversión de UOM) y la vista de Warehouse Management (para la zona de almacenamiento).", correct: true },
-                { text: "Exclusivamente la vista de Compras.", correct: false }
-            ],
-            explanation: "Perfecto. Las Vistas Básicas manejan las matemáticas de conversión (UOM), y la vista WM (Warehouse Management) dicta el comportamiento físico dentro del almacén.",
-            hint: "Piensa: ¿Quién hace la matemática de conversión? (Básico). ¿Quién decide en qué estante va? (WMS)."
-        }
+        description: "Anatomía de los datos maestros. Cómo las 'Vistas' definen el comportamiento algorítmico del WMS.",
+        review: "Vistas Básicas (UOM) -> Vista Compras (PO) -> Vista Plant/Storage (Hazmat/SLED) -> Vista WM (Estrategia Putaway). Un error en las conversiones destruye los cálculos volumétricos del WMS.",
+        pages: [
+            `<h3>La Anatomía del Producto</h3>
+            <p>El Maestro de Materiales no es solo un nombre y un código de barras. Es una base de datos gigantesca, dividida en <strong>Vistas (Views)</strong>. Cuando creas un material en SAP, debes seleccionar qué departamentos interactuarán con él. Las vistas más críticas para un arquitecto logístico son cuatro.</p>`,
+            
+            `<h3>1. Vistas Básicas (Basic Data)</h3>
+            <p>Es información global (Mandante). Aquí configuras el Número de Material, la Descripción y lo más importante: <strong>La Unidad de Medida Base (Base UOM)</strong>.</p>
+            <p>Regla de oro de SAP: La Base UOM debe ser la unidad más pequeña en la que se pueda gestionar el material (Ej. "Pieza" o "EA"). A partir de ahí, creas <strong>Unidades de Medida Alternativas</strong>. Debes decirle al sistema matemáticamente: <em>1 Palet (PAL) = 50 Cajas (CAR) = 500 Piezas (EA)</em>. Sin esta matemática, el WMS no puede calcular cuántos palets vienen en un camión de 10,000 piezas.</p>`,
+            
+            `<h3>2. Vistas de Ejecución y EWM</h3>
+            <p><strong>Vista Plant Data / Storage:</strong> Aquí defines las variables ambientales. ¿El producto tiene Fecha de Caducidad (SLED - Shelf Life Expiration Date)? ¿Requiere control de temperatura? ¿Es inflamable?</p>
+            <p><strong>Vista Warehouse Management:</strong> El núcleo físico. Aquí configuras el <em>Control de Entrada de Almacén (Putaway Control Indicator)</em>. Este campo es el que le dice al algoritmo de EWM: "Este producto es pesado, busca ubicaciones vacías únicamente en los niveles a ras de piso del Bulk Storage".</p>`
+        ],
+        exam: [
+            {
+                question: "¿Cuál es la regla de oro para definir la Unidad de Medida Base (Base UOM) en el Material Master?",
+                options: [
+                    { text: "Debe ser siempre el Palet, porque es más fácil de contar.", correct: false },
+                    { text: "Debe ser la unidad física más pequeña en la que se pueda mover o gestionar el producto (Ej. Pieza).", correct: true },
+                    { text: "Debe ser la unidad de medida que usa el proveedor en China.", correct: false }
+                ]
+            },
+            {
+                question: "¿Qué ocurre en SAP EWM si olvidas configurar las conversiones de unidades de medida alternativas (Ej. 1 Palet = 50 Cajas)?",
+                options: [
+                    { text: "El sistema WMS no podrá calcular correctamente el peso y el volumen para asignar las ubicaciones tridimensionales.", correct: true },
+                    { text: "El sistema no permite emitir facturas al cliente.", correct: false },
+                    { text: "Nada, EWM asume por defecto que todo viene en Palets.", correct: false }
+                ]
+            },
+            {
+                question: "El 'Putaway Control Indicator', que le dicta al algoritmo a qué tipo de estantería debe ir un producto, se configura en:",
+                options: [
+                    { text: "La Vista de Contabilidad", correct: false },
+                    { text: "La Vista de Compras", correct: false },
+                    { text: "La Vista de Warehouse Management", correct: true }
+                ]
+            }
+        ]
     },
     {
         id: "s1_l2",
         semester: 1,
         type: "lab",
-        title: "1.4 Lab: Creación de Maestro de Materiales (MM01)",
-        duration: "20 Min • Simulador SAP",
+        title: "1.4 Lab Multi-Paso: Alta de Materiales",
+        duration: "30 Min • Simulador SAP",
         req: "s1_m2",
-        description: "Accede al módulo MM y genera el registro maestro para un nuevo smartphone.",
-        simTask: {
-            instruction: "El equipo de I+D ha lanzado un nuevo producto. Debes crear su registro en el sistema antes de que compras pueda ordenar el primer lote a China. Inicia la transacción estándar global de creación de materiales.",
-            expectedCmd: "MM01",
-            successMessage: "SUCCESS [SAP_RC: 00]:\n> Cargando dynpro de Material Master...\n> Vistas seleccionadas: Basic, Purchasing, WM.\n> Guardando en BD...\n> Material 'PRD-9945' creado exitosamente.",
-            hint: "Es la transacción número uno de SAP Materials Management. Las letras son 'MM' y los números son '01' (01 siempre es crear en SAP)."
-        }
-    },
-    {
-        id: "s1_m3",
-        semester: 1,
-        type: "theory",
-        title: "1.5 La Geometría Interna: Storage Types y Bins",
-        duration: "2 Horas • Teoría Core",
-        req: "s1_l2",
-        description: "Dejamos el ERP. Bienvenidos a EWM. Así se mapea el espacio físico en tres dimensiones.",
-        content: `
-            <span class="tag-subtitle">Módulo 1.3 • Topografía EWM</span>
-            <h2>Mapeando la Realidad en Coordenadas</h2>
-            <p>En el momento en que cruzamos la frontera hacia el Warehouse Management System (WMS), la unidad más importante ya no es el dinero, es el <strong>Espacio</strong>.</p>
-            
-            <h2>1. Tipo de Almacén (Storage Type)</h2>
-            <p>Es la división física o lógica más grande de tu nave industrial. Un EWM debe tener separados los tipos de tecnología. Ejemplos de Storage Types:</p>
-            <ul>
-                <li><strong>High Rack Storage:</strong> Racks convencionales a gran altura operados por montacargas retráctiles (Reach Trucks).</li>
-                <li><strong>Bulk Storage (Bloque):</strong> Zonas en el piso sin estanterías, donde se apilan pallets pesados (ej. bebidas, cemento) uno sobre otro.</li>
-                <li><strong>Open Storage:</strong> Patios exteriores (ej. para almacenar tuberías de acero o vehículos).</li>
-                <li><strong>Picking Zone:</strong> Estanterías dinámicas bajas (Carton Flow) diseñadas exclusivamente para que los humanos recojan unidades sueltas a mano.</li>
-            </ul>
-
-            <h2>2. Secciones (Storage Sections)</h2>
-            <p>Subdivide el Storage Type. Por ejemplo, dentro del "High Rack", puedes crear una sección "Fast-Moving" (Alta Rotación) cerca del pasillo principal, y otra "Slow-Moving" al fondo.</p>
-
-            <h2>3. Las Ubicaciones (Storage Bins)</h2>
-            <p>Es la coordenada exacta final (X, Y, Z). Su nomenclatura es estrictamente lógica para que el operario no se pierda. Un estándar industrial es: <strong>[Pasillo]-[Columna]-[Nivel]</strong>.<br>Ejemplo de Bin: <code>A12-05-03</code> (Pasillo 12, Columna 5, Nivel 3). A nivel de sistema de datos, a este Bin se le asigna una capacidad máxima de peso (ej. 1000 Kg) para evitar que un palet pesado rompa la estantería.</p>
-        `,
-        review: "De Macro a Micro en EWM: El Warehouse Number se divide en Storage Types (Tipo de tecnología de rack). Estos en Storage Sections (Zonas de rotación). Y estos finalmente en Storage Bins (Coordenada exacta X,Y,Z).",
-        quiz: {
-            question: "Un cliente te pide configurar una zona en el piso, sin estanterías de acero, para apilar de a 3 niveles pallets completos de agua embotellada. ¿Qué Storage Type es el adecuado?",
-            options: [
-                { text: "High Rack Storage (Estantería en Altura)", correct: false },
-                { text: "Picking Zone (Zona de recolección manual)", correct: false },
-                { text: "Bulk Storage (Almacenamiento en Bloque/Piso)", correct: true }
-            ],
-            explanation: "Correcto. El Bulk Storage está diseñado algorítmicamente para zonas sin estantería, permitiendo apilar unidades (Stacking) y gestionando carriles en el piso en lugar de Bins individuales en altura.",
-            hint: "Piensa en el volumen masivo y en cosas que se apilan en el piso unas sobre otras."
-        }
+        description: "Crea el Maestro de Materiales para el producto 'Motor V8' configurando sus vistas logísticas.",
+        simTask: { hint: "Utiliza el comando estándar para Crear Materiales." },
+        simSteps: [
+            {
+                instruction: "<strong>PASO 1:</strong> Inicia la transacción estándar de MM para Crear un Maestro de Materiales.",
+                expectedCmd: "MM01",
+                hint: "MM01",
+                successMessage: "> Accediendo a Creación de Material...\n> Seleccione el Ramo (Industry Sector) y Tipo de Material."
+            },
+            {
+                instruction: "<strong>PASO 2:</strong> Hemos seleccionado Ramo: Ingeniería Mecánica y Tipo: Producto Terminado (FERT). El sistema te pide las Vistas. Escribe 'WM' para seleccionar las Vistas de Warehouse Management.",
+                expectedCmd: "WM",
+                hint: "Escribe WM",
+                successMessage: "> Vistas WM seleccionadas.\n> Cargando Dynpro de datos logísticos...\n> Ingresa Putaway Control Indicator."
+            },
+            {
+                instruction: "<strong>PASO 3:</strong> Para un 'Motor V8', la estantería convencional colapsaría. Escribe 'BULK' para asignarlo algorítmicamente a almacenamiento en piso, y guardar.",
+                expectedCmd: "BULK",
+                hint: "Escribe BULK",
+                successMessage: "> Asignando Estrategia: BULK STORAGE.\n> Evaluando pesos y dimensiones...\n> Guardando Material PRD-V800.\n> SUCCESS: Material listo para ser importado."
+            }
+        ]
     }
 ];
