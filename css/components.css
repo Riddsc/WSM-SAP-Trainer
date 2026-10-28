@@ -526,93 +526,101 @@ body {
     50% { transform: translateY(-8px); }
 }
 /* ==========================================
-   INTERFAZ DE SETTINGS, ALERTAS Y ZONA DE PELIGRO
+   FIX MASCOTA: ALINEACIÓN ESTRICTA Y PERFECTA
    ========================================== */
-.settings-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid var(--border-light);
-}
-
-.settings-label {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.time-picker-input {
-    background: rgba(128,128,128,0.1);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    padding: 10px 15px;
-    font-family: inherit;
-    font-size: 1.1rem;
-    font-weight: bold;
-    outline: none;
-    transition: border-color 0.3s;
-}
-
-.time-picker-input:focus {
-    border-color: var(--cyan);
-}
-
-.btn-danger {
-    background: transparent;
-    border: 2px solid var(--danger);
-    color: var(--danger);
-    box-shadow: none;
-}
-
-.btn-danger:active {
-    background: rgba(239, 68, 68, 0.1);
-    transform: scale(0.98);
-}
-/* Clase para ocultar solo el texto, dejando al robot visible */
-.bubble-hidden {
-    opacity: 0;
-    transform: translateY(10px) scale(0.9);
-    pointer-events: none;
-}
-/* ==========================================
-   FIX DEFINITIVO: ALINEACIÓN PERFECTA (FLEXBOX)
-   ========================================== */
-/* Convertimos el contenedor en una columna apilada al centro */
 #mascot-container {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    width: 110px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: flex-end !important;
+    z-index: 9999 !important;
 }
 
-/* Quitamos cualquier posición flotante de los SVG para que respeten la columna */
 #svg-mecharidds, #svg-mechanizer {
-    position: relative !important;
-    left: auto !important;
-    bottom: auto !important;
+    width: 100px !important;
+    height: auto !important;
+    margin: 0 auto !important;
 }
 
-/* El letrero descansa justo en el medio, bajándolo un poco hacia la frente */
 #mascot-name {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    bottom: auto !important;
-    transform: translateY(12px) !important; /* Efecto de solapamiento con la cabeza */
-    z-index: 20 !important;
+    position: absolute !important;
+    bottom: 80px !important; /* Lo ancla a la altura de la frente */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    white-space: nowrap !important;
+    z-index: 10 !important;
     margin: 0 !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5) !important;
 }
 
-/* Movemos el globo de texto ligeramente a la derecha estilo cómic */
 #mascot-message {
-    position: relative !important;
-    margin-bottom: 0 !important;
-    z-index: 10 !important;
-    transform: translateX(25px) !important; 
+    position: absolute !important;
+    bottom: 120px !important; /* Sube por encima de la cabeza */
+    right: 30px !important; /* Se ancla hacia la izquierda */
+    width: max-content !important;
+    max-width: 220px !important;
+    z-index: 5 !important;
+    transform-origin: bottom right !important;
 }
+
+/* ==========================================
+   ESTILOS PREMIUM PARA SETTINGS Y PERFIL
+   ========================================== */
+.modern-input {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(6,182,212,0.3);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1.05rem;
+    outline: none;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+.modern-input:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 10px rgba(6,182,212,0.2);
+    background: rgba(0,0,0,0.4);
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+.report-table th, .report-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    text-align: left;
+}
+.report-table th { color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; }
+.status-badge { padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 0.75rem; }
+.status-done { background: rgba(16,185,129,0.2); color: #34d399; }
+.status-pend { background: rgba(245,158,11,0.2); color: #fbbf24; }
+.status-lock { background: rgba(239,68,68,0.2); color: #f87171; }
+
+/* Controles de Hardware */
+.switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider-toggle { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(128,128,128,0.3); transition: .4s; border-radius: 34px; }
+.slider-toggle:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider-toggle { background-color: var(--cyan); }
+input:checked + .slider-toggle:before { transform: translateX(22px); }
+
+input[type=range] { -webkit-appearance: none; background: transparent; height: 4px; border-radius: 2px; background-color: rgba(128,128,128,0.3); outline: none; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--cyan); cursor: pointer; margin-top: -6px; }
+
+/* Certificado */
+.cert-container { background: white; color: black; padding: 40px; border-radius: 8px; text-align: center; border: 12px solid #06B6D4; position: relative; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.cert-container h1 { color: #0A0F1C; font-family: 'Times New Roman', serif; font-size: 2.2rem; }
+.cert-container .signature { font-family: 'Brush Script MT', cursive, sans-serif; color: #06B6D4; font-size: 1.8rem; margin: 0; }
+@media print { body * { visibility: hidden; } #view-container, #view-container * { visibility: visible; } #view-container { position: absolute; left: 0; top: 0; width: 100%; } .btn { display: none !important; } }
 /* ==========================================
    NUEVOS CONTROLES: TOGGLES Y SLIDERS
    ========================================== */
