@@ -135,3 +135,265 @@ body {
 .sap-error { color: #FF3333; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* ==========================================
+   DISEÑO TERMINAL SAP (RETRO HACKER + GLASSMORPHISM)
+   ========================================== */
+#sap-terminal-overlay {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(5, 5, 5, 0.98);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Courier New', Courier, monospace;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.terminal-hidden {
+    transform: translateY(100%);
+}
+
+.terminal-header {
+    background: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid #333;
+}
+
+.terminal-status {
+    color: #4da6ff;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #00ff00;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #00ff00;
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+.terminal-close {
+    background: transparent;
+    border: none;
+    color: #ff4d4d;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.terminal-body {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    font-size: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    scroll-behavior: smooth;
+}
+
+#terminal-history {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.log-system { color: #888888; }
+.log-user { color: #ffffff; }
+.log-success { color: #00ff00; text-shadow: 0 0 5px rgba(0,255,0,0.4); }
+.log-error { color: #ff3333; text-shadow: 0 0 5px rgba(255,0,0,0.5); font-weight: bold; }
+.log-hint { color: #ffcc00; font-style: italic; }
+
+.terminal-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.terminal-prompt {
+    color: #00ff00;
+    text-shadow: 0 0 5px rgba(0,255,0,0.4);
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+#terminal-input {
+    background: transparent;
+    border: none;
+    color: #00ff00;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    font-weight: bold;
+    flex: 1;
+    outline: none;
+    text-transform: uppercase;
+    caret-color: #00ff00;
+    text-shadow: 0 0 5px rgba(0,255,0,0.4);
+}
+
+#terminal-instruction-panel {
+    background: #1a1a1a;
+    border-top: 2px solid #4da6ff;
+    padding: 15px;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.inst-label {
+    color: #4da6ff;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+#terminal-current-instruction {
+    color: #ffffff;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* ==========================================
+   PANEL DESLIZABLE DE APUNTES Y FAB BUTTON
+   ========================================== */
+.fab-btn {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background-color: var(--cyan, #4da6ff);
+    color: #000;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    cursor: pointer;
+    z-index: 9000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.fab-btn:active {
+    transform: scale(0.9);
+}
+
+#notes-overlay {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 60vh;
+    background-color: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -5px 25px rgba(0,0,0,0.5);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.notes-hidden {
+    transform: translateY(100%);
+}
+
+.notes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #444;
+}
+
+.notes-header h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.notes-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 15px 20px;
+}
+
+.notes-context {
+    color: var(--cyan, #4da6ff);
+    font-size: 0.85rem;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#notes-textarea {
+    flex: 1;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: #fff;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+}
+
+#notes-textarea:focus {
+    border-color: var(--cyan, #4da6ff);
+}
+
+.notes-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    border-top: 1px solid #444;
+}
+
+.save-status {
+    color: #00ff00;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.save-status.visible {
+    opacity: 1;
+}
+
+.export-btn {
+    background-color: transparent;
+    color: var(--cyan, #4da6ff);
+    border: 1px solid var(--cyan, #4da6ff);
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
