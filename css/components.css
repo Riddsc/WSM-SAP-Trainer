@@ -525,3 +525,49 @@ body {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-8px); }
 }
+/* ==========================================
+   INTERFAZ DE SETTINGS, ALERTAS Y ZONA DE PELIGRO
+   ========================================== */
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-light);
+}
+
+.settings-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.time-picker-input {
+    background: rgba(128,128,128,0.1);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    padding: 10px 15px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: bold;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.time-picker-input:focus {
+    border-color: var(--cyan);
+}
+
+.btn-danger {
+    background: transparent;
+    border: 2px solid var(--danger);
+    color: var(--danger);
+    box-shadow: none;
+}
+
+.btn-danger:active {
+    background: rgba(239, 68, 68, 0.1);
+    transform: scale(0.98);
+}
