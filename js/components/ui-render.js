@@ -45,6 +45,11 @@ const UIRenderer = {
         currentLessonState.id = itemId;
         currentLessonState.page = pageIndex;
 
+        // Actualizamos el contexto de los apuntes automáticamente
+        if (typeof smartNotes !== 'undefined') {
+            smartNotes.setContext(itemId, mod.title);
+        }
+
         if (mod.type === 'theory' && mod.pages) {
             const isLastPage = pageIndex === mod.pages.length - 1;
             const content = mod.pages[pageIndex];
@@ -150,6 +155,12 @@ const UIRenderer = {
             AudioEngine.play('success');
             AppState.markComplete(itemId);
             AppState.saveScore(itemId, score);
+            
+            // ¡Hacemos que la mascota felicite al usuario!
+            if (typeof visualUI !== 'undefined') {
+                visualUI.showMascot(`¡Excelente trabajo! Aprobaste con un ${score}%. ¡Sigue así!`, 5);
+            }
+
             resultsDiv.innerHTML = `
                 <div class="review-box" style="border-color:var(--success); background:rgba(16,185,129,0.1);">
                     <h4 style="color:var(--success);">✅ CERTIFICADO (Score: ${score}%)</h4>
@@ -159,6 +170,12 @@ const UIRenderer = {
             `;
         } else {
             AudioEngine.play('error');
+            
+            // La mascota da ánimo si reprueba
+            if (typeof visualUI !== 'undefined') {
+                visualUI.showMascot(`Obtuviste un ${score}%. ¡No te rindas, repasa y vuelve a intentarlo!`, 5);
+            }
+
             resultsDiv.innerHTML = `
                 <div class="review-box" style="border-color:var(--danger); background:rgba(239,68,68,0.1);">
                     <h4 style="color:var(--danger);">❌ REPROBADO (Score: ${score}%)</h4>
@@ -216,6 +233,7 @@ const UIRenderer = {
         container.scrollTop = 0;
     }
 };
+
 /**
  * ==========================================
  * GESTOR DE APUNTES CONTEXTUALES (SMART NOTES)
@@ -239,75 +257,69 @@ class SmartNotesManager {
     }
 
     init() {
-        if (!this.fab) return; // Si no existe el botón en el DOM, aborta
+        if (!this.fab) return; 
 
-        // Eventos de apertura y cierre
         this.fab.addEventListener('click', () => this.openNotes());
-        this.closeBtn.addEventListener('click', () => this.closeNotes());
-        
-        // Evento de exportación
-        this.exportBtn.addEventListener('click', () => this.exportToTXT());
+        if (this.closeBtn) this.closeBtn.addEventListener('click', () => this.closeNotes());
+        if (this.exportBtn) this.exportBtn.addEventListener('click', () => this.exportToTXT());
 
-        // Evento de auto-guardado (Debounce de 1 segundo)
-        this.textarea.addEventListener('input', () => {
-            clearTimeout(this.saveTimeout);
-            this.saveStatus.classList.remove('visible'); // Oculta el "check" mientras escribe
-            
-            this.saveTimeout = setTimeout(() => {
-                this.saveNotes();
-            }, 1000); // Guarda 1 segundo después de que deja de teclear
-        });
+        if (this.textarea) {
+            this.textarea.addEventListener('input', () => {
+                clearTimeout(this.saveTimeout);
+                if (this.saveStatus) this.saveStatus.classList.remove('visible'); 
+                
+                this.saveTimeout = setTimeout(() => {
+                    this.saveNotes();
+                }, 1000); 
+            });
+        }
     }
 
-    /**
-     * Llama a este método desde tu router.js cuando cambies de vista/lección
-     * Ej: smartNotes.setContext('s4_m1', '4.1 Cross-Docking Avanzado');
-     */
     setContext(lessonId, lessonTitle) {
         this.currentLessonId = lessonId || 'general';
         this.currentLessonTitle = lessonTitle || 'Apuntes Generales';
-        this.titleText.innerText = this.currentLessonTitle;
+        if (this.titleText) this.titleText.innerText = this.currentLessonTitle;
         
-        // Carga las notas de esta lección específica al cambiar el contexto
         this.loadNotes();
     }
 
     openNotes() {
-        this.loadNotes(); // Refresca por si hubo cambios
-        this.overlay.classList.remove('notes-hidden');
+        this.loadNotes(); 
+        if (this.overlay) this.overlay.classList.remove('notes-hidden');
     }
 
     closeNotes() {
-        this.overlay.classList.add('notes-hidden');
-        this.textarea.blur(); // Oculta el teclado en móviles
+        if (this.overlay) this.overlay.classList.add('notes-hidden');
+        if (this.textarea) this.textarea.blur(); 
     }
 
     saveNotes() {
+        if (!this.textarea) return;
         const content = this.textarea.value;
         const storageKey = `logistica_pro_notes_${this.currentLessonId}`;
         
         localStorage.setItem(storageKey, content);
         
-        // Muestra el mensaje de éxito "Guardado Automático ✓"
-        this.saveStatus.classList.add('visible');
+        if (this.saveStatus) this.saveStatus.classList.add('visible');
     }
 
     loadNotes() {
+        if (!this.textarea) return;
         const storageKey = `logistica_pro_notes_${this.currentLessonId}`;
         const savedContent = localStorage.getItem(storageKey);
         
         this.textarea.value = savedContent ? savedContent : '';
-        this.saveStatus.classList.remove('visible');
+        if (this.saveStatus) this.saveStatus.classList.remove('visible');
     }
 
     exportToTXT() {
+        if (!this.textarea) return;
         const content = this.textarea.value;
         if (!content.trim()) {
             alert("No hay apuntes para exportar en esta lección.");
             return;
         }
 
-        // Crear un Blob con el texto y descargar
         const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -317,11 +329,123 @@ class SmartNotesManager {
         document.body.appendChild(a);
         a.click();
         
-        // Limpieza
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
 }
 
-// Instanciamos el gestor de notas globalmente
 const smartNotes = new SmartNotesManager();
+
+/**
+ * ==========================================
+ * GESTOR VISUAL (TEMAS Y MASCOTAS MECHARIDDS/MECHANIZER)
+ * ==========================================
+ */
+class VisualManager {
+    constructor() {
+        this.themeBtn = document.getElementById('theme-toggle-btn');
+        this.mascotContainer = document.getElementById('mascot-container');
+        this.mascotMessage = document.getElementById('mascot-message');
+        this.mascotName = document.getElementById('mascot-name');
+        this.mascotSwitchBtn = document.getElementById('mascot-switch-btn');
+        this.svgMechaRidds = document.getElementById('svg-mecharidds');
+        this.svgMechanizer = document.getElementById('svg-mechanizer');
+        
+        // Memoria de la mascota preferida
+        this.currentMascot = localStorage.getItem('logistica_pro_mascot') || 'mecharidds';
+        this.mascotTimeout = null;
+
+        this.initTheme();
+        this.initMascot();
+    }
+
+    // --- LÓGICA DEL TEMA CLARO/OSCURO ---
+    initTheme() {
+        if (!this.themeBtn) return;
+
+        const savedTheme = localStorage.getItem('logistica_pro_theme');
+        if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            this.themeBtn.innerText = '🌙'; 
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            this.themeBtn.innerText = '🌞'; 
+        }
+
+        this.themeBtn.addEventListener('click', () => this.toggleTheme());
+    }
+
+    toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('logistica_pro_theme', 'dark');
+            this.themeBtn.innerText = '🌞';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('logistica_pro_theme', 'light');
+            this.themeBtn.innerText = '🌙';
+        }
+    }
+
+    // --- LÓGICA DE LAS MASCOTAS ---
+    initMascot() {
+        if (!this.mascotSwitchBtn) return;
+        
+        this.updateMascotUI();
+
+        this.mascotSwitchBtn.addEventListener('click', () => {
+            // Alternar identidad
+            this.currentMascot = this.currentMascot === 'mecharidds' ? 'mechanizer' : 'mecharidds';
+            localStorage.setItem('logistica_pro_mascot', this.currentMascot);
+            this.updateMascotUI();
+            
+            // Saludo personalizado al cambiar
+            const saludo = this.currentMascot === 'mecharidds' 
+                ? "¡MechaRidds en línea! Listo para analizar el sistema." 
+                : "¡Mechanizer lista! Agregando estilo a la base de datos.";
+            this.showMascot(saludo, 4);
+        });
+    }
+
+    updateMascotUI() {
+        const bubble = document.querySelector('.mascot-bubble');
+        
+        if (this.currentMascot === 'mecharidds') {
+            if (this.svgMechaRidds) this.svgMechaRidds.style.display = 'block';
+            if (this.svgMechanizer) this.svgMechanizer.style.display = 'none';
+            if (this.mascotName) {
+                this.mascotName.innerText = 'MechaRidds';
+                this.mascotName.style.backgroundColor = 'var(--cyan)';
+                this.mascotName.style.color = '#000';
+            }
+            if (bubble) bubble.style.borderColor = 'var(--cyan)';
+        } else {
+            if (this.svgMechaRidds) this.svgMechaRidds.style.display = 'none';
+            if (this.svgMechanizer) this.svgMechanizer.style.display = 'block';
+            if (this.mascotName) {
+                this.mascotName.innerText = 'Mechanizer';
+                this.mascotName.style.backgroundColor = '#f48fb1'; // Tono Girlie Pink
+                this.mascotName.style.color = '#fff';
+            }
+            if (bubble) bubble.style.borderColor = '#f48fb1';
+        }
+    }
+
+    showMascot(message, durationInSeconds = 5) {
+        if (!this.mascotContainer || !this.mascotMessage) return;
+
+        this.mascotMessage.innerText = message;
+        this.mascotContainer.classList.remove('mascot-hidden');
+
+        if (this.mascotTimeout) {
+            clearTimeout(this.mascotTimeout);
+        }
+
+        this.mascotTimeout = setTimeout(() => {
+            this.mascotContainer.classList.add('mascot-hidden');
+        }, durationInSeconds * 1000);
+    }
+}
+
+const visualUI = new VisualManager();
