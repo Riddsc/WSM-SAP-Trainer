@@ -544,3 +544,20 @@ class VisualManager {
     }
 }
 const visualUI = new VisualManager();
+/**
+ * AUTOCARGA (Fix para el arranque de pantalla en blanco)
+ * Obliga al sistema a dibujar el Dashboard y saludar al iniciar la App.
+ */
+window.addEventListener('DOMContentLoaded', () => {
+    // 1. Dibuja la academia inmediatamente
+    if (typeof UIRenderer !== 'undefined') {
+        UIRenderer.renderDashboard();
+    }
+    
+    // 2. Saludo de bienvenida de la mascota
+    setTimeout(() => {
+        if (typeof visualUI !== 'undefined') {
+            visualUI.showMascot("¡Sistemas online! Listo para continuar tu maestría.", 4);
+        }
+    }, 1200);
+});
