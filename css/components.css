@@ -526,46 +526,50 @@ body {
     50% { transform: translateY(-8px); }
 }
 /* ==========================================
-   FIX MASCOTA: ALINEACIÓN ESTRICTA Y PERFECTA
+   FIX RADICAL: MASCOTA Y BURBUJA CENTRADAS
    ========================================== */
 #mascot-container {
     position: fixed !important;
-    bottom: 20px !important;
-    right: 20px !important;
-    width: 110px !important;
+    bottom: 15px !important;
+    right: 15px !important;
+    width: 120px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     z-index: 9999 !important;
+    pointer-events: none; /* Permite hacer click a través del contenedor vacío */
+}
+
+#mascot-container * {
+    pointer-events: auto; /* Restaura los clicks en los elementos internos */
 }
 
 #svg-mecharidds, #svg-mechanizer {
-    width: 100px !important;
+    width: 90px !important;
     height: auto !important;
+    display: block !important;
     margin: 0 auto !important;
 }
 
 #mascot-name {
-    position: absolute !important;
-    bottom: 80px !important; /* Lo ancla a la altura de la frente */
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: translateY(-12px) !important; /* Superpone sutilmente el nombre en la cabeza */
+    margin: 0 auto !important;
+    text-align: center !important;
     white-space: nowrap !important;
     z-index: 10 !important;
-    margin: 0 !important;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.5) !important;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.4) !important;
 }
 
 #mascot-message {
     position: absolute !important;
-    bottom: 120px !important; /* Sube por encima de la cabeza */
-    right: 30px !important; /* Se ancla hacia la izquierda */
-    width: max-content !important;
-    max-width: 220px !important;
+    bottom: 110px !important;
+    right: 10px !important;
+    width: 200px !important;
     z-index: 5 !important;
-    transform-origin: bottom right !important;
 }
-
 /* ==========================================
    ESTILOS PREMIUM PARA SETTINGS Y PERFIL
    ========================================== */
