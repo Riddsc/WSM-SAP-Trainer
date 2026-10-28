@@ -577,3 +577,22 @@ body {
     transform: translateY(10px) scale(0.9);
     pointer-events: none;
 }
+/* ==========================================
+   FIX: REPOSICIONAMIENTO DEL NOMBRE DE LA MASCOTA
+   ========================================== */
+#mascot-name {
+    position: absolute !important;
+    bottom: 85px !important; /* Lo pega exactamente encima de la cabeza */
+    top: auto !important;    /* Desconecta el anclaje a la burbuja invisible */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 20 !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+}
+
+/* Elevamos ligeramente la burbuja de texto para que cuando hablen no tape el nombre */
+#mascot-message {
+    margin-bottom: 35px !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
