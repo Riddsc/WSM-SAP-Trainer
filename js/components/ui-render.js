@@ -540,13 +540,42 @@ const visualUI = new VisualManager();
 
 // Autocarga para evitar la pantalla blanca al inicio
 window.addEventListener('DOMContentLoaded', () => {
-    if (typeof UIRenderer !== 'undefined') {
-        UIRenderer.renderDashboard();
-    }
+    // 1. Dibuja la academia inmediatamente
+    if (typeof UIRenderer !== 'undefined') UIRenderer.renderDashboard();
     
+    // 2. Saludo de bienvenida
     setTimeout(() => {
         if (typeof visualUI !== 'undefined') {
             visualUI.showMascot("¡Sistemas online! Listo para continuar tu maestría.", 4);
         }
     }, 1200);
+
+    // 3. INTERCEPTOR GLOBAL DE AUDIO (Respeta el volumen y Mute)
+    if (typeof AudioEngine !== 'undefined' && AudioEngine.play) {
+        const originalPlay = AudioEngine.play.bind(AudioEngine);
+        AudioEngine.play = (soundName) => {
+            const isEnabled = localStorage.getItem('logistica_sound') !== 'false';
+            if (isEnabled) {
+                // Forzamos el volumen en el objeto audio justo antes de reproducir
+                const vol = parseInt(localStorage.getItem('logistica_vol') || '100') / 100;
+                if(AudioEngine.sounds && AudioEngine.sounds[soundName]) {
+                    AudioEngine.sounds[soundName].volume = vol;
+                }
+                originalPlay(soundName);
+            }
+        };
+    }
+
+    // 4. INTERCEPTOR GLOBAL DE HAPTICS (Vibración al tocar cualquier botón)
+    document.body.addEventListener('click', (e) => {
+        // Si tocamos un botón, una tarjeta o una opción de quiz
+        if (e.target.closest('.btn, .quiz-opt, .module-card, .icon-btn')) {
+            const vibEnabled = localStorage.getItem('logistica_vib') !== 'false';
+            const vibLevel = localStorage.getItem('logistica_vib_level') || 'MEDIUM';
+            
+            if (vibEnabled && window.Capacitor && window.Capacitor.Plugins.Haptics) {
+                window.Capacitor.Plugins.Haptics.impact({ style: vibLevel });
+            }
+        }
+    });
 });
