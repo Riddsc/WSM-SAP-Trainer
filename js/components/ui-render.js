@@ -310,20 +310,43 @@ const UIRenderer = {
         }
     },
     
-    renderGlossary() {
+   renderGlossary() {
         const container = document.getElementById('view-container');
         if (!container) return;
 
         container.innerHTML = `
-            <span class="tag-subtitle">Glosario Corporativo</span>
-            <h2 class="main-title">Transacciones Clave</h2>
-            <div class="module-card"><div class="card-top"><span class="card-badge">MM / IM</span></div><h3>MIGO</h3><p>Movimiento general de mercancías (Entradas, salidas, traslados).</p></div>
-            <div class="module-card"><div class="card-top"><span class="card-badge">WM / EWM</span></div><h3>LT01</h3><p>Creación manual de Orden de Transporte interna en el almacén.</p></div>
-            <div class="module-card"><div class="card-top"><span class="card-badge">CUSTOMIZING</span></div><h3>OX09</h3><p>Mantenimiento y creación de Storage Locations vinculados al Plant.</p></div>
+            <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px; background: rgba(6, 182, 212, 0.1); padding: 15px; border-radius: var(--radius-md); border: 1px solid rgba(6, 182, 212, 0.3);">
+                <div style="font-size:3rem; filter: drop-shadow(0 0 10px rgba(6,182,212,0.5));">📘</div>
+                <div>
+                    <span class="tag-subtitle" style="margin-bottom:4px;">Base de Conocimiento</span>
+                    <h2 class="main-title" style="margin:0; font-size:1.4rem;">Transacciones Maestras</h2>
+                </div>
+            </div>
+            
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px; line-height:1.5;">
+                Diccionario de operaciones vitales. Memorizar estos T-Codes te dará fluidez absoluta en el entorno SAP.
+            </p>
+
+            <div class="module-card"><div class="card-top"><span class="card-badge">MM / IM</span></div><h3 style="color:var(--cyan);">MIGO</h3><p>Movimiento de mercancías (Entradas, salidas, traslados y traspasos).</p></div>
+            <div class="module-card"><div class="card-top"><span class="card-badge">MM / IM</span></div><h3 style="color:var(--cyan);">MMBE</h3><p>Resumen de stocks. Permite auditar la disponibilidad de un material en tiempo real.</p></div>
+            <div class="module-card"><div class="card-top"><span class="card-badge">MM / IM</span></div><h3 style="color:var(--cyan);">ME21N</h3><p>Creación de Pedidos de Compras (Purchase Orders) a proveedores.</p></div>
+            
+            <div class="module-card"><div class="card-top"><span class="card-badge lab">WM / EWM</span></div><h3 style="color:var(--warning);">/SCWM/PRDI</h3><p>Mantenimiento de Entregas de Entrada (Inbound Delivery) para recepción.</p></div>
+            <div class="module-card"><div class="card-top"><span class="card-badge lab">WM / EWM</span></div><h3 style="color:var(--warning);">/SCWM/PRDO</h3><p>Mantenimiento de Entregas de Salida (Outbound Delivery) para despacho.</p></div>
+            <div class="module-card"><div class="card-top"><span class="card-badge lab">WM / EWM</span></div><h3 style="color:var(--warning);">/SCWM/MON</h3><p>El Monitor de Almacén. Centro de mando total operativo de EWM.</p></div>
+            <div class="module-card"><div class="card-top"><span class="card-badge lab">WM / EWM</span></div><h3 style="color:var(--warning);">/SCWM/RFUI</h3><p>Entorno de Radiofrecuencia. Interfaz nativa para las pistolas de escaneo (Handhelds).</p></div>
+            <div class="module-card"><div class="card-top"><span class="card-badge lab">WM / EWM</span></div><h3 style="color:var(--warning);">/SCWM/PACK</h3><p>Transacción de embalaje. Estructuración física de HUs (Handling Units).</p></div>
+
+            <div class="module-card"><div class="card-top"><span class="card-badge" style="background:#4B5563; color:#fff;">CUSTOMIZING</span></div><h3 style="color:#F9FAFB;">OX09</h3><p>Mantenimiento y creación de Storage Locations vinculados al Plant.</p></div>
+            <div class="module-card" style="margin-bottom:40px;"><div class="card-top"><span class="card-badge" style="background:#4B5563; color:#fff;">CUSTOMIZING</span></div><h3 style="color:#F9FAFB;">SPRO</h3><p>Parametrización del sistema. Acceso al árbol de configuración maestro.</p></div>
         `;
         container.scrollTop = 0;
-    }
-};
+        
+        // La mascota opina cuando abres esta pantalla
+        if (typeof visualUI !== 'undefined') {
+            visualUI.showMascot("Glosario activado. MMBE y /SCWM/MON serán tus mejores aliados.", 5);
+        }
+    };
 
 class SmartNotesManager {
     constructor() {
@@ -412,7 +435,7 @@ class VisualManager {
     constructor() {
         this.themeBtn = document.getElementById('theme-toggle-btn');
         this.mascotContainer = document.getElementById('mascot-container');
-        this.mascotMessage = document.getElementById('mascot-message');
+        this.mascotBubble = document.getElementById('mascot-message'); // Apuntamos directo a la burbuja
         this.mascotName = document.getElementById('mascot-name');
         this.mascotSwitchBtn = document.getElementById('mascot-switch-btn');
         this.svgMechaRidds = document.getElementById('svg-mecharidds');
@@ -450,32 +473,40 @@ class VisualManager {
             localStorage.setItem('logistica_pro_theme', 'light');
             newIcon = '🌙';
         }
-        // Actualizar icono en el Header si existe
         if (this.themeBtn) this.themeBtn.innerText = newIcon;
     }
 
     initMascot() {
         this.updateMascotUI();
-        // Listener original desde la burbuja flotante
+        
         if (this.mascotSwitchBtn) {
             this.mascotSwitchBtn.addEventListener('click', () => this.toggleMascot());
         }
+
+        // Hacemos que el Robot entre a la pantalla al iniciar y NUNCA se vaya
+        setTimeout(() => {
+            if (this.mascotContainer) {
+                this.mascotContainer.classList.remove('mascot-hidden');
+            }
+            // Ocultamos la burbuja inicial por defecto
+            if (this.mascotBubble) {
+                this.mascotBubble.classList.add('bubble-hidden');
+            }
+        }, 500);
     }
 
-    // Método extraído para poder ser invocado desde la UI de Settings
     toggleMascot() {
         this.currentMascot = this.currentMascot === 'mecharidds' ? 'mechanizer' : 'mecharidds';
         localStorage.setItem('logistica_pro_mascot', this.currentMascot);
         this.updateMascotUI();
         
         const saludo = this.currentMascot === 'mecharidds' 
-            ? "¡MechaRidds en línea! Listo para analizar el sistema." 
-            : "¡Mechanizer lista! Agregando estilo a la base de datos.";
+            ? "¡MechaRidds en línea! Listo para el análisis." 
+            : "¡Mechanizer lista! Agregando estilo a los datos.";
         this.showMascot(saludo, 4);
     }
 
     updateMascotUI() {
-        const bubble = document.querySelector('.mascot-bubble');
         if (this.currentMascot === 'mecharidds') {
             if (this.svgMechaRidds) this.svgMechaRidds.style.display = 'block';
             if (this.svgMechanizer) this.svgMechanizer.style.display = 'none';
@@ -484,7 +515,7 @@ class VisualManager {
                 this.mascotName.style.backgroundColor = 'var(--cyan)';
                 this.mascotName.style.color = '#000';
             }
-            if (bubble) bubble.style.borderColor = 'var(--cyan)';
+            if (this.mascotBubble) this.mascotBubble.style.borderColor = 'var(--cyan)';
         } else {
             if (this.svgMechaRidds) this.svgMechaRidds.style.display = 'none';
             if (this.svgMechanizer) this.svgMechanizer.style.display = 'block';
@@ -493,21 +524,23 @@ class VisualManager {
                 this.mascotName.style.backgroundColor = '#f48fb1';
                 this.mascotName.style.color = '#fff';
             }
-            if (bubble) bubble.style.borderColor = '#f48fb1';
+            if (this.mascotBubble) this.mascotBubble.style.borderColor = '#f48fb1';
         }
     }
 
     showMascot(message, durationInSeconds = 5) {
-        if (!this.mascotContainer || !this.mascotMessage) return;
-        this.mascotMessage.innerText = message;
-        this.mascotContainer.classList.remove('mascot-hidden');
+        if (!this.mascotContainer || !this.mascotBubble) return;
+
+        this.mascotBubble.innerText = message;
+        // Aparece la burbuja
+        this.mascotBubble.classList.remove('bubble-hidden');
 
         if (this.mascotTimeout) clearTimeout(this.mascotTimeout);
 
         this.mascotTimeout = setTimeout(() => {
-            this.mascotContainer.classList.add('mascot-hidden');
+            // SOLO ocultamos la burbuja, la mascota se queda flotando permanentemente
+            this.mascotBubble.classList.add('bubble-hidden');
         }, durationInSeconds * 1000);
     }
 }
-
 const visualUI = new VisualManager();
