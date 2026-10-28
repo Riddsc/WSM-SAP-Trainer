@@ -1,5 +1,5 @@
 /**
- * Logística Pro - Motor UI (Paginación, Exámenes Anti-Trampas, Perfil y Glosario)
+ * Logística Pro - Motor UI (Paginación, Exámenes, Perfil, Alarmas y Glosario)
  */
 let currentLessonState = { id: null, page: 0, answers: [], score: 0, activeExam: [] };
 
@@ -45,7 +45,6 @@ const UIRenderer = {
         currentLessonState.id = itemId;
         currentLessonState.page = pageIndex;
 
-        // Actualizamos el contexto de los apuntes automáticamente
         if (typeof smartNotes !== 'undefined') {
             smartNotes.setContext(itemId, mod.title);
         }
@@ -100,7 +99,7 @@ const UIRenderer = {
         let examHtml = `
             <div class="exam-header">
                 <h2 style="color:var(--text-primary); border:none; padding:0; margin-bottom:10px;">Examen de Certificación</h2>
-                <p style="color:var(--text-muted); font-size:0.9rem;">Debe aprobar con un 80% mínimo. Las preguntas y opciones han sido aleatorizadas para garantizar la integridad técnica.</p>
+                <p style="color:var(--text-muted); font-size:0.9rem;">Debe aprobar con un 80% mínimo. Las preguntas han sido aleatorizadas para garantizar la integridad técnica.</p>
             </div>
         `;
 
@@ -156,7 +155,6 @@ const UIRenderer = {
             AppState.markComplete(itemId);
             AppState.saveScore(itemId, score);
             
-            // ¡Hacemos que la mascota felicite al usuario!
             if (typeof visualUI !== 'undefined') {
                 visualUI.showMascot(`¡Excelente trabajo! Aprobaste con un ${score}%. ¡Sigue así!`, 5);
             }
@@ -170,8 +168,6 @@ const UIRenderer = {
             `;
         } else {
             AudioEngine.play('error');
-            
-            // La mascota da ánimo si reprueba
             if (typeof visualUI !== 'undefined') {
                 visualUI.showMascot(`Obtuviste un ${score}%. ¡No te rindas, repasa y vuelve a intentarlo!`, 5);
             }
@@ -186,37 +182,132 @@ const UIRenderer = {
         }
     },
 
+    // ========================================================
+    // NUEVO RENDER DE PERFIL Y SETTINGS
+    // ========================================================
     renderProfile() {
         const container = document.getElementById('view-container');
         if (!container) return;
 
-        // Validamos que el progreso sea un número seguro
         let pct = 0;
         try { pct = AppState.getProgressPercentage(); } catch (e) { pct = 0; }
 
         container.innerHTML = `
             <span class="tag-subtitle">Administración de Cuenta</span>
-            <h2 class="main-title">Mi Perfil Estudiantil</h2>
+            <h2 class="main-title">Configuración y Perfil</h2>
             
+            <!-- TARJETA 1: Progreso -->
             <div class="review-box">
                 <h4>Progreso Total Académico</h4>
                 <p>Has completado el <strong>${pct}%</strong> de la Maestría WMS.</p>
             </div>
 
+            <!-- TARJETA 2: Preferencias Visuales -->
             <div class="module-card" style="margin-top:30px; cursor:default;">
-                <h3 style="color:var(--cyan);">💾 Crear Copia de Seguridad</h3>
-                <p>Exporta tu progreso, puntajes y apuntes. Si cambias de teléfono, podrás restaurar este archivo.</p>
-                <button class="btn btn-primary" onclick="AppState.exportBackup()">Descargar Backup (.json)</button>
+                <h3 style="color:var(--cyan);">🎨 Preferencias Visuales</h3>
+                
+                <div class="settings-row" style="border-top:none; margin-top:5px; padding-top:0;">
+                    <span class="settings-label">Tema de la Interfaz</span>
+                    <button class="btn btn-outline" style="width:auto; padding:8px 16px;" onclick="visualUI.toggleTheme()">Claro / Oscuro</button>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label">Asistente Guía</span>
+                    <button class="btn btn-outline" style="width:auto; padding:8px 16px;" onclick="visualUI.toggleMascot()">Cambiar Robot</button>
+                </div>
             </div>
 
+            <!-- TARJETA 3: Notificaciones (Alertas de Estudio) -->
             <div class="module-card" style="margin-top:20px; cursor:default;">
-                <h3 style="color:var(--warning);">📥 Restaurar Copia</h3>
-                <p>Carga un archivo .json de Logística Pro para recuperar tu cuenta. (Sobrescribirá el progreso actual).</p>
-                <input type="file" id="backup-file" accept=".json" style="display:none;" onchange="AppState.importBackup(event)">
-                <button class="btn btn-outline" onclick="document.getElementById('backup-file').click()">Seleccionar Archivo</button>
+                <h3 style="color:var(--cyan);">⏰ Alertas de Estudio</h3>
+                <p>Configura un recordatorio diario para no perder tu racha de aprendizaje.</p>
+                
+                <div class="settings-row" style="border:none; gap:10px;">
+                    <input type="time" id="study-time" class="time-picker-input" style="flex:1;" value="20:00">
+                    <button class="btn btn-primary" style="width:auto; padding:10px 20px;" onclick="UIRenderer.scheduleReminder()">Activar</button>
+                </div>
+                <p id="reminder-status" style="color:var(--success); font-size:0.85rem; margin-top:10px; display:none;"></p>
+            </div>
+
+            <!-- TARJETA 4: Respaldo de Datos -->
+            <div class="module-card" style="margin-top:20px; cursor:default;">
+                <h3 style="color:var(--cyan);">💾 Respaldo de Datos</h3>
+                <p>Exporta tu avance. El archivo se guardará en tu carpeta de Descargas.</p>
+                
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button class="btn btn-primary" onclick="AppState.exportBackup()">Exportar (.json)</button>
+                    <input type="file" id="backup-file" accept=".json" style="display:none;" onchange="AppState.importBackup(event)">
+                    <button class="btn btn-outline" onclick="document.getElementById('backup-file').click()">Importar</button>
+                </div>
+            </div>
+
+            <!-- TARJETA 5: Zona de Peligro -->
+            <div class="module-card" style="margin-top:40px; border: 1px solid rgba(239, 68, 68, 0.3); cursor:default;">
+                <h3 style="color:var(--danger);">⚠️ Zona de Peligro</h3>
+                <p style="margin-bottom:15px;">Esta acción borrará todo tu progreso, apuntes y certificaciones de manera permanente.</p>
+                <button class="btn btn-danger" onclick="UIRenderer.factoryReset()">Borrar todos mis datos</button>
             </div>
         `;
         container.scrollTop = 0;
+    },
+
+    // Lógica NATIVA de notificaciones usando Capacitor Local Notifications
+    async scheduleReminder() {
+        const timeInput = document.getElementById('study-time').value;
+        const statusText = document.getElementById('reminder-status');
+        
+        if (!timeInput) return;
+
+        // Si Capacitor está disponible en el APK
+        if (window.Capacitor && window.Capacitor.Plugins.LocalNotifications) {
+            const LocalNotifications = window.Capacitor.Plugins.LocalNotifications;
+            
+            try {
+                // Solicitar permisos de notificación en Android/iOS
+                const permStatus = await LocalNotifications.requestPermissions();
+                
+                if (permStatus.display === 'granted') {
+                    const [hours, minutes] = timeInput.split(':');
+                    
+                    await LocalNotifications.schedule({
+                        notifications: [{
+                            title: "¡Hora de estudiar Logística!",
+                            body: "Tu terminal SAP S/4HANA te espera. ¡Continúa tu maestría!",
+                            id: 1,
+                            schedule: {
+                                on: { hour: parseInt(hours), minute: parseInt(minutes) },
+                                allowWhileIdle: true,
+                                repeats: true // Se repite diario a esa hora
+                            },
+                            sound: null
+                        }]
+                    });
+
+                    statusText.innerText = `✅ Alarma diaria configurada a las ${timeInput}`;
+                    statusText.style.display = 'block';
+                    if(typeof visualUI !== 'undefined') visualUI.showMascot("¡Notificación activada! Estaré esperando para estudiar contigo.");
+                } else {
+                    alert("Por favor, permite las notificaciones en los ajustes de tu celular.");
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        } else {
+            // Fallback para pruebas en navegador Web
+            statusText.innerText = `✅ (Simulador Web) Alarma guardada para las ${timeInput}`;
+            statusText.style.display = 'block';
+        }
+    },
+
+    factoryReset() {
+        const confirm1 = confirm("⚠️ ATENCIÓN: Estás a punto de borrar todo tu progreso. ¿Estás seguro?");
+        if (confirm1) {
+            const confirm2 = confirm("🚨 ÚLTIMA ADVERTENCIA: Esta acción no se puede deshacer. ¿Proceder?");
+            if (confirm2) {
+                localStorage.clear();
+                alert("Progreso reseteado. Reiniciando la aplicación...");
+                window.location.reload();
+            }
+        }
     },
     
     renderGlossary() {
@@ -234,11 +325,6 @@ const UIRenderer = {
     }
 };
 
-/**
- * ==========================================
- * GESTOR DE APUNTES CONTEXTUALES (SMART NOTES)
- * ==========================================
- */
 class SmartNotesManager {
     constructor() {
         this.fab = document.getElementById('fab-notes');
@@ -258,7 +344,6 @@ class SmartNotesManager {
 
     init() {
         if (!this.fab) return; 
-
         this.fab.addEventListener('click', () => this.openNotes());
         if (this.closeBtn) this.closeBtn.addEventListener('click', () => this.closeNotes());
         if (this.exportBtn) this.exportBtn.addEventListener('click', () => this.exportToTXT());
@@ -267,10 +352,7 @@ class SmartNotesManager {
             this.textarea.addEventListener('input', () => {
                 clearTimeout(this.saveTimeout);
                 if (this.saveStatus) this.saveStatus.classList.remove('visible'); 
-                
-                this.saveTimeout = setTimeout(() => {
-                    this.saveNotes();
-                }, 1000); 
+                this.saveTimeout = setTimeout(() => { this.saveNotes(); }, 1000); 
             });
         }
     }
@@ -279,7 +361,6 @@ class SmartNotesManager {
         this.currentLessonId = lessonId || 'general';
         this.currentLessonTitle = lessonTitle || 'Apuntes Generales';
         if (this.titleText) this.titleText.innerText = this.currentLessonTitle;
-        
         this.loadNotes();
     }
 
@@ -297,9 +378,7 @@ class SmartNotesManager {
         if (!this.textarea) return;
         const content = this.textarea.value;
         const storageKey = `logistica_pro_notes_${this.currentLessonId}`;
-        
         localStorage.setItem(storageKey, content);
-        
         if (this.saveStatus) this.saveStatus.classList.add('visible');
     }
 
@@ -307,7 +386,6 @@ class SmartNotesManager {
         if (!this.textarea) return;
         const storageKey = `logistica_pro_notes_${this.currentLessonId}`;
         const savedContent = localStorage.getItem(storageKey);
-        
         this.textarea.value = savedContent ? savedContent : '';
         if (this.saveStatus) this.saveStatus.classList.remove('visible');
     }
@@ -315,20 +393,14 @@ class SmartNotesManager {
     exportToTXT() {
         if (!this.textarea) return;
         const content = this.textarea.value;
-        if (!content.trim()) {
-            alert("No hay apuntes para exportar en esta lección.");
-            return;
-        }
-
+        if (!content.trim()) { alert("No hay apuntes para exportar en esta lección."); return; }
         const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        
         a.href = url;
         a.download = `Apuntes_${this.currentLessonId}.txt`;
         document.body.appendChild(a);
         a.click();
-        
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
@@ -336,11 +408,6 @@ class SmartNotesManager {
 
 const smartNotes = new SmartNotesManager();
 
-/**
- * ==========================================
- * GESTOR VISUAL (TEMAS Y MASCOTAS MECHARIDDS/MECHANIZER)
- * ==========================================
- */
 class VisualManager {
     constructor() {
         this.themeBtn = document.getElementById('theme-toggle-btn');
@@ -351,7 +418,6 @@ class VisualManager {
         this.svgMechaRidds = document.getElementById('svg-mecharidds');
         this.svgMechanizer = document.getElementById('svg-mechanizer');
         
-        // Memoria de la mascota preferida
         this.currentMascot = localStorage.getItem('logistica_pro_mascot') || 'mecharidds';
         this.mascotTimeout = null;
 
@@ -359,10 +425,8 @@ class VisualManager {
         this.initMascot();
     }
 
-    // --- LÓGICA DEL TEMA CLARO/OSCURO ---
     initTheme() {
         if (!this.themeBtn) return;
-
         const savedTheme = localStorage.getItem('logistica_pro_theme');
         if (savedTheme === 'light') {
             document.documentElement.setAttribute('data-theme', 'light');
@@ -371,46 +435,47 @@ class VisualManager {
             document.documentElement.setAttribute('data-theme', 'dark');
             this.themeBtn.innerText = '🌞'; 
         }
-
         this.themeBtn.addEventListener('click', () => this.toggleTheme());
     }
 
     toggleTheme() {
         const currentTheme = document.documentElement.getAttribute('data-theme');
+        let newIcon = '';
         if (currentTheme === 'light') {
             document.documentElement.setAttribute('data-theme', 'dark');
             localStorage.setItem('logistica_pro_theme', 'dark');
-            this.themeBtn.innerText = '🌞';
+            newIcon = '🌞';
         } else {
             document.documentElement.setAttribute('data-theme', 'light');
             localStorage.setItem('logistica_pro_theme', 'light');
-            this.themeBtn.innerText = '🌙';
+            newIcon = '🌙';
+        }
+        // Actualizar icono en el Header si existe
+        if (this.themeBtn) this.themeBtn.innerText = newIcon;
+    }
+
+    initMascot() {
+        this.updateMascotUI();
+        // Listener original desde la burbuja flotante
+        if (this.mascotSwitchBtn) {
+            this.mascotSwitchBtn.addEventListener('click', () => this.toggleMascot());
         }
     }
 
-    // --- LÓGICA DE LAS MASCOTAS ---
-    initMascot() {
-        if (!this.mascotSwitchBtn) return;
-        
+    // Método extraído para poder ser invocado desde la UI de Settings
+    toggleMascot() {
+        this.currentMascot = this.currentMascot === 'mecharidds' ? 'mechanizer' : 'mecharidds';
+        localStorage.setItem('logistica_pro_mascot', this.currentMascot);
         this.updateMascotUI();
-
-        this.mascotSwitchBtn.addEventListener('click', () => {
-            // Alternar identidad
-            this.currentMascot = this.currentMascot === 'mecharidds' ? 'mechanizer' : 'mecharidds';
-            localStorage.setItem('logistica_pro_mascot', this.currentMascot);
-            this.updateMascotUI();
-            
-            // Saludo personalizado al cambiar
-            const saludo = this.currentMascot === 'mecharidds' 
-                ? "¡MechaRidds en línea! Listo para analizar el sistema." 
-                : "¡Mechanizer lista! Agregando estilo a la base de datos.";
-            this.showMascot(saludo, 4);
-        });
+        
+        const saludo = this.currentMascot === 'mecharidds' 
+            ? "¡MechaRidds en línea! Listo para analizar el sistema." 
+            : "¡Mechanizer lista! Agregando estilo a la base de datos.";
+        this.showMascot(saludo, 4);
     }
 
     updateMascotUI() {
         const bubble = document.querySelector('.mascot-bubble');
-        
         if (this.currentMascot === 'mecharidds') {
             if (this.svgMechaRidds) this.svgMechaRidds.style.display = 'block';
             if (this.svgMechanizer) this.svgMechanizer.style.display = 'none';
@@ -425,7 +490,7 @@ class VisualManager {
             if (this.svgMechanizer) this.svgMechanizer.style.display = 'block';
             if (this.mascotName) {
                 this.mascotName.innerText = 'Mechanizer';
-                this.mascotName.style.backgroundColor = '#f48fb1'; // Tono Girlie Pink
+                this.mascotName.style.backgroundColor = '#f48fb1';
                 this.mascotName.style.color = '#fff';
             }
             if (bubble) bubble.style.borderColor = '#f48fb1';
@@ -434,13 +499,10 @@ class VisualManager {
 
     showMascot(message, durationInSeconds = 5) {
         if (!this.mascotContainer || !this.mascotMessage) return;
-
         this.mascotMessage.innerText = message;
         this.mascotContainer.classList.remove('mascot-hidden');
 
-        if (this.mascotTimeout) {
-            clearTimeout(this.mascotTimeout);
-        }
+        if (this.mascotTimeout) clearTimeout(this.mascotTimeout);
 
         this.mascotTimeout = setTimeout(() => {
             this.mascotContainer.classList.add('mascot-hidden');
