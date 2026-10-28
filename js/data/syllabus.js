@@ -1305,4 +1305,790 @@ const syllabusData = [
             { instruction: "Auditar Eficiencia ELS y Executed Workload", expectedCmd: "/SCWM/MON-KPI", hint: "/SCWM/MON-KPI", successMessage: "> Tabla /SCWM/EXCLD actualizada: Eficiencia ELS 108.4%. SEMESTRE 4 COMPLETADO." }
         ]
     }
+,
+    // ==========================================
+    // SEMESTRE 5 - INTEGRACIÓN DE PRODUCCIÓN (PP) Y CALIDAD (QM)
+    // ==========================================
+    {
+        id: "s5_m1",
+        semester: 5,
+        type: "theory",
+        title: "5.1 Integración Avanzada de Producción (PP-EWM)",
+        duration: "40 Horas • Arquitectura de Manufactura",
+        req: "s4_l2",
+        description: "El puente entre la logística pura y la manufactura industrial. Aprende a sincronizar SAP EWM con SAP PP (Production Planning) y sistemas MES para abastecer líneas de ensamblaje mediante Production Material Requests (PMRs), ciclos de control Kanban y backflushing en tiempo real. 15 capítulos profundos y 40 preguntas de certificación.",
+        review: "Regla de Oro: En SAP EWM avanzado ya no usamos Outbound Deliveries para abastecer producción. Usamos el documento nativo PMR (Production Material Request) que lee directamente los componentes de la Orden de Fabricación (CO01) y calcula el Staging exacto hacia el PSA (Production Supply Area) sin duplicar documentos financieros.",
+        pages: [
+            `<h3>Capítulo 1: La Frontera entre el Almacén y la Fábrica</h3>
+            <p>El almacén logístico resguarda el inventario, pero la planta de manufactura lo consume. La sincronización entre EWM y PP es vital.</p>
+            <details>
+                <summary>Ver explicación a fondo (El Cuello de Botella Industrial)</summary>
+                <div class="details-content">
+                    <p>Si la línea de ensamblaje automotriz pide 50 motores y el almacén demora 20 minutos en enviarlos, la línea se detiene (Downtime). Cada minuto de línea parada cuesta miles de dólares. La integración <strong>PP-EWM (Production Planning - Extended Warehouse Management)</strong> automatiza el suministro de componentes justo a tiempo (JIT) hacia los estantes de la fábrica, leyendo la lista de materiales (BOM) de la Orden de Producción.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 2: Production Supply Area (PSA)</h3>
+            <p>El PSA es la zona de estanterías físicas ubicada a escasos metros de la máquina de producción.</p>
+            <details>
+                <summary>Ver explicación a fondo (Mapeo Logístico del PSA)</summary>
+                <div class="details-content">
+                    <p>En SAP, el <strong>PSA (Área de Suministro de Producción)</strong> es el punto de encuentro entre PP y EWM. En el ERP (PP), el PSA es un dato maestro (PK05). En EWM, ese mismo PSA se mapea a un Storage Bin físico específico (ej. <code>BIN-LINEA-01</code>). EWM envía la mercancía desde el rack general de reserva hasta este Bin del PSA, y desde ahí la máquina "jala" el componente para consumirlo.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 3: El Documento PMR (Production Material Request)</h3>
+            <p>El documento nativo de S/4HANA EWM para abastecimiento de producción. Sustituye a las entregas de salida.</p>
+            <details>
+                <summary>Ver explicación a fondo (Evolución Arquitectónica)</summary>
+                <div class="details-content">
+                    <p>Históricamente (SAP WM), abastecer a producción requería crear una Delivery en el ERP, lo que inflaba la base de datos de LIKP/LIPS. S/4HANA introdujo el <strong>PMR</strong>. Al liberar una Orden de Producción (CO02), el ERP envía una señal a EWM. EWM crea un PMR localmente que consolida todos los componentes requeridos, simplificando el modelo de datos y permitiendo el Staging dinámico.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 4: Tipos de Suministro: Pick Parts vs Crate Parts</h3>
+            <p>No todos los componentes se abastecen igual. ¿Necesitas piezas exactas o canastillas completas?</p>
+            <details>
+                <summary>Ver explicación a fondo (Staging Indicators)</summary>
+                <div class="details-content">
+                    <p><strong>Pick Parts:</strong> Abastecimiento exacto. Si la orden dice 14 tuercas, EWM te hace extraer 14 tuercas. <strong>Crate Parts (Cajas Completas):</strong> Típico para tornillería a granel. Aunque la orden pida 14 tuercas, el sistema te obliga a bajar un palet o caja completa de 1,000 unidades al PSA para que la máquina tome lo que necesite, devolviendo el sobrante a fin de mes.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 5: Release Order Parts (Componentes de Orden de Liberación)</h3>
+            <p>Se usan cuando múltiples órdenes de producción consumen el mismo componente continuamente durante el día.</p>
+            <details>
+                <summary>Ver explicación a fondo (Agrupación de Demanda)</summary>
+                <div class="details-content">
+                    <p>Si fabricas 10 modelos de computadoras y todos usan el mismo microprocesador, hacer Pick Parts crearía 10 tareas de almacén al mismo pasillo. <strong>Release Order Parts</strong> suma la cantidad de procesadores de las 10 órdenes y crea un solo gran PMR consolidado. El montacarguista hace un solo viaje con 500 procesadores al PSA de la línea de ensamblaje.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 6: Integración con Kanban de SAP PP</h3>
+            <p>Filosofía Toyota. Un recipiente vacío es la señal visual y lógica para que el almacén lo rellene.</p>
+            <details>
+                <summary>Ver explicación a fondo (Señal de Tarjeta - Kanban)</summary>
+                <div class="details-content">
+                    <p>En el tablero Kanban (PK13N), la máquina tiene dos cajas de etiquetas. Cuando la máquina vacía la Caja 1, el operario escanea el código de barras Kanban cambiándolo a estado <code>EMPTY</code> (Rojo). Esto dispara instantáneamente una Warehouse Task en EWM. El montacargas llena la caja y al depositarla en el PSA, la tarjeta cambia automáticamente a estado <code>FULL</code> (Verde).</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 7: Control Cycles (Ciclos de Control - LSK)</h3>
+            <p>El dato maestro que une al Material, al Centro, al PSA y define cómo se abastecerá (Kanban, PMR, WM).</p>
+            <details>
+                <summary>Ver explicación a fondo (Transacción LPK1)</summary>
+                <div class="details-content">
+                    <p>Sin <strong>Control Cycles</strong>, el ERP no sabe hablar con EWM sobre manufactura. En S/4HANA (Transacción LSK o LPK1), defines para cada SKU cómo viaja hacia cada línea de producción. Defines el <em>Staging Indicator</em> (ej. "3" para Pick Parts) y el Bin de EWM destino. Es la matriz de enrutamiento industrial.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 8: Proceso de Staging en EWM (/SCWM/STAGE)</h3>
+            <p>La consola de control donde el supervisor de almacén decide cuándo y cómo surtir a la fábrica.</p>
+            <details>
+                <summary>Ver explicación a fondo (Planificación de Desplazamiento)</summary>
+                <div class="details-content">
+                    <p>El planificador entra a <code>/SCWM/STAGE</code>, visualiza todos los PMRs activos y los agrupa. No se envía todo al mismo tiempo para no saturar físicamente la fábrica. El sistema verifica el <em>Capacity Check</em> del PSA (para no mandar 10 palets si el PSA solo tiene espacio para 2) y crea las Warehouse Tasks escalonadas hacia los montacargas.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 9: Consumo de Materiales (Backflushing)</h3>
+            <p>Cuando la máquina consume el material, el inventario debe desaparecer en SAP y generar un cargo contable.</p>
+            <details>
+                <summary>Ver explicación a fondo (Deducción Retrospectiva)</summary>
+                <div class="details-content">
+                    <p>El <strong>Backflush (Movimiento 261)</strong> es el consumo automático. Cuando el operario de la máquina reporta en PP que fabricó 1 Televisor (Movimiento 101), SAP PP lee la receta (BOM) y automáticamente da de baja (deduce) 1 Pantalla y 2 Bocinas del Bin del PSA en EWM. No se escanea el consumo componente por componente; se asume matemáticamente.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 10: Recepción de Producto Terminado (Inbound from Production)</h3>
+            <p>El televisor ya está ensamblado. Ahora debe viajar de la fábrica hacia el rack de Producto Terminado del almacén.</p>
+            <details>
+                <summary>Ver explicación a fondo (Expected Goods Receipt EWM-PP)</summary>
+                <div class="details-content">
+                    <p>Al final de la línea hay una empacadora. Cuando se arma el EuroPalet con 20 televisores, se le imprime un SSCC y se declara la entrada (MIGO 101) contra la Orden de Producción. Esto genera automáticamente una <strong>Inbound Delivery</strong> en EWM. El montacargas escanea el SSCC en la zona de producción y el algoritmo PACI/STSS le dice en qué rack guardarlo.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 11: Limpieza del PSA (Clear PSA)</h3>
+            <p>Finaliza la producción y quedan tornillos sobrantes en la línea. Deben volver a la bodega principal.</p>
+            <details>
+                <summary>Ver explicación a fondo (Transacción /SCWM/CLEAR_PSA)</summary>
+                <div class="details-content">
+                    <p>Si la fábrica operó con <em>Crate Parts</em>, sobrarán componentes en el piso de planta. Usando la transacción <code>/SCWM/CLEAR_PSA</code>, el sistema escanea todos los PSA buscando stock que no tiene órdenes de producción activas vinculadas, y genera tareas automáticas de <strong>Putaway de Retorno</strong> hacia la zona de reserva, manteniendo el piso de planta despejado.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 12: Co-Products y By-Products (Subproductos)</h3>
+            <p>En industrias químicas o lácteas, al fabricar el Producto A, inevitablemente sale un Producto B (ej. Suero de leche).</p>
+            <details>
+                <summary>Ver explicación a fondo (Movimiento 531)</summary>
+                <div class="details-content">
+                    <p>Un <strong>Co-Product</strong> tiene valor comercial (se vende); un <strong>By-Product</strong> suele ser merma o requerir reproceso. En ambos casos, PP genera una recepción automática con movimiento 531 en EWM. EWM debe tener configuradas estrategias de almacenamiento (Putaway) específicas para aislar estos subproductos, frecuentemente en silos de tanques líquidos.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 13: Determinación de Lotes (Batch Determination) en Producción</h3>
+            <p>Asegurar que la fábrica consuma los ingredientes más próximos a vencer (FEFO) para minimizar mermas.</p>
+            <details>
+                <summary>Ver explicación a fondo (Integración BMBC y EWM)</summary>
+                <div class="details-content">
+                    <p>La <strong>Determinación de Lotes</strong> puede ocurrir en ERP (PP) o directamente en EWM. La best-practice recomienda hacerla en EWM durante la creación de la Warehouse Task de Staging. EWM evalúa la condición FEFO y busca en el rack el ingrediente activo más viejo, asegurando que la orden de producción se alimente con componentes a punto de expirar.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 14: Nested HUs (Unidades de Manipulación Anidadas) en Producción</h3>
+            <p>Abastecer kits pre-armados. Una caja grande que contiene 4 cajitas más pequeñas, cada una con código de barras.</p>
+            <details>
+                <summary>Ver explicación a fondo (Multilevel Packing)</summary>
+                <div class="details-content">
+                    <p>La manufactura automotriz o aeroespacial utiliza carritos de kitting. EWM arma un carrito (HU Madre) que contiene gavetas (HUs Hijas). EWM mueve la HU Madre completa hacia la línea de ensamblaje (PSA). Al consumir, PP hace backflush leyendo directamente los componentes dentro de las HUs Hijas anidadas de forma transparente.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 15: Integración MES (Manufacturing Execution Systems)</h3>
+            <p>Cuando SAP no opera solo. El almacén habla con EWM y la fábrica con un software MES de terceros (Siemens, Rockwell).</p>
+            <details>
+                <summary>Ver explicación a fondo (Arquitectura SAP MII / PCo)</summary>
+                <div class="details-content">
+                    <p>Las fábricas ultramodernas usan un MES para controlar los robots soldadores. La integración <strong>S/4HANA EWM <-> MES</strong> se realiza vía APIs (OData, SOAP) intermediadas por SAP MII (Manufacturing Integration and Intelligence) o PCo. El MES envía un mensaje de "Máquina lista para lote 2"; SAP MII lo traduce a EWM, quien lanza la grúa MFS para entregar el palet en el robot.</p>
+                </div>
+            </details>`
+        ],
+        exam: [
+            { question: "¿Cuál es el principal documento operativo introducido en SAP S/4HANA EWM diseñado exclusivamente para gestionar el abastecimiento de componentes a las órdenes de producción sin generar entregas de salida masivas?", options: [{text:"Production Material Request (PMR).", correct:true}, {text:"Outbound Delivery Order (ODO).", correct:false}, {text:"Material Document (MIGO).", correct:false}, {text:"Kanban Control Card.", correct:false}] },
+            { question: "En el contexto de la integración EWM-PP, ¿qué significa la sigla PSA?", options: [{text:"Production Supply Area (Área de Suministro de Producción / Estanterías físicas junto a la máquina).", correct:true}, {text:"Process Sequence Algorithm.", correct:false}, {text:"Plant Security Agreement.", correct:false}, {text:"Putaway Strategy Assessment.", correct:false}] },
+            { question: "¿Qué indicador de Staging (Staging Indicator) se utiliza cuando el sistema EWM extrae la cantidad exacta de piezas requeridas por la orden de producción sin sobrar un solo tornillo?", options: [{text:"Pick Parts (Piezas de Selección Exacta).", correct:true}, {text:"Crate Parts.", correct:false}, {text:"Bulk Materials.", correct:false}, {text:"Release Order Parts.", correct:false}] },
+            { question: "¿Qué indicador de Staging fuerza al sistema a abastecer un palet o caja completa (Ej. 1,000 unidades) al piso de producción independientemente de que la orden exija una cantidad menor?", options: [{text:"Crate Parts (Cajas Completas).", correct:true}, {text:"Pick Parts.", correct:false}, {text:"By-Products.", correct:false}, {text:"Direct Consumption.", correct:false}] },
+            { question: "Si fabricas 20 órdenes de producción distintas en el día que consumen la misma materia prima de alta rotación, ¿qué estrategia de Staging agrupa las 20 necesidades en un solo requerimiento acumulado de transporte hacia el PSA?", options: [{text:"Release Order Parts (Componentes de Orden de Liberación).", correct:true}, {text:"Pick Parts.", correct:false}, {text:"Discrete Cartonization.", correct:false}, {text:"Task Interleaving.", correct:false}] },
+            { question: "¿Qué dato maestro de SAP vincula al Material, el Centro y el PSA para dictaminar la estrategia de reabastecimiento (ej. si debe usarse EWM, Kanban o WM clásico)?", options: [{text:"Control Cycles (Ciclos de Control).", correct:true}, {text:"Purchasing Info Record.", correct:false}, {text:"Sales Area Data.", correct:false}, {text:"Valuation Class.", correct:false}] },
+            { question: "En la integración Kanban con EWM, ¿qué evento del mundo físico detona de manera automática e instantánea la creación de una Warehouse Task de reabastecimiento hacia el montacargas?", options: [{text:"El escaneo o cambio de estado de la tarjeta Kanban a 'EMPTY' (Vacío) en el área de producción.", correct:true}, {text:"La impresión de una factura de cliente.", correct:false}, {text:"El pago mensual de la nómina de empleados.", correct:false}, {text:"El inicio de sesión del Gerente en el Fiori Launchpad.", correct:false}] },
+            { question: "Dentro del flujo de SAP, ¿qué significa el concepto de 'Backflushing' en manufactura?", options: [{text:"La deducción (consumo) automática y retroactiva de los componentes del inventario en el PSA basándose en la declaración de producto terminado y la Lista de Materiales (BOM).", correct:true}, {text:"Limpiar la fábrica con mangueras de agua a presión al terminar el turno.", correct:false}, {text:"Revertir una factura de proveedor por error de precios.", correct:false}, {text:"Eliminar los lotes caducados de la base de datos SQL.", correct:false}] },
+            { question: "Cuando finaliza el ensamblaje de un televisor y se empaca en la línea de producción, ¿qué proceso detona SAP para ingresarlo al almacén general de reserva de EWM?", options: [{text:"Genera una Inbound Delivery desde Producción (movimiento 101 contra la Orden de Producción) permitiendo su Putaway guiado en EWM.", correct:true}, {text:"Se emite directamente la factura al cliente final.", correct:false}, {text:"Se borra la Orden de Producción del sistema.", correct:false}, {text:"Se lanza un Wave Release de salida.", correct:false}] },
+            { question: "¿Qué transacción especializada utiliza el supervisor de almacén en EWM para agrupar PMRs, verificar capacidades de planta y crear las órdenes de trabajo escalonadas hacia los montacargas para abastecer a la fábrica?", options: [{text:"/SCWM/STAGE (Consola de Staging).", correct:true}, {text:"MMBE.", correct:false}, {text:"ME21N.", correct:false}, {text:"VK11.", correct:false}] },
+            { question: "¿Para qué sirve el proceso y transacción 'Clear PSA' (/SCWM/CLEAR_PSA) en SAP EWM?", options: [{text:"Para limpiar los remanentes del piso de fábrica, identificando stock en el PSA que ya no tiene órdenes activas y generando WTs de retorno hacia el rack de reserva.", correct:true}, {text:"Para eliminar el historial de auditoría de los usuarios antiguos.", correct:false}, {text:"Para reiniciar el servidor SAP S/4HANA por memoria llena.", correct:false}, {text:"Para archivar los clientes que no han comprado en 3 años.", correct:false}] },
+            { question: "En un proceso de refinería, al procesar petróleo (Producto Principal) se obtiene alquitrán que requiere tratamiento (Subproducto o By-Product). ¿Qué tipo de movimiento y acción detona en SAP EWM?", options: [{text:"Movimiento 531 (Entrada de By-Product), detonando una recepción automática y un Putaway hacia silos o zonas de almacenamiento designadas.", correct:true}, {text:"Movimiento 601 de Venta directa al cliente.", correct:false}, {text:"Movimiento 102 de anulación de compras.", correct:false}, {text:"Un Short Dump de sistema porque EWM no soporta líquidos.", correct:false}] },
+            { question: "¿Dónde recomienda la arquitectura de best-practices de SAP S/4HANA realizar la Determinación de Lotes (Batch Determination - FEFO) para componentes de fabricación?", options: [{text:"En EWM, directamente durante la creación de la Warehouse Task de Staging, para que el algoritmo busque físicamente en el rack el ingrediente más viejo disponible.", correct:true}, {text:"En Finanzas, durante el cálculo de la depreciación anual.", correct:false}, {text:"Un mes después de haber consumido los materiales.", correct:false}, {text:"En Recursos Humanos, cruzado con la fecha de nacimiento del operario.", correct:false}] },
+            { question: "¿Qué estructura lógica de EWM se utiliza para gestionar 'Kits de ensamblaje' o carritos donde una caja grande contiene 10 cajitas independientes escaneables?", options: [{text:"Nested Handling Units (HUs Anidadas / Empaque Multinivel).", correct:true}, {text:"Cross-Company Code Stock Transfers.", correct:false}, {text:"Material Ledgers.", correct:false}, {text:"Profitability Analysis (CO-PA).", correct:false}] },
+            { question: "En una arquitectura industrial automatizada, ¿qué siglas recibe el software de piso de fábrica (terceros) que interactúa con robots y habla con SAP EWM a través de SAP MII/PCo?", options: [{text:"MES (Manufacturing Execution System).", correct:true}, {text:"CRM (Customer Relationship Management).", correct:false}, {text:"SRM (Supplier Relationship Management).", correct:false}, {text:"BW (Business Warehouse).", correct:false}] },
+            { question: "En un ambiente integrado EWM-PP, si el inventario financiero de SAP ERP no concuerda con el físico reportado por el PSA en EWM, ¿cuál suele ser la causa más común?", options: [{text:"Consumos reales de la máquina que no fueron reportados vía Backflushing, o mermas de producción no declaradas en el ERP.", correct:true}, {text:"Hackers internacionales atacando la base de datos.", correct:false}, {text:"Un error en el servidor de correos Exchange.", correct:false}, {text:"Que el material está configurado como Servicio (DIEN) y no como Producto.", correct:false}] },
+            { question: "¿Es posible configurar SAP EWM para que abastezca una línea de producción sin que exista una Orden de Producción (CO01) previa en el ERP?", options: [{text:"No, en el modelo de PMR avanzado la Orden de Producción u Orden de Proceso es el requisito mandatorio del cual EWM extrae la lista de requerimientos (BOM).", correct:true}, {text:"Sí, EWM adivina lo que la fábrica necesita mágicamente.", correct:false}, {text:"Sí, usando una Orden de Venta estándar (VA01) directamente.", correct:false}, {text:"Depende de la fase lunar.", correct:false}] },
+            { question: "Un 'Storage Bin' asignado a un PSA (Production Supply Area) logísticamente pertenece a:", options: [{text:"EWM (Se parametriza en la estructura del Warehouse Number para tener trazabilidad 3D del piso de fábrica).", correct:true}, {text:"FI (Finanzas).", correct:false}, {text:"HCM (Recursos Humanos).", correct:false}, {text:"QM (Calidad).", correct:false}] },
+            { question: "¿Qué sucede si una Warehouse Task de abastecimiento (Staging) sufre una excepción BIDF (Bin Denied / Rack Vacío) durante su recolección?", options: [{text:"EWM lanza el manejo de excepciones, bloquea el rack vacío y recalcula el STSS para buscar el componente en otro rack y evitar parar la línea de producción.", correct:true}, {text:"La Orden de Producción se borra irreversiblemente de SAP.", correct:false}, {text:"El cliente recibe un correo de que su pedido fue cancelado.", correct:false}, {text:"El montacargas se bloquea con clave.", correct:false}] },
+            { question: "¿Cuál es el principal beneficio de cambiar la antigua logística WM basada en Outbound Deliveries por la nueva integración PP-EWM basada en PMRs?", options: [{text:"Evita la generación de miles de documentos de entrega (Deliveries) redundantes en el ERP, reduciendo la carga de base de datos y unificando el control en EWM.", correct:true}, {text:"Aumenta el cobro de impuestos corporativos.", correct:false}, {text:"Permite imprimir en impresoras de inyección de tinta.", correct:false}, {text:"Reduce el peso físico del acero de las estanterías.", correct:false}] },
+            { question: "Si la máquina de ensamblaje solicita 2 palets completos pero el PSA solo tiene capacidad volumétrica para 1 palet a la vez, ¿cómo lo gestiona EWM?", options: [{text:"Mediante el Capacity Check del Bin del PSA, fraccionando o escalonando la creación de las WTs de abastecimiento desde la consola de Staging.", correct:true}, {text:"Lanzando los 2 palets para que se estrellen en el piso.", correct:false}, {text:"Suspendiendo la producción por 1 semana.", correct:false}, {text:"Apagando la pantalla RF del operario.", correct:false}] },
+            { question: "¿Qué transacción clásica de SAP ERP se utiliza para notificar (confirmar) la fabricación de un producto final y detonar los Backflushes?", options: [{text:"CO11N / CO15 / MFBF (para manufactura repetitiva).", correct:true}, {text:"FB50 (Asiento de diario).", correct:false}, {text:"ME21N (Pedido de compras).", correct:false}, {text:"SU01 (Creación de usuarios).", correct:false}] },
+            { question: "¿Un 'Co-Product' fabricado junto al producto principal puede almacenarse en EWM con su propia valoración contable en SAP FI?", options: [{text:"Sí, los co-productos son inventariables y tienen su propia Valuation Class para recibir costos del proceso conjunto.", correct:true}, {text:"No, solo el producto principal puede valorarse.", correct:false}, {text:"Sí, pero solo si no tienen código de barras.", correct:false}, {text:"No, los co-productos son ilegales contablemente.", correct:false}] },
+            { question: "En Kanban Clásico (2-Bin System), ¿cuántas tarjetas o cajas físicas requiere la máquina para nunca detenerse?", options: [{text:"Dos (una caja en uso siendo consumida y otra caja vacía que viaja/avisa a EWM para ser rellenada).", correct:true}, {text:"Cincuenta cajas.", correct:false}, {text:"Ninguna caja.", correct:false}, {text:"Solo la pantalla de una computadora.", correct:false}] },
+            { question: "¿Qué protocolo técnico utiliza SAP EWM para conversar nativamente con el ERP en el modelo descentralizado para confirmar los consumos y recepciones de producción?", options: [{text:"Mensajería qRFC (Queued Remote Function Call).", correct:true}, {text:"Bluetooth.", correct:false}, {text:"Cables HDMI.", correct:false}, {text:"Impresión de códigos QR.", correct:false}] },
+            { question: "Si el material 'Motor V8' está marcado como 'Pick Parts' y se requieren 5 unidades, ¿qué generará EWM?", options: [{text:"Una WT exacta por 5 unidades desde el rack hasta el PSA.", correct:true}, {text:"Una WT por el palet entero de 50 motores.", correct:false}, {text:"Una alerta de error porque Pick Parts es solo para tornillos.", correct:false}, {text:"Una factura proforma de exportación.", correct:false}] },
+            { question: "Si el material 'Tornillo de Acero' está marcado como 'Crate Parts' y la orden requiere 5 unidades, sabiendo que la caja base trae 1,000, ¿qué generará EWM?", options: [{text:"Una WT por la caja completa de 1,000 unidades hacia el PSA.", correct:true}, {text:"Una WT exacta por 5 tornillos forzando al operario a contarlos a mano.", correct:false}, {text:"Cero WTs, porque asume que hay stock infinito.", correct:false}, {text:"Un bloqueo automático por diferencia de cantidades.", correct:false}] },
+            { question: "¿Qué ocurre con las 995 unidades sobrantes del Crate Part que quedaron en el PSA al final de la jornada si la máquina solo ensambló un equipo?", options: [{text:"Quedan físicamente en el PSA y lógicamente en EWM, listas para ser usadas por otra orden, o se devuelven al rack mediante /SCWM/CLEAR_PSA.", correct:true}, {text:"Se desaparecen de la base de datos automáticamente.", correct:false}, {text:"Se facturan al gobierno.", correct:false}, {text:"El ERP las considera destruidas por mermas.", correct:false}] },
+            { question: "El 'Staging' en manufactura significa:", options: [{text:"El proceso físico y sistémico de mover y posicionar los componentes logísticos desde el almacén hacia el borde de la línea de producción.", correct:true}, {text:"El proceso de auditar los estados financieros de la empresa.", correct:false}, {text:"La capacitación de los nuevos operarios de limpieza.", correct:false}, {text:"La configuración de los escáneres Zebra en la red Wi-Fi.", correct:false}] },
+            { question: "¿Cuál es el riesgo de NO utilizar Backflush en una línea de producción de alta velocidad (ej. embotelladora a 3,000 botellas/hora)?", options: [{text:"Que se necesite un ejército de operarios tecleando manualmente el consumo de tapas y botellas en SAP, lo cual es humanamente imposible y trabaría la fábrica.", correct:true}, {text:"Que el líquido se eche a perder más rápido.", correct:false}, {text:"Que SAP EWM funcione más lento por exceso de RAM.", correct:false}, {text:"Ningún riesgo; Backflush es solo un adorno gráfico en Fiori.", correct:false}] },
+            { question: "En la integración EWM-MES, si el brazo robótico soldador falla, ¿cómo evita el MES que SAP EWM siga mandando palets de metal hacia el robot?", options: [{text:"El MES envía un mensaje de estado por API a SAP para bloquear el PSA o pausar temporalmente las WTs de abastecimiento dirigidas a esa celda.", correct:true}, {text:"El robot llama por teléfono al gerente de almacén.", correct:false}, {text:"El MES detiene el reloj del sistema operativo Windows.", correct:false}, {text:"SAP EWM detecta el humo físicamente por las cámaras.", correct:false}] },
+            { question: "¿Qué es un BOM (Bill of Materials) y por qué es crítico para EWM en procesos de manufactura?", options: [{text:"Es la receta técnica de componentes de un producto. Es crítico porque EWM usa el BOM para calcular qué materiales, y en qué cantidad, debe abastecer vía PMR.", correct:true}, {text:"Es el recibo de sueldo de los operarios del almacén.", correct:false}, {text:"Es un reporte de finanzas sobre materiales dañados.", correct:false}, {text:"Es la factura de flete del transportista.", correct:false}] },
+            { question: "¿A qué nivel de la estructura organizativa de SAP se define un Control Cycle (Ciclo de Control)?", options: [{text:"A nivel de Centro (Plant) y Área de Suministro de Producción (PSA).", correct:true}, {text:"A nivel de Mandante (Cross-Client).", correct:false}, {text:"A nivel de Sociedad (Company Code).", correct:false}, {text:"A nivel de Canal de Distribución (Sales Channel).", correct:false}] },
+            { question: "Para visualizar el historial de tareas de abastecimiento hacia una línea de producción en específico, ¿qué nodo del Warehouse Monitor (/SCWM/MON) debe consultar el arquitecto?", options: [{text:"Production Supply / Production Material Request.", correct:true}, {text:"Inbound / Inbound Delivery.", correct:false}, {text:"Resource Management / Queue Sequence.", correct:false}, {text:"Alerts / Exception Codes.", correct:false}] },
+            { question: "Si la Orden de Producción CO01 requiere un material 'X' que EWM identifica como 'Out of Stock' (Sin inventario en toda la bodega), el documento PMR:", options: [{text:"Se genera, pero EWM no podrá crear las Warehouse Tasks de Staging para ese material hasta que se reciba nuevo inventario (Backorder).", correct:true}, {text:"Destruye la Orden de Producción de SAP ERP.", correct:false}, {text:"Cambia el requerimiento automáticamente por un material 'Y' al azar.", correct:false}, {text:"Abre el cajón de dinero de la recepción.", correct:false}] },
+            { question: "En un escenario MFS + PP-EWM, el abastecimiento se realiza mediante grúas automáticas. ¿Qué documento desencadena el telegrama TCP/IP hacia el PLC de la grúa?", options: [{text:"La Warehouse Task de Staging originada por el PMR, al convertirse en telegrama MFS.", correct:true}, {text:"La Orden de Producción CO02 del ERP.", correct:false}, {text:"La factura electrónica del proveedor.", correct:false}, {text:"La tarjeta de tiempo de Recursos Humanos.", correct:false}] },
+            { question: "Si se fabrican piezas aeronáuticas críticas, ¿dónde se asegura la trazabilidad del Lote exacto y Número de Serie ensamblado en SAP?", options: [{text:"Se escanea y asocia de forma estricta (Serial Number Profile / Batch Management) durante el consumo (Goods Issue) en el PSA, quedando ligado al equipo final.", correct:true}, {text:"En una hoja de Excel guardada en la computadora del gerente.", correct:false}, {text:"No se requiere trazabilidad en S/4HANA.", correct:false}, {text:"A través del color de la caja de empaque.", correct:false}] },
+            { question: "¿Qué módulo de SAP ERP debe estar activado y configurado en conjunto con EWM para que el flujo completo de PMR funcione?", options: [{text:"SAP PP (Production Planning) o SAP PP-PI (Production Planning for Process Industries).", correct:true}, {text:"SAP HCM (Recursos Humanos).", correct:false}, {text:"SAP FI-AA (Activos Fijos).", correct:false}, {text:"SAP TRM (Treasury and Risk Management).", correct:false}] },
+            { question: "¿Cómo se llama el proceso de recibir un producto de la fábrica y despacharlo directamente al cliente final sin almacenarlo (combinando PP y SD vía EWM)?", options: [{text:"Producción con Opportunistic Cross-Docking o Flow-Through.", correct:true}, {text:"Dumping.", correct:false}, {text:"Blind Receiving.", correct:false}, {text:"Ciclo de Vida de Activos.", correct:false}] },
+            { question: "Como consultor senior, recomiendas implementar SAP EWM integrado con PP principalmente porque:", options: [{text:"Proporciona visibilidad 3D del stock en planta, optimiza el movimiento de montacargas, automatiza el reabastecimiento exacto y elimina el exceso de inventario inmovilizado en las líneas.", correct:true}, {text:"Porque hace que los gráficos de Fiori se vean más bonitos.", correct:false}, {text:"Porque elimina la necesidad de cobrarle a los clientes.", correct:false}, {text:"Porque permite apagar el servidor los fines de semana.", correct:false}] }
+        ]
+    },
+    {
+        id: "s5_l1",
+        semester: 5,
+        type: "lab",
+        title: "5.2 Lab Multi-Paso: Staging PP-EWM y Backflushing",
+        duration: "2 Horas 15 Min • Integración Industrial",
+        req: "s5_m1",
+        description: "El departamento de Manufactura ha liberado la Orden de Producción #90050 para ensamblar un Motor V8. Entra al monitor de Staging de EWM, analiza el PMR, verifica que haya capacidad en la estantería del PSA (Línea de Ensamblaje 1), crea las tareas de montacargas y audita el consumo automático retrospectivo (Backflush) tras el ensamblaje.",
+        simTask: { hint: "Fases: CO02-RELEASE -> /SCWM/STAGE -> SELECT-PMR -> CREATE-WT -> /SCWM/RFUI -> CONFIRM-STAGING -> PP-MFBF-BACKFLUSH." },
+        simSteps: [
+            { instruction: "Liberar Orden de Producción (ERP)", expectedCmd: "CO02-RELEASE", hint: "CO02-RELEASE", successMessage: "> Orden de Fabricación 90050 LIBERADA. PMR generado asíncronamente en EWM." },
+            { instruction: "Abrir Consola de Staging (EWM)", expectedCmd: "/SCWM/STAGE", hint: "/SCWM/STAGE", successMessage: "> Monitor de Abastecimiento de Producción cargado. PSA: LINEA-01." },
+            { instruction: "Seleccionar PMR Pendiente", expectedCmd: "SELECT-PMR", hint: "SELECT-PMR", successMessage: "> PMR #1000550 (Req: 16 Pistones, 2 Culatas, 1 Bloque V8) Seleccionado." },
+            { instruction: "Ejecutar Motor de Tareas", expectedCmd: "CREATE-WT", hint: "CREATE-WT", successMessage: "> Capacity Check OK. 3 WTs creadas hacia montacargas (Pick Parts)." },
+            { instruction: "Simulador de Montacargas RF", expectedCmd: "/SCWM/RFUI", hint: "/SCWM/RFUI", successMessage: "> Terminal iniciada. Menú 'Putaway a Producción'." },
+            { instruction: "Confirmar Entrega en Línea", expectedCmd: "CONFIRM-STAGING", hint: "CONFIRM-STAGING", successMessage: "> Materiales entregados físicamente en BIN-LINEA-01. EWM Stock en PSA = OK." },
+            { instruction: "Ejecutar Consumo de Máquina", expectedCmd: "PP-MFBF-BACKFLUSH", hint: "PP-MFBF-BACKFLUSH", successMessage: "> Producción Terminada. BACKFLUSH EJECUTADO (Mov 261). Inventario deducido correctamente." }
+        ]
+    },
+    {
+        id: "s5_m2",
+        semester: 5,
+        type: "theory",
+        title: "5.3 Gestión de Calidad Integrada (SAP QM-EWM)",
+        duration: "40 Horas • Arquitectura de Aseguramiento (QA)",
+        req: "s5_l1",
+        description: "El control absoluto sobre la calidad del inventario corporativo. Aprende cómo SAP EWM y SAP QM se integran mediante Inspection Object Types (IOTs) para bloquear lotes farmacéuticos, generar muestreos estadísticos, rutar productos hacia laboratorios de pruebas destructivas y ejecutar Decisiones de Empleo (Usage Decisions) sin fricciones logísticas. 15 capítulos teóricos y 40 preguntas de certificación.",
+        review: "Regla de Oro: El módulo de Calidad manda sobre Logística. Si el Lote de Inspección (Inspection Lot) dictamina un 'Usage Decision' de Rechazo, EWM bloquea automáticamente la mercancía y la enruta hacia Scrap (Destrucción) o Rework (Reproceso). Las reglas de calidad se rigen por la transacción maestra /SCWM/QRSETUP (Inspection Rules) y los IOTs.",
+        pages: [
+            `<h3>Capítulo 1: El Paradigma de Calidad Integrada</h3>
+            <p>El almacén no solo guarda cajas; custodia millones de dólares sujetos a normativas de la FDA, ISO 9001 o regulaciones de aeronáutica. Si el almacén despacha un palet de medicina vencida o contaminada, las consecuencias legales quiebran empresas.</p>
+            <details>
+                <summary>Ver explicación a fondo (El Muro de QA)</summary>
+                <div class="details-content">
+                    <p>La integración QM-EWM es el muro de contención (Quality Firewall). En almacenes sin integración, los operarios pueden hacer picking por error de un lote dudoso. En EWM, el stock en estado <strong>'Q' (Quality Inspection)</strong> es ciego matemáticamente para el algoritmo de Outbound: es imposible asignarlo a una ola de salidas de clientes. Calidad manda sobre la operación comercial.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 2: Inspection Object Types (IOTs)</h3>
+            <p>Son los "enchufes" arquitectónicos que conectan un evento logístico de EWM con el motor de Calidad (QM).</p>
+            <details>
+                <summary>Ver explicación a fondo (El Mapa IOT)</summary>
+                <div class="details-content">
+                    <p>En el Customizing de EWM, activas diferentes IOTs según en qué etapa del flujo logístico quieres inspeccionar:<br>
+                    <strong>IOT 1:</strong> Inspección Pre-Entrada (Aviso de Despacho del Proveedor).<br>
+                    <strong>IOT 3:</strong> Inspección de Salida (Revisión antes de cargar el camión al cliente).<br>
+                    <strong>IOT 4:</strong> Inspección de Entrada (La más crítica, ocurre en el PGR).<br>
+                    <strong>IOT 5:</strong> Inspecciones Internas o cíclicas (Inspecciones periódicas de lotes que llevan meses guardados).</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 3: Inspección de Entrada (IOT 4) y Q-Zone</h3>
+            <p>El camión descarga. Automáticamente, el sistema secuestra el inventario y lo aísla lógicamente.</p>
+            <details>
+                <summary>Ver explicación a fondo (Ruteo Dinámico de Calidad)</summary>
+                <div class="details-content">
+                    <p>Al contabilizar el Post Goods Receipt (PGR), el IOT 4 se gatilla. SAP verifica si el Material Master exige inspección. Si es así, crea un <strong>Inspection Lot (Lote de Inspección)</strong> en el ERP y una Warehouse Task en EWM para mover el palet desde el muelle hacia la <strong>Q-Zone (Zona de Cuarentena)</strong> o Laboratorio de QA. El palet jamás tocará los racks de venta hasta aprobar el examen.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 4: Inspection Rules (Reglas de Inspección - /SCWM/QRSETUP)</h3>
+            <p>El cerebro condicional. Define a quién, cuánto y cómo inspeccionar sin tener que codificar a mano.</p>
+            <details>
+                <summary>Ver explicación a fondo (Matriz de Riesgos)</summary>
+                <div class="details-content">
+                    <p>La transacción maestra de calidad en EWM es <code>/SCWM/QRSETUP</code>. Aquí configuras matrices de riesgo: "Si el material es QUÍMICO y el proveedor es NUEVO, inspecciona el 100% de los palets. Si el proveedor tiene certificado ISO y lleva 5 años de buen récord (Skip-Lot), inspecciona solo 1 palet de cada 20 de forma aleatoria". Todo de forma algorítmica.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 5: Muestreo Físico (Sample Size & Sampling Procedures)</h3>
+            <p>El inspector de calidad no puede abrir las 10,000 botellas que llegaron; necesita una muestra representativa (Sample).</p>
+            <details>
+                <summary>Ver explicación a fondo (Work Center de QA)</summary>
+                <div class="details-content">
+                    <p>Según la regla <em>Sampling Procedure</em> basada en tablas de estadística militar (ej. AQL), SAP determina que debe extraer 15 botellas de muestra. EWM genera una Warehouse Task especial (Sample Extraction WT). El operario extrae las 15 botellas, las escanea, y las lleva al <strong>Work Center de QA</strong>. El resto del palet (9,985 botellas) queda inmovilizado en la zona de reserva esperando el resultado de la muestra.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 6: Registro de Resultados (Results Recording - QA32/QE01)</h3>
+            <p>El laboratorista ingresa las mediciones físicas o químicas a la base de datos de SAP QM.</p>
+            <details>
+                <summary>Ver explicación a fondo (Master Inspection Characteristics - MICs)</summary>
+                <div class="details-content">
+                    <p>El lote de inspección contiene <strong>MICs (Características Maestras de Inspección)</strong>. Ejemplos: MIC 1 = Temperatura (Permitido: 2°C a 8°C). MIC 2 = Color (Permitido: Blanco). Si el laboratorista teclea 15°C, SAP QM rechaza automáticamente esa característica (Out of Spec). Esta información vive en el ERP, pero impacta la logística inmovilizada en EWM.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 7: La Decisión de Empleo (Usage Decision - UD)</h3>
+            <p>El momento de la verdad. ¿El material se aprueba para la venta, o se destruye?</p>
+            <details>
+                <summary>Ver explicación a fondo (Follow-Up Actions)</summary>
+                <div class="details-content">
+                    <p>El Gerente de Calidad firma digitalmente el UD (Usage Decision) en la transacción QA11. Existen decisiones estándar: <strong>A (Aprobado)</strong> o <strong>R (Rechazado)</strong>. Al guardar el UD, SAP dispara un <strong>Follow-Up Action (Acción Subsiguiente)</strong>. Esta acción se comunica vía qRFC de vuelta a EWM, desencadenando toda una tormenta de Warehouse Tasks automatizadas según el resultado.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 8: Logística Post-Aprobación (Unrestricted Stock)</h3>
+            <p>El Gerente de Calidad aprobó el lote. El stock se libera comercialmente.</p>
+            <details>
+                <summary>Ver explicación a fondo (Cambio de Tipo de Stock - Posting Change)</summary>
+                <div class="details-content">
+                    <p>Si el UD es "Aprobado", el Follow-Up Action en EWM ejecuta un <strong>Posting Change (Cambio Contable)</strong> en milisegundos. El inventario pasa del tipo de stock <code>'Q' (Quality)</code> al tipo de stock <code>'F' o 'Blank' (Unrestricted/Libre Utilización)</code>. Inmediatamente después, genera una Warehouse Task para mover los palets desde la zona de cuarentena hacia el rack de venta (High Rack Putaway).</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 9: Logística de Rechazo, Reproceso (Rework) y Scrap (Chatarra)</h3>
+            <p>El lote falló las pruebas. El peligro de contaminación es inminente. Debe aislarse o destruirse.</p>
+            <details>
+                <summary>Ver explicación a fondo (Ruteo de Excepciones)</summary>
+                <div class="details-content">
+                    <p>Si el UD es "Rechazado", el Follow-Up Action cambia el stock a tipo <code>'S' (Blocked/Scrap)</code>. EWM crea tareas forzosas hacia la <strong>Zona de Destrucción (Scrap Zone)</strong> o, si el artículo es recuperable (ej. le falta una etiqueta), hacia la <strong>Zona de Reproceso (Rework Work Center)</strong>. Financieramente, esto detona una pérdida contable o un cargo/débito en reclamo hacia el proveedor en SAP MM.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 10: Ensayos Destructivos (Destructive Testing)</h3>
+            <p>Para probar que un chaleco antibalas funciona, tienes que dispararle y destruirlo. El inventario desaparece.</p>
+            <details>
+                <summary>Ver explicación a fondo (Inventario Consumido por QA)</summary>
+                <div class="details-content">
+                    <p>En pruebas destructivas o de microbiología, la muestra extraída jamás regresa al almacén principal. El Follow-Up Action del módulo QM ejecuta automáticamente un <strong>Goods Issue to Sample (Salida por Muestreo)</strong>. En EWM, las 15 unidades que se llevaron al laboratorio se borran del inventario físico y se cargan al Centro de Costos del departamento de calidad en SAP FI.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 11: Inspecciones Cíclicas e Internas (IOT 5 / Relocation)</h3>
+            <p>Medicinas que llevan guardadas 12 meses deben re-evaluarse antes de salir al mercado para asegurar su potencia.</p>
+            <details>
+                <summary>Ver explicación a fondo (Batch Expiration Monitoring)</summary>
+                <div class="details-content">
+                    <p>Un Job nocturno monitorea las fechas de caducidad (SLED). Si un lote de vacunas entra en su "Ventana Crítica de Inspección Repetitiva" (Recurring Inspection), el ERP genera un nuevo Lote de Inspección (IOT 5). EWM cambia sorpresivamente el stock de los racks de 'Unrestricted' a 'Quality', congelándolo, y envía WTs para que los operarios bajen los palets y los lleven al laboratorio para un test de estabilidad.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 12: Devoluciones de Clientes (Customer Returns) y Calidad</h3>
+            <p>Un cliente devuelve 5 laptops porque "no encienden". No puedes meterlas al inventario de venta directamente.</p>
+            <details>
+                <summary>Ver explicación a fondo (ARM - Advanced Returns Management)</summary>
+                <div class="details-content">
+                    <p>El proceso <strong>Advanced Returns Management (ARM)</strong> usa el IOT 4 o IOT 3. Al recibir la caja de devolución en el muelle (Advanced Return Delivery), el sistema la envía forzosamente al <strong>Returns Work Center</strong>. Un técnico evalúa si la laptop realmente está dañada, si fue golpeada por el transportista, o si funciona perfecto (A-Stock). Su Decisión de Empleo determina si se devuelve el dinero al cliente o se tira a la basura.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 13: Certificados de Calidad (Quality Certificates)</h3>
+            <p>Documentos PDF firmados (ej. Certificado de Análisis - CoA) que el proveedor debe enviar con el camión, o el almacén no recibe.</p>
+            <details>
+                <summary>Ver explicación a fondo (Bloqueo de Inbound por Falta de Documentos)</summary>
+                <div class="details-content">
+                    <p>En la industria farmacéutica, si llega la materia prima pero el transportista olvidó el <em>Certificate of Analysis (CoA)</em> del lote, SAP EWM bloquea por sistema la contabilización del Post Goods Receipt (PGR) a través del status "Certificate Missing". El camión se queda en el patio de maniobras (Yard Management) hasta que el proveedor envíe el PDF y el empleado de garita lo adjunte en SAP.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 14: Lotes de Inspección en EWM vs ERP (Engine QM Embebido vs Descentralizado)</h3>
+            <p>S/4HANA trajo una revolución: incrustar el motor de QM dentro del propio EWM para ganar microsegundos de respuesta.</p>
+            <details>
+                <summary>Ver explicación a fondo (QIE - Quality Inspection Engine)</summary>
+                <div class="details-content">
+                    <p>Antes, EWM dependía enteramente de los mensajes RFC lentos del ERP para saber qué hacer. Ahora, S/4HANA EWM utiliza el <strong>QIE (Quality Inspection Engine)</strong> local. Esto permite generar documentos de inspección paralelos en EWM en tiempo real, permitiendo a los operarios del Work Center ingresar defectos desde su pistola de radiofrecuencia (/RFUI) sin tener acceso a las pantallas complejas de SAP ERP.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 15: Monitor EWM para Calidad y Tablas Core SQL QM</h3>
+            <p>Como consultor, si un palet está bloqueado en calidad y no sabes por qué, aquí encuentras las respuestas.</p>
+            <details>
+                <summary>Ver explicación a fondo (Troubleshooting QM-EWM)</summary>
+                <div class="details-content">
+                    <p>En el Monitor (<code>/SCWM/MON</code>), nodo <em>Quality Inspection</em>, visualizas los Inspection Documents vinculados al stock. <strong>Tablas Core:</strong> <code>QALS</code> (Cabecera de Lote de Inspección ERP), <code>QAMV</code> (Características de inspección), <code>QAMR</code> (Resultados de inspección), y en EWM <code>/SCWM/QUAN</code> (Tabla maestra de Quants/Stock donde visualizas el flag de tipo 'Q' o 'S' de las HUs inmovilizadas).</p>
+                </div>
+            </details>`
+        ],
+        exam: [
+            { question: "¿Cuál es el propósito fundamental de integrar SAP EWM con SAP QM en un almacén de clase mundial?", options: [{text:"Crear un 'Quality Firewall' (muro de calidad) inmovilizando sistémicamente inventarios dudosos o sin evaluar para evitar que sean recolectados y enviados a clientes.", correct:true}, {text:"Mejorar los gráficos y colores del sistema SAP Fiori.", correct:false}, {text:"Permitir que el departamento de finanzas cobre los fletes más rápido.", correct:false}, {text:"Eliminar la necesidad de contratar gerentes en el almacén.", correct:false}] },
+            { question: "En la arquitectura técnica de integración EWM-QM, ¿qué significan las siglas IOT?", options: [{text:"Inspection Object Types (Los eventos de proceso, como entrada o salida, que detonan una inspección de calidad).", correct:true}, {text:"Internet of Things.", correct:false}, {text:"Internal Operation Taxes.", correct:false}, {text:"Inter-Office Transfers.", correct:false}] },
+            { question: "¿Qué IOT (Inspection Object Type) se dispara de forma crítica y estándar justo en el momento en que se contabiliza el Post Goods Receipt (PGR) de un camión entrante?", options: [{text:"IOT 4 (Inspección de Entrada / Inbound Inspection).", correct:true}, {text:"IOT 1 (Inspección Pre-Entrada).", correct:false}, {text:"IOT 3 (Inspección de Salida).", correct:false}, {text:"IOT 5 (Inspección Interna).", correct:false}] },
+            { question: "¿Qué IOT se encarga de las inspecciones cíclicas o internas para lotes de productos que ya llevan almacenados 12 meses en la bodega y necesitan re-evaluación por vencimiento?", options: [{text:"IOT 5 (Inspección Interna o Relocation Inspection).", correct:true}, {text:"IOT 4.", correct:false}, {text:"IOT 1.", correct:false}, {text:"IOT 9.", correct:false}] },
+            { question: "¿Cuál es la transacción maestra centralizada en SAP EWM donde el consultor parametriza las Reglas de Inspección (ej. inspeccionar el 100%, o solo muestras, dependiendo del proveedor o material)?", options: [{text:"/SCWM/QRSETUP (Inspection Rules).", correct:true}, {text:"MM01 (Material Master).", correct:false}, {text:"SU01 (User Maintenance).", correct:false}, {text:"SE38 (ABAP Editor).", correct:false}] },
+            { question: "Cuando EWM recibe mercancía sujeta a calidad bajo IOT 4, ¿bajo qué Tipo de Stock (Stock Type) ingresa financieramente y lógicamente el inventario para inmovilizarlo?", options: [{text:"Tipo de Stock 'Q' (Quality Inspection Stock).", correct:true}, {text:"Tipo de Stock 'Blank' o 'F' (Unrestricted / Libre Utilización).", correct:false}, {text:"Tipo de Stock 'B' (Blocked by Finance).", correct:false}, {text:"Tipo de Stock 'T' (Transit).", correct:false}] },
+            { question: "Si un lote de 1,000 unidades llega y el sistema calcula, según las reglas de muestreo (AQL), que solo se necesitan 15 unidades de muestra. ¿Qué genera EWM?", options: [{text:"Una Warehouse Task de extracción de muestra (Sample WT) para llevar 15 unidades al laboratorio, inmovilizando las 985 unidades restantes en el rack de reserva bajo estado 'Q'.", correct:true}, {text:"Envía las 1,000 unidades directo al laboratorio colapsando el edificio.", correct:false}, {text:"Destruye las 985 unidades restantes por seguridad.", correct:false}, {text:"Rechaza el camión obligando a que envíe solo 15 unidades.", correct:false}] },
+            { question: "¿Qué son las MICs (Master Inspection Characteristics) dentro de un Lote de Inspección de SAP QM?", options: [{text:"Las variables técnicas a medir en el laboratorio (ej. pH, color, temperatura) que definen el límite de tolerancia (Pass/Fail) del análisis.", correct:true}, {text:"Las cámaras de seguridad físicas del almacén.", correct:false}, {text:"Un tipo especial de código de barras militar.", correct:false}, {text:"La tarifa por hora que cobra el inspector.", correct:false}] },
+            { question: "¿Qué significan las siglas 'UD' en el flujo de gestión de calidad integrada en SAP S/4HANA?", options: [{text:"Usage Decision (Decisión de Empleo - el dictamen final firmado por el Gerente de Calidad que aprueba o rechaza un lote).", correct:true}, {text:"User Database (Base de datos de usuarios).", correct:false}, {text:"Universal Delivery (Entrega universal).", correct:false}, {text:"Urgent Dispatch (Despacho urgente).", correct:false}] },
+            { question: "Si el Gerente de QA en el ERP realiza un 'Usage Decision' con resultado APROBADO, ¿qué mecanismo técnico utiliza SAP para informar y mover la mercancía en EWM de forma automatizada?", options: [{text:"A través de una 'Follow-Up Action' que ejecuta un Cambio Contable (Posting Change) en EWM, cambiando el stock de 'Q' a 'Libre', y generando las WTs de Putaway final.", correct:true}, {text:"Llama por teléfono al supervisor de almacén para que mueva las cajas a mano.", correct:false}, {text:"Genera una nueva Orden de Compra para premiar al proveedor.", correct:false}, {text:"Borra el Material Master entero.", correct:false}] },
+            { question: "Si el UD dictamina un RECHAZO definitivo por contaminación, ¿qué Follow-Up Action desencadena EWM típicamente sobre el inventario físico en la Q-Zone?", options: [{text:"Ejecuta el cambio de estado a tipo 'S' (Scrap/Blocked) y genera una Warehouse Task forzosa moviendo los palets desde la zona de calidad hacia la Zona de Destrucción (Scrap Zone).", correct:true}, {text:"Lo vende al doble del precio en una liquidación.", correct:false}, {text:"Lo empaqueta como regalo para los empleados.", correct:false}, {text:"Lo vuelve a enviar al rack de venta libre, pero ocultándolo.", correct:false}] },
+            { question: "En un proceso de QA donde se aplican 'Ensayos Destructivos' (ej. someter una pieza a presión extrema hasta que estalla), ¿qué ocurre con el inventario lógico de esa muestra en SAP?", options: [{text:"El Follow-Up Action ejecuta un consumo o salida de mercancía por muestreo (Goods Issue to Sample), descargando el inventario de EWM con cargo al Centro de Costos de Calidad.", correct:true}, {text:"SAP clona el inventario mágicamente para no perder dinero.", correct:false}, {text:"Se devuelve el polvo de la pieza rota al proveedor para que la repare.", correct:false}, {text:"El sistema genera un Short Dump porque no soporta roturas.", correct:false}] },
+            { question: "¿Qué característica de control avanzada permite a SAP EWM bloquear en garita a un camión entrante si le falta un documento PDF normativo crucial?", options: [{text:"La validación del Certificate of Analysis (CoA) en el Inbound Delivery; sin él, el status de calidad falla y se bloquea el PGR.", correct:true}, {text:"El escáner térmico del guardia de seguridad.", correct:false}, {text:"El pago anticipado de los impuestos de aduana.", correct:false}, {text:"El certificado de antecedentes penales del chofer.", correct:false}] },
+            { question: "Un cliente devuelve un producto de alta tecnología porque llegó abollado. Usando Advanced Returns Management (ARM), ¿hacia dónde enruta EWM forzosamente el paquete al recibirlo en muelle?", options: [{text:"Hacia un Work Center especializado de Devoluciones (Returns Work Center) para que un técnico dictamine la gravedad del daño mediante una inspección IOT.", correct:true}, {text:"Directamente al rack de ventas Unrestricted como nuevo.", correct:false}, {text:"Directamente al basurero corporativo sin preguntar.", correct:false}, {text:"Al escritorio de recepción administrativa (Front Desk).", correct:false}] },
+            { question: "¿Cómo se denomina el motor local interno de SAP S/4HANA EWM que permite gestionar documentos de calidad y registrar defectos directamente desde las pantallas de radiofrecuencia (RF) del almacén sin depender exclusivamente del ERP?", options: [{text:"QIE (Quality Inspection Engine).", correct:true}, {text:"V8 JavaScript Engine.", correct:false}, {text:"Unreal Engine 5.", correct:false}, {text:"SAP BTP Integration Suite.", correct:false}] },
+            { question: "Dentro del EWM Warehouse Monitor (/SCWM/MON), ¿en qué tabla SQL principal podrías buscar si existe un flag de stock tipo 'Q' o 'S' inmovilizando una unidad de manipulación (HU)?", options: [{text:"En la tabla /SCWM/QUAN (La tabla maestra de Quants/Inventario).", correct:true}, {text:"En la tabla T001W (Maestro de Centros).", correct:false}, {text:"En la tabla BIKER (No existe en logística).", correct:false}, {text:"En la tabla VBAK (Cabecera de ventas).", correct:false}] },
+            { question: "En un escenario descentralizado (ERP separado de EWM), si la red corporativa sufre una desconexión total (Network Outage) por 2 horas, ¿qué sucede con las Decisiones de Empleo (UD) realizadas por el gerente en ERP QA11?", options: [{text:"Se encolan de forma asíncrona mediante mensajes qRFC y, tan pronto regresa la red, EWM las procesa en orden y dispara las WTs de los Follow-Up Actions.", correct:true}, {text:"Se borran permanentemente y el gerente debe rehacerlas.", correct:false}, {text:"EWM asume automáticamente que todo está aprobado para no frenar ventas.", correct:false}, {text:"El ERP genera un Rollback masivo de toda la producción del año.", correct:false}] },
+            { question: "¿Qué ventaja estadística militar e industrial integra SAP QM para evitar inspeccionar cada tuerca individualmente en envíos masivos?", options: [{text:"Procedimientos de Muestreo Basados en Normas Internacionales (como AQL - Acceptable Quality Limits y reglas Skip-Lot para proveedores confiables).", correct:true}, {text:"El Teorema de Pitágoras.", correct:false}, {text:"Secuencias de Fibonacci invertidas.", correct:false}, {text:"Mediciones astrológicas corporativas.", correct:false}] },
+            { question: "Si un almacén de alimentos usa 'Rework' (Reproceso), ¿qué flujo físico rige EWM para el lote fallido?", options: [{text:"EWM mueve el lote a una zona física de Rework, PP lanza una Orden de Reproceso (CO01) para re-etiquetar, y al terminar, la mercancía se re-evalúa en QM antes de ir al rack final.", correct:true}, {text:"Se vende a mitad de precio en la puerta del almacén sin registro alguno.", correct:false}, {text:"Se esconde el palet detrás de los montacargas rotos.", correct:false}, {text:"Se borra la tabla MARA para que Finanzas no note la pérdida.", correct:false}] },
+            { question: "¿Por qué el consultor logístico arquitecto (Senior Architect) nunca debe permitir que se evada el IOT 4 (Inbound Inspection) en productos regulados como farmacéuticos?", options: [{text:"Porque anula el 'Quality Firewall', permitiendo que lotes peligrosos se mezclen con el stock comercial y generando riesgo legal multimillonario y peligro de salud pública.", correct:true}, {text:"Porque SAP cobraría una multa por falta de uso del módulo.", correct:false}, {text:"Porque los montacargas se aburrirían por falta de tareas de cuarentena.", correct:false}, {text:"Porque los laboratorios de calidad se quedarían sin presupuesto anual.", correct:false}] }
+        ]
+    },
+    {
+        id: "s5_l2",
+        semester: 5,
+        type: "lab",
+        title: "5.4 Lab Multi-Paso: Inspección de Calidad (QM-EWM Firewall)",
+        duration: "2 Horas 30 Min • Contingencia Sanitaria",
+        req: "s5_m2",
+        description: "Acaba de llegar un lote de 5,000 vacunas importadas (Inbound Delivery). Por normativas sanitarias, está sometido a IOT 4. Ejecuta el PGR, observa cómo el sistema confisca el palet bajo estado 'Q', extrae la muestra para el Work Center de QA, y como Gerente, registra un 'Usage Decision' de rechazo (R) por ruptura de cadena de frío, enviando todo el lote a la cámara de Destrucción.",
+        simTask: { hint: "Fases: /SCWM/PRDI -> PGR-IOT4 -> /SCWM/MON-Q -> SAMPLE-EXTRACT -> ERP-QA32 -> RECORD-RESULTS -> UD-REJECT -> /SCWM/TO_CONF -> SCRAP-ZONE." },
+        simSteps: [
+            { instruction: "Cargar Inbound Delivery EWM", expectedCmd: "/SCWM/PRDI", hint: "/SCWM/PRDI", successMessage: "> IBD #88001 (5,000 Dosis Vacuna). Lote 0001." },
+            { instruction: "Contabilizar PGR", expectedCmd: "PGR-IOT4", hint: "PGR-IOT4", successMessage: "> PGR EJECUTADO. IOT 4 Activado: Lote de Inspección #991000 creado. Stock en Cuarentena (Q)." },
+            { instruction: "Auditar Bloqueo en EWM", expectedCmd: "/SCWM/MON-Q", hint: "/SCWM/MON-Q", successMessage: "> Palet SSCC-8822 inmovilizado en GR Zone (9010). Stock Type: Q." },
+            { instruction: "Extraer Muestra Médica", expectedCmd: "SAMPLE-EXTRACT", hint: "SAMPLE-EXTRACT", successMessage: "> WT 4001: 50 dosis separadas hacia Q-Work Center. 4,950 dosis bajo resguardo de seguridad." },
+            { instruction: "Ingresar a Worklist QA (ERP)", expectedCmd: "ERP-QA32", hint: "ERP-QA32", successMessage: "> QA32 Worklist Abierto. Lote #991000 listo para evaluación." },
+            { instruction: "Registrar Resultados Analíticos", expectedCmd: "RECORD-RESULTS", hint: "RECORD-RESULTS", successMessage: "> MIC Temperatura reporta 18°C (Límite max 8°C). FALLO CRÍTICO (Out of Spec)." },
+            { instruction: "Firmar Usage Decision (Rechazo)", expectedCmd: "UD-REJECT", hint: "UD-REJECT", successMessage: "> UD FIRMADO: R (Rechazado). Follow-Up Action: SCRAP. Mensaje qRFC enviado a EWM." },
+            { instruction: "Verificar Tarea de Retiro EWM", expectedCmd: "/SCWM/TO_CONF", hint: "/SCWM/TO_CONF", successMessage: "> WT Automática #80992 generada: Origen 9010 (Palet inmovilizado) -> Destino: INCINERADOR-01." },
+            { instruction: "Destruir Lote Contaminado", expectedCmd: "SCRAP-ZONE", hint: "SCRAP-ZONE", successMessage: "> STOCK ELIMINADO FÍSICA Y CONTABLEMENTE. Riesgo de Salud Pública mitigado al 100%." }
+        ]
+    }
+,
+    // ==========================================
+    // SEMESTRE 6 - SAP TM ASR, EWM BILLING (3PL) Y ANALÍTICA CDS / FIORI
+    // ==========================================
+    {
+        id: "s6_m1",
+        semester: 6,
+        type: "theory",
+        title: "6.1 Advanced Shipping & Receiving (ASR) y EWM Billing (3PL)",
+        duration: "40 Horas • Arquitectura de Transporte y Facturación",
+        req: "s5_l2",
+        description: "El nivel cumbre de rentabilidad logística. Aprende a fusionar EWM con SAP TM (Transportation Management) para consolidar fletes directamente sobre el Freight Order (FO) mediante el framework ASR. Además, domina Warehouse Billing para operadores 3PL, cobrando a los clientes por metros cúbicos ocupados, palets movidos y servicios de empaque usando Measurement Services. 15 capítulos profundos y 20 preguntas de certificación ejecutiva.",
+        review: "Regla de Oro: En S/4HANA moderno (ASR), EWM y TM comparten la misma base de datos. Ya no existen TUs (Transportation Units) duplicadas en EWM; el camión físico se representa directamente mediante el TM Freight Order (FO). Para 3PLs, el EWM Measurement Service captura las métricas de operación y genera automáticamente el Billing Document en SAP SD para cobrar los servicios.",
+        pages: [
+            `<h3>Capítulo 1: El Ecosistema 3PL (Third Party Logistics)</h3>
+            <p>Un operador logístico (ej. DHL, Kuehne+Nagel) no vende productos; vende el espacio de su almacén y el sudore de sus montacarguistas.</p>
+            <details>
+                <summary>Ver explicación a fondo (El Negocio de la Logística)</summary>
+                <div class="details-content">
+                    <p>Si eres un 3PL, tienes el inventario de 50 empresas distintas (Entitled to Dispose) en un mismo Centro. La rentabilidad depende de cobrar por cada acción: por guardar un palet 10 días, por etiquetar una caja (Value-Added Services - VAS) y por cada camión cargado. SAP EWM debe actuar como un taxímetro milimétrico que registre cada evento y lo facture automáticamente a fin de mes.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 2: Warehouse Billing (Facturación de Almacén)</h3>
+            <p>La arquitectura financiera para cobrar servicios logísticos mediante Snapshots de inventario.</p>
+            <details>
+                <summary>Ver explicación a fondo (Integración EWM-SD)</summary>
+                <div class="details-content">
+                    <p><strong>Warehouse Billing</strong> captura dos tipos de cargos. 1) <strong>Cargos Recurrentes:</strong> ¿Cuántos metros cúbicos ocupó el cliente X hoy a medianoche? SAP toma un 'Snapshot' del inventario diario y cobra tarifa de almacenamiento. 2) <strong>Cargos Transaccionales:</strong> ¿Cuántas Warehouse Orders se confirmaron para el cliente Y? Se cobra una tarifa fija por cada movimiento de Putaway o Picking.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 3: Measurement Services (Servicios de Medición)</h3>
+            <p>Algoritmos nocturnos que barren la base de datos de EWM buscando KPIs facturables.</p>
+            <details>
+                <summary>Ver explicación a fondo (Extracción de Métricas)</summary>
+                <div class="details-content">
+                    <p>Un Measurement Service es una consulta SQL sofisticada parametrizada en EWM. Ejemplo: <em>"Contar el número de Handling Units del Partner 1000 que entraron por el muelle entre las 08:00 y las 18:00"</em>. El resultado de esta medición (ej. 450 HUs) se envía mediante un <strong>Billing Document Request (BDR)</strong> hacia SAP SD (Sales and Distribution), quien multiplica 450 por $2 USD para emitir la factura final.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 4: Value-Added Services (VAS - Servicios de Valor Agregado)</h3>
+            <p>Emplayar, etiquetar precios especiales, armar kits de promoción (Kitting).</p>
+            <details>
+                <summary>Ver explicación a fondo (Work Centers de Empaque)</summary>
+                <div class="details-content">
+                    <p>El cliente pide que a los perfumes se les pegue una etiqueta de "Día de la Madre" antes de enviarlos a tienda. Esto es un <strong>VAS</strong>. EWM genera una Orden VAS paralela a la Warehouse Order. Detiene el palet en el Work Center (Zona 8000), el operario escanea el material de empaque consumido (film plástico, etiquetas) y EWM registra el tiempo laboral para cobrárselo al cliente en la facturación mensual.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 5: Evolución de Integración de Transporte (SAP TM)</h3>
+            <p>De sistemas separados (ERP + TM + EWM) a una única base de datos incrustada en S/4HANA.</p>
+            <details>
+                <summary>Ver explicación a fondo (Embedded TM vs Standalone)</summary>
+                <div class="details-content">
+                    <p>Históricamente, SAP EWM y SAP TM hablaban mediante pesados mensajes SOAP/XML. El TM planificaba el camión y le enviaba un mensaje a EWM para que creara un "Transportation Unit" (TU). La redundancia de datos causaba bloqueos. <strong>S/4HANA Embedded TM</strong> unifica el código: el TM y el EWM corren en el mismo servidor y memoria, eliminando las interfaces redundantes y los desfases de estado de los camiones.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 6: Freight Units (FU) y Freight Orders (FO)</h3>
+            <p>El lenguaje maestro de SAP Transportation Management.</p>
+            <details>
+                <summary>Ver explicación a fondo (La Matemática del Flete)</summary>
+                <div class="details-content">
+                    <p>Cuando se crea un pedido de venta, SAP TM genera <strong>Freight Units (FUs)</strong>, que representan el requerimiento logístico (ej. "Mover 2 toneladas de Cemento de Bogotá a Cali"). El planificador consolida múltiples FUs en un <strong>Freight Order (FO)</strong>, que representa el camión físico (ej. Tractomula Placa XYZ-123). Este FO es el documento rector para EWM.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 7: Advanced Shipping & Receiving (ASR)</h3>
+            <p>El framework moderno de S/4HANA que erradica la redundancia de las Transportation Units (TUs).</p>
+            <details>
+                <summary>Ver explicación a fondo (El Fin de Yard Management Duplicado)</summary>
+                <div class="details-content">
+                    <p>Con <strong>ASR</strong> activado, EWM ya no utiliza su viejo módulo de TUs para despachar. El documento de ejecución del almacén se vuelve directamente el <strong>Freight Order de TM</strong>. Si el guardia de seguridad marca "Llegada a Garita" en el documento TM, el monitor de EWM (/SCWM/MON) refleja instantáneamente que el camión está en puerta, compartiendo la misma tabla SQL. Simplifica la arquitectura radicalmente.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 8: Load Planning (Planificación de Carga en 3D)</h3>
+            <p>Motor gráfico de TM que dicta a EWM el orden exacto en que debe cargar los palets en el tráiler.</p>
+            <details>
+                <summary>Ver explicación a fondo (Axle Weight & Reverse Stop)</summary>
+                <div class="details-content">
+                    <p>El TM Load Optimizer evalúa el peso por ejes del camión para evitar multas de carretera y el orden de paradas (Reverse Stop-Sequence). Si el camión descarga primero en Medellín y luego en Cartagena, EWM recibe instrucciones de cargar primero los palets de Cartagena (al fondo) y luego los de Medellín (a la puerta). Esto altera el orden del Wave Release en EWM.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 9: Direct Integration EWM-TM (Escenario Outbound)</h3>
+            <p>Sincronización milimétrica: EWM reporta si las cajas ocuparon más volumen del estimado por TM.</p>
+            <details>
+                <summary>Ver explicación a fondo (Actualización de Volumen Real)</summary>
+                <div class="details-content">
+                    <p>TM planeó el flete asumiendo 10 metros cúbicos. Pero durante el proceso de empaque (Cartonization) en EWM, el operario usó cajas más grandes y el volumen real subió a 12 m3. Al escanear la HU cerrada, EWM notifica automáticamente al Freight Order en TM. TM recalcula la tarifa del transportista o alerta si el camión ya no tiene capacidad para cerrar puertas.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 10: Transit Warehousing (EWM como Hub Aéreo/Terrestre)</h3>
+            <p>Operación de aeropuertos de carga o hubs postales donde la mercancía nunca es tuya, solo transita.</p>
+            <details>
+                <summary>Ver বাধা fondo (Air Freight Consolidation)</summary>
+                <div class="details-content">
+                    <p>Aplica para FedEx, DHL Express. En <strong>Transit Warehousing</strong>, EWM no conoce los productos internos (televisores, ropa). Solo gestiona HUs ciegas (cajas cerradas) guiadas por el Air Waybill (AWB) de TM. EWM escanea el paquete entrante, lo dirige a la zona de exportación correspondiente y arma palets aéreos (ULDs - Unit Load Devices) optimizando contornos cilíndricos para aviones.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 11: Freight Settlement (Liquidación de Gastos de Transporte)</h3>
+            <p>El puente entre TM y Finanzas (MM/FI) para pagarle al transportista.</p>
+            <details>
+                <summary>Ver explicación a fondo (Freight Settlement Document - FSD)</summary>
+                <div class="details-content">
+                    <p>Una vez que EWM confirma el <em>Post Goods Issue (PGI)</em>, la operación física termina. TM toma los costos calculados en el Freight Order y genera un <strong>FSD (Freight Settlement Document)</strong>. Este documento viaja automáticamente a SAP MM, creando una Hoja de Entrada de Servicios y una factura logística (MIRO) para liberar el pago en tesorería al dueño de la tractomula.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 12: Gestión de Daños en Carga (Discrepancy / Damage Recording)</h3>
+            <p>Si el palet sale sano de EWM pero llega roto a destino, el seguro debe intervenir.</p>
+            <details>
+                <summary>Ver explicación a fondo (Notificación de Excepciones TM)</summary>
+                <div class="details-content">
+                    <p>Al descargar en un almacén receptor con ASR, el operario escanea la caja. Si nota humedad o roturas, usa un Exception Code en la RF (ej. DAMG) y toma una foto con la terminal (attachment). Esto se refleja instantáneamente en el FO de TM como una Discrepancia, reteniendo automáticamente el pago de la liquidación de flete hasta que se resuelva la disputa con la empresa transportista.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 13: Monitor EWM / Nodo Transporte y ASR</h3>
+            <p>El tablero unificado para el supervisor de andenes (Dock Manager).</p>
+            <details>
+                <summary>Ver explicación a fondo (Control de Tráfico)</summary>
+                <div class="details-content">
+                    <p>Con ASR, el monitor de EWM adquiere poderes de TM. En el nodo de <strong>Shipping & Receiving</strong>, el supervisor ve los Freight Orders activos, qué porcentaje de la carga ya está en la zona de Staging, qué camiones están en el Yard esperando, y puede ejecutar bloqueos de salida si faltan precintos de seguridad (Seals) en las puertas del tráiler.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 14: Manejo de Mercancías Peligrosas (Dangerous Goods - DG)</h3>
+            <p>Integración EWM-TM con regulaciones globales (IATA, ADR, IMDG).</p>
+            <details>
+                <summary>Ver explicación a fondo (Compliance de Transporte)</summary>
+                <div class="details-content">
+                    <p>Si EWM carga un barril de Ácido Sulfúrico y otro de Cianuro, TM detecta una violación a las reglas de segregación química (no pueden viajar en el mismo remolque). EWM bloquea la confirmación de la Loading WT. El Freight Order exige generar e imprimir documentos de materiales peligrosos (Tremcards) obligatorios para que el chofer los presente en los peajes o aduanas.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 15: Arquitectura Cross-System para Multinacionales</h3>
+            <p>Un centro en EWM Descentralizado S/4HANA integrado a un TM Global en otro servidor.</p>
+            <details>
+                <summary>Ver explicación a fondo (Arquitectura Hub)</summary>
+                <div class="details-content">
+                    <p>Las corporaciones inmensas pueden tener el ERP en un continente, y usar S/4HANA EWM como un sistema puramente descentralizado junto a TM. En este modelo Hub-and-Spoke, los mensajes SOA (Service Oriented Architecture) garantizan que, si el ERP matriz cae, la distribución local regional, la planeación de fletes y los cobros a los clientes sigan operando en el Hub EWM/TM independiente 24/7.</p>
+                </div>
+            </details>`
+        ],
+        exam: [
+            { question: "En un escenario 3PL (Third Party Logistics), ¿cuál es el objetivo arquitectónico del módulo 'Warehouse Billing' de SAP EWM?", options: [{text:"Capturar, calcular y enviar a SAP SD todos los costos de los servicios de almacenamiento, empaque y manipulación (Putaway/Picking) para facturarlos al cliente dueño del inventario.", correct:true}, {text:"Pagar las nóminas de los operarios de montacargas a través de SAP HCM.", correct:false}, {text:"Cobrar los impuestos de aduana a los proveedores extranjeros.", correct:false}, {text:"Imprimir facturas en las pistolas de radiofrecuencia (RF).", correct:false}] },
+            { question: "Dentro del EWM Billing, ¿qué es un 'Measurement Service' (Servicio de Medición)?", options: [{text:"Una consulta o algoritmo programado que barre EWM (ej. contando HUs almacenadas o Warehouse Orders completadas) para generar las cantidades facturables (BDRs).", correct:true}, {text:"El proceso físico de pesar un camión en la báscula de entrada (Yard Management).", correct:false}, {text:"Una herramienta para medir el desgaste de las llantas de los montacargas.", correct:false}, {text:"Un sensor láser que mide las dimensiones de las cajas de cartón vacías.", correct:false}] },
+            { question: "¿Cómo se denomina en SAP EWM a los servicios adicionales solicitados por el cliente, tales como emplayar palets, armar kits promocionales o etiquetar precios antes del despacho?", options: [{text:"Value-Added Services (VAS - Servicios de Valor Agregado).", correct:true}, {text:"Transportation Cross-Docking (TCD).", correct:false}, {text:"Post Goods Issue (PGI).", correct:false}, {text:"Storage Type Search Sequence (STSS).", correct:false}] },
+            { question: "En la evolución de S/4HANA, ¿cuál es la mayor ventaja del modelo 'Embedded TM' (Transportation Management embebido) sobre la versión histórica Standalone?", options: [{text:"EWM y TM corren en el mismo servidor y base de datos, eliminando la pesada mensajería middleware (XML/SOAP) y los desfases de sincronización de documentos.", correct:true}, {text:"Es gratuito y de código abierto (Open Source).", correct:false}, {text:"Solo funciona si el almacén está operado por robots.", correct:false}, {text:"Permite usar bases de datos Oracle en lugar de HANA.", correct:false}] },
+            { question: "En SAP TM, ¿qué documento técnico representa el requerimiento logístico puro de transporte de mercancía antes de asignarse a un camión específico?", options: [{text:"Freight Unit (FU).", correct:true}, {text:"Purchase Requisition (PR).", correct:false}, {text:"Handling Unit (HU).", correct:false}, {text:"Warehouse Order (WO).", correct:false}] },
+            { question: "En SAP TM, ¿qué documento técnico representa la capacidad consolidada, es decir, el camión físico (con chofer y placa) planificado para ejecutar el viaje?", options: [{text:"Freight Order (FO).", correct:true}, {text:"Sales Order (SO).", correct:false}, {text:"Inbound Delivery (IBD).", correct:false}, {text:"Measurement Document.", correct:false}] },
+            { question: "Con el nuevo framework ASR (Advanced Shipping & Receiving) de S/4HANA, ¿qué objeto histórico y redundante de EWM queda obsoleto al sincronizarse directamente con el Freight Order de TM?", options: [{text:"El Transportation Unit (TU) de EWM Yard Management.", correct:true}, {text:"El Material Master (MARA).", correct:false}, {text:"El Storage Bin (/SCWM/LS01).", correct:false}, {text:"El Inbound Delivery de SAP ERP.", correct:false}] },
+            { question: "Si el optimizador 3D de SAP TM ('Load Planning') detecta que un camión tiene múltiples paradas (Stop-Sequence: descargar primero en Cali, luego en Buenaventura), ¿cómo afecta esto a EWM?", options: [{text:"TM dicta el orden de carga a EWM; EWM altera sus olas y tareas para cargar al fondo los palets de Buenaventura y en la puerta los de Cali (LIFO en el camión).", correct:true}, {text:"EWM ignora a TM y carga todo alfabéticamente.", correct:false}, {text:"TM cancela el camión porque no permite múltiples paradas.", correct:false}, {text:"EWM cobra el doble de facturación al transportista.", correct:false}] },
+            { question: "¿Qué proceso de integración ocurre si, durante el empaque en EWM, las dimensiones reales del palet resultan ser 20% más grandes de lo que TM planificó originalmente?", options: [{text:"EWM actualiza el volumen real de la HU; TM recibe la notificación instantánea, recalcula la ocupación del camión (Load Planning) y ajusta los costos del flete.", correct:true}, {text:"TM rechaza el palet, obligando a EWM a destruir la mercancía sobrante.", correct:false}, {text:"EWM manda el exceso por correo postal a expensas de la compañía.", correct:false}, {text:"El ERP genera un reporte de fraude.", correct:false}] },
+            { question: "En un escenario de 'Transit Warehousing' (Hub aeroportuario/courier), ¿cuál es la característica operativa principal de SAP EWM?", options: [{text:"EWM no necesita conocer el producto interno; opera 'a ciegas' guiado por etiquetas externas de TM (AWB), moviendo cajas cerradas hacia los palets aéreos (ULDs).", correct:true}, {text:"EWM desarma todas las cajas para inspeccionar cada cable interno y contar el inventario en el ERP.", correct:false}, {text:"EWM solo permite movimientos manuales sin pistolas RF.", correct:false}, {text:"El módulo TM se desactiva permanentemente.", correct:false}] },
+            { question: "Después de que un camión sale del almacén EWM (PGI), ¿qué documento de TM es el puente final para crear la cuenta por pagar al transportista en SAP MM/FI?", options: [{text:"Freight Settlement Document (FSD).", correct:true}, {text:"Outbound Delivery Order (ODO).", correct:false}, {text:"Proof of Delivery (POD).", correct:false}, {text:"Customer Invoice (VF01).", correct:false}] },
+            { question: "Si un cliente reporta mercancía dañada por culpa del transportista y se registra una 'Discrepancia' (Damage Recording) en la aplicación de llegada ASR, ¿qué sucede en TM?", options: [{text:"TM retiene o bloquea temporalmente el proceso de Freight Settlement (liquidación de pago) al transportista hasta que el departamento de finanzas resuelva la disputa.", correct:true}, {text:"TM aprueba el pago e incrementa un bono de premio al transportista.", correct:false}, {text:"SAP borra el camión de la base de datos.", correct:false}, {text:"El almacén EWM expulsa automáticamente al cliente de la base de datos.", correct:false}] },
+            { question: "En materia de Compliance, ¿qué sucede si la integración TM-EWM detecta la carga simultánea de mercancías peligrosas incompatibles (Dangerous Goods - DG) en el mismo Freight Order?", options: [{text:"El sistema emite errores críticos de segregación; EWM bloquea las Warehouse Tasks de carga hacia ese andén y TM detiene el Freight Order.", correct:true}, {text:"El sistema imprime advertencias, pero permite el envío sin restricciones.", correct:false}, {text:"EWM apaga el servidor HANA para prevenir incendios.", correct:false}, {text:"TM aumenta el seguro de vida del chofer automáticamente pero autoriza la salida.", correct:false}] },
+            { question: "¿Cómo se comunican internamente TM y EWM en la arquitectura 'Embedded S/4HANA' moderna sin utilizar TUs?", options: [{text:"Comparten la misma base de datos (HANA) y los mismos objetos de negocio (Documentos de Transporte de ASR), eliminando la mensajería XML asíncrona.", correct:true}, {text:"A través de correos electrónicos internos de SAP Business Workplace.", correct:false}, {text:"Mediante llamadas telefónicas de los planificadores.", correct:false}, {text:"Utilizando discos duros externos (USB).", correct:false}] },
+            { question: "¿Qué transacción/consola utiliza un supervisor logístico (3PL) para generar el Billing Document Request (BDR) tras recolectar los Measurement Services del mes?", options: [{text:"La transacción de Liquidación de Servicios de Almacén (Warehouse Billing Settlement).", correct:true}, {text:"La creación de pedidos de compras ME21N.", correct:false}, {text:"El planificador MRP (MD04).", correct:false}, {text:"El registro de tiempos de empleados CAT2.", correct:false}] },
+            { question: "Si un cliente 3PL requiere cobrar 5 USD por cada palet recibido por el muelle de entrada, ¿qué mecanismo configuras?", options: [{text:"Un Measurement Service Transaccional en EWM que cuente las Warehouse Tasks de Putaway confirmadas para ese cliente y las transmita a SAP SD.", correct:true}, {text:"Una multa de recursos humanos.", correct:false}, {text:"Un descuento en la Orden de Venta estándar.", correct:false}, {text:"Un incremento en el precio promedio móvil del material.", correct:false}] },
+            { question: "Si un cliente 3PL requiere cobrar 10 USD por metro cúbico ocupado en los racks al finalizar cada día, ¿qué mecanismo configuras?", options: [{text:"Un Measurement Service de Inventario (Snapshot) que fotografíe la ocupación volumétrica a medianoche y envíe los agregados a la facturación SD.", correct:true}, {text:"Un documento de inventario físico anual (PI).", correct:false}, {text:"Una orden de mantenimiento de activos fijos (SAP PM).", correct:false}, {text:"Un reporte de control de calidad IOT4.", correct:false}] },
+            { question: "¿A qué módulo del ecosistema corporativo S/4HANA llegan los BDRs de EWM para generar la Factura Legal (Invoice) que se envía al cliente 3PL?", options: [{text:"SAP SD (Sales and Distribution).", correct:true}, {text:"SAP PP (Production Planning).", correct:false}, {text:"SAP QM (Quality Management).", correct:false}, {text:"SAP TM (Transportation Management).", correct:false}] },
+            { question: "Bajo ASR, el Check-in y Check-out del camión en la puerta de la planta actualiza directamente el estado de:", options: [{text:"El Freight Order (FO).", correct:true}, {text:"La Orden de Producción (CO01).", correct:false}, {text:"El Maestro de Proveedores.", correct:false}, {text:"El Asiento Contable (Journal Entry).", correct:false}] },
+            { question: "¿Cuál es el principal documento legal impreso generado por TM y entregado al chofer, que ampara la propiedad y ruta de la carga consolidada (ej. Bill of Lading)?", options: [{text:"El Waybill o Bill of Lading, asociado directamente al Freight Order y a los Dangerous Goods documents.", correct:true}, {text:"El recibo de nómina del almacén.", correct:false}, {text:"La lista de precios del supermercado.", correct:false}, {text:"El currículum del transportista.", correct:false}] }
+        ]
+    },
+    {
+        id: "s6_l1",
+        semester: 6,
+        type: "lab",
+        title: "6.2 Lab Multi-Paso: Carga ASR (TM-EWM) y Facturación 3PL",
+        duration: "2 Horas 30 Min • Consolidación Final",
+        req: "s6_m1",
+        description: "El Freight Order #99550 (Tractomula) ha llegado a la puerta para cargar mercancía de tu cliente 3PL. Realiza el Check-in (ASR), carga el palet con RF y emite la orden de facturación automática del almacén (Billing Document) por los servicios de despacho prestados.",
+        simTask: { hint: "Fases: NWBC-FO -> CHECK-IN -> /SCWM/RFUI -> OUTBOUND-LOAD -> SCAN-SSCC -> LOAD-COMPLETE -> /SCWM/MON -> RUN-MEASUREMENT -> GENERATE-BDR." },
+        simSteps: [
+            { instruction: "Abrir TM Freight Order", expectedCmd: "NWBC-FO", hint: "NWBC-FO", successMessage: "> Freight Order 99550 abierto en Fiori/NWBC. Estado: Planeado." },
+            { instruction: "Ejecutar Check-in de Tractomula", expectedCmd: "CHECK-IN", hint: "CHECK-IN", successMessage: "> Evento ARRIV_YARD marcado. Estado EWM/TM sincronizado a 'In Yard'." },
+            { instruction: "Emular RF para Operario de Carga", expectedCmd: "/SCWM/RFUI", hint: "/SCWM/RFUI", successMessage: "> Terminal iniciada. Menú 'Loading by Freight Order'." },
+            { instruction: "Iniciar Proceso de Carga", expectedCmd: "OUTBOUND-LOAD", hint: "OUTBOUND-LOAD", successMessage: "> ODO seleccionada. Rampa de carga 920 confirmada." },
+            { instruction: "Escanear SSCC del Palet al Camión", expectedCmd: "SCAN-SSCC", hint: "SCAN-SSCC", successMessage: "> Palet 558000 cargado físicamente. TM Volumen actualizado al 100%." },
+            { instruction: "Confirmar Fin de Carga (PGI)", expectedCmd: "LOAD-COMPLETE", hint: "LOAD-COMPLETE", successMessage: "> PGI Ejecutado. Camión despachado (Check-out). Costos FSD listos para pago." },
+            { instruction: "Abrir Monitor Central de Facturación", expectedCmd: "/SCWM/MON", hint: "/SCWM/MON", successMessage: "> EWM Monitor cargado. Nodo 'Warehouse Billing'." },
+            { instruction: "Extraer KPIs de la Jornada (Measurement)", expectedCmd: "RUN-MEASUREMENT", hint: "RUN-MEASUREMENT", successMessage: "> Measurement Service: 1 Palet Cargado (Tarifa $15 USD)." },
+            { instruction: "Generar Cobro al Cliente 3PL (BDR)", expectedCmd: "GENERATE-BDR", hint: "GENERATE-BDR", successMessage: "> Billing Document Request (BDR) enviado a SAP SD exitosamente. FACTURACIÓN CERRADA." }
+        ]
+    },
+    {
+        id: "s6_m2",
+        semester: 6,
+        type: "theory",
+        title: "6.3 Arquitectura Analítica, Core Data Services (CDS) y APIs EWM",
+        duration: "30 Horas • Desarrollo y Cloud Extensibility",
+        req: "s6_l1",
+        description: "El futuro de SAP. Abandona los pesados reportes ABAP ALV y abraza la arquitectura 'In-Memory'. Aprende cómo SAP S/4HANA utiliza Vistas CDS (Core Data Services) empujadas a la base de datos HANA para renderizar tableros Fiori Elements (KPI Dashboards) en milisegundos. Explora cómo exponer los datos de EWM al exterior usando OData v4 APIs para integración con la nube (BTP).",
+        review: "Regla de Oro: En S/4HANA (Code-to-Data paradigm), los cálculos ya no se hacen en la capa de aplicación ABAP, sino que se delegan (Push-down) a los motores nativos de la base de datos HANA mediante Vistas CDS. Esto permite que millones de líneas de inventario se sumaricen en un gráfico de barras Fiori en 120 milisegundos y se expongan como APIs OData.",
+        pages: [
+            `<h3>Capítulo 1: El Paradigma "Code-to-Data"</h3>
+            <p>La revolución de HANA. ¿Por qué traer los datos al código si el código puede ir a los datos?</p>
+            <details>
+                <summary>Ver explicación a fondo (El Fin de los Bucles ABAP)</summary>
+                <div class="details-content">
+                    <p>En el antiguo ERP (R/3), el programa ABAP solicitaba a la base de datos (Oracle/SQL) 1 millón de registros, los cargaba en una tabla interna en memoria RAM de aplicación (Data-to-Code) y luego sumaba los valores con un ciclo <code>LOOP</code>. Esto tardaba minutos u horas. En S/4HANA, el paradigma es <strong>Code-to-Data</strong>: le envías la orden matemática (mediante CDS Views) directo al motor de HANA, y HANA te devuelve en milisegundos únicamente el gran total (1 solo registro).</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 2: ABAP Core Data Services (CDS Views)</h3>
+            <p>El estándar moderno de modelado de datos en S/4HANA. SQL con esteroides y semántica de negocio.</p>
+            <details>
+                <summary>Ver explicación a fondo (Semántica y Anotaciones)</summary>
+                <div class="details-content">
+                    <p>Una <strong>Vista CDS</strong> (Core Data Service) no es solo un `+`VIEW`+` de SQL. Además de hacer <em>Joins</em> entre <code>/SCWM/AQUA</code> (Inventario) y <code>/SCWM/WHO</code> (Órdenes), una CDS View incluye <strong>Anotaciones (@Annotations)</strong>. Por ejemplo, la anotación <code>@OData.publish: true</code> convierte automáticamente esa vista SQL en un servicio web API RESTful listo para la nube, sin programar una sola línea de backend.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 3: Virtual Data Model (VDM)</h3>
+            <p>La pirámide de datos de SAP S/4HANA: Vistas Básicas, Compuestas y de Consumo.</p>
+            <details>
+                <summary>Ver explicación a fondo (Arquitectura de Capas CDS)</summary>
+                <div class="details-content">
+                    <p>SAP prohíbe que el desarrollador front-end lea directamente las tablas físicas crudas. Todo pasa por el <strong>VDM (Modelo de Datos Virtual)</strong>. 1) <strong>Basic Views (Private):</strong> Leen las tablas 1:1. 2) <strong>Composite Views:</strong> Unen las Basic Views aplicando cálculos de negocio (ej. "Palets vencidos = Fecha Actual > SLED"). 3) <strong>Consumption Views (C-Views):</strong> Son las que se exponen a Fiori, optimizadas para los gráficos y filtros de la interfaz gráfica.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 4: Fiori Elements y KPI Dashboards</h3>
+            <p>Creación de interfaces gráficas empresariales (UI) sin escribir código JavaScript ni HTML.</p>
+            <details>
+                <summary>Ver explicación a fondo (Smart Templates)</summary>
+                <div class="details-content">
+                    <p>Con SAPUI5 puro, un desarrollador tardaba meses en programar una app con tablas, filtros y Excel export. <strong>Fiori Elements</strong> lee las anotaciones semánticas de la CDS View de EWM (ej. <code>@UI.lineItem</code>) y <em>renderiza la pantalla entera automáticamente</em>. Los gerentes logísticos usan la app "KPI Workspace" para crear gráficos de "Productividad de Outbound" en vivo usando drag-and-drop sobre estas vistas CDS.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 5: Embedded Analytics en SAP EWM</h3>
+            <p>Reportes gráficos y análisis predictivo ejecutándose en la misma máquina transaccional.</p>
+            <details>
+                <summary>Ver explicación a fondo (La Muerte de la Extracción Nocturna)</summary>
+                <div class="details-content">
+                    <p>Históricamente, los reportes analíticos pesados paralizaban el sistema de almacén, por lo que los datos se extraían en la madrugada hacia SAP BW (Business Warehouse). Con <strong>S/4HANA Embedded Analytics</strong>, puedes tener tableros en vivo (ej. "Cuellos de botella de Putaway hace 1 minuto") corriendo en el mismo servidor de EWM transaccional, gracias a la capacidad de HANA de procesar OLTP y OLAP simultáneamente sin bloqueos.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 6: OData APIs (RESTful) para S/4HANA EWM</h3>
+            <p>El puente estándar y moderno para integrar EWM con aplicaciones web, celulares de terceros y software externo.</p>
+            <details>
+                <summary>Ver explicación a fondo (De RFC a OData v4)</summary>
+                <div class="details-content">
+                    <p>Ya no enviamos archivos planos (TXT) por FTP ni usamos pesados IDocs de los 90s para sistemas web. SAP expone APIs estándar (ej. <em>WarehouseOrder API</em> o <em>InboundDelivery API</em>) basadas en el protocolo <strong>OData v2/v4 (REST/JSON)</strong>. Una startup que desarrolla drones para inventario puede llamar a la API de EWM con un <code>GET /sap/opu/odata/.../WarehouseTaskSet</code> para recibir las coordenadas de vuelo en JSON al instante.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 7: SAP Business Technology Platform (BTP)</h3>
+            <p>El entorno de innovación en la nube de SAP. Amplía EWM sin tocar el código central (Clean Core).</p>
+            <details>
+                <summary>Ver explicación a fondo (Side-by-Side Extensibility)</summary>
+                <div class="details-content">
+                    <p>Los clientes antiguos destrozaban el código estándar (Core) de SAP con modificaciones Z (User Exits/BAdIs salvajes) que hacían imposible actualizar el ERP. El nuevo dogma es el <strong>Clean Core</strong>. Si necesitas una app compleja de Inteligencia Artificial para predecir atascos en EWM, la programas en la nube pública (SAP BTP) usando NodeJS o Java, y esta app en la nube se conecta a tu S/4HANA EWM local mediante APIs OData (Side-by-Side).</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 8: Cloud Connector</h3>
+            <p>El túnel seguro de grado militar que conecta tu almacén físico on-premise con SAP BTP en la nube.</p>
+            <details>
+                <summary>Ver explicación a fondo (VPN Inversa)</summary>
+                <div class="details-content">
+                    <p>Tu S/4HANA EWM está blindado tras el firewall corporativo de la fábrica y no tiene IP pública. El <strong>SAP Cloud Connector</strong> es un pequeño software instalado localmente que abre un túnel TLS saliente (VPN inversa) hacia SAP BTP. Gracias a esto, la app de drones en la nube puede leer los datos locales de EWM con máxima seguridad, sin necesidad de que el departamento de IT abra puertos entrantes peligrosos en el router principal.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 9: Event-Driven Architecture (Enterprise Messaging)</h3>
+            <p>La nueva forma de avisar a otros sistemas. "EWM lanza un grito, y el que quiera lo escucha".</p>
+            <details>
+                <summary>Ver explicación a fondo (Publish-Subscribe Pattern)</summary>
+                <div class="details-content">
+                    <p>Antes, si EWM confirmaba un PGI, debía saber exactamente a qué 3 sistemas notificar de forma síncrona. Si uno estaba caído, fallaba todo. Ahora se usa <strong>SAP Event Mesh</strong>. EWM simplemente publica el evento asíncrono (ej. <code>GoodsIssueConfirmed</code>) en un bus de eventos (Topic). Un sistema CRM en AWS, una app móvil y una báscula pueden estar "suscritos" (Subscribers) a ese canal y reaccionar independientemente. Máxima escalabilidad.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 10: In-App Extensibility (Ampliaciones dentro de S/4HANA)</h3>
+            <p>Agregar un campo personalizado (Z) a un documento sin escribir código.</p>
+            <details>
+                <summary>Ver explicación a fondo (Key User Extensibility)</summary>
+                <div class="details-content">
+                    <p>Necesitas agregar el campo "Temperatura del Camión" a la Inbound Delivery. Antes requerías semanas de un desarrollador ABAP (modificando tablas, pantallas y estructuras). Hoy, usas la app Fiori <strong>Custom Fields and Logic</strong>. En 5 clics creas el campo, y el sistema automáticamente altera la base de datos HANA, las Vistas CDS y las APIs OData en background. En 10 minutos está listo para producción (Key User Extensibility).</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 11: Machine Learning en EWM (SAP ISLM)</h3>
+            <p>Inteligencia artificial embebida para pronosticar fallos o predecir tiempos de entrega.</p>
+            <details>
+                <summary>Ver explicación a fondo (Intelligent Scenario Lifecycle Management)</summary>
+                <div class="details-content">
+                    <p>La base de datos HANA posee bibliotecas nativas de Machine Learning (PAL - Predictive Analysis Library). EWM puede usarlas para predecir si una Outbound Delivery va a retrasarse basándose en el clima, el tráfico de la hora y el desempeño histórico del operario asignado, alertando al planificador en Fiori antes de que el camión siquiera llegue a la puerta.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 12: EWM Warehouse Monitor (/SCWM/MON) vs Fiori Dashboards</h3>
+            <p>¿Cuándo usar el monitor clásico y cuándo usar los analíticos de Fiori?</p>
+            <details>
+                <summary>Ver explicación a fondo (Operacional vs Analítico)</summary>
+                <div class="details-content">
+                    <p>El <strong>Warehouse Monitor (/SCWM/MON)</strong> en SAP GUI es una herramienta <em>Operacional y Táctica</em>. Los supervisores lo usan para corregir errores, desbloquear WOs, cancelar tareas (Transaction Processing). Los <strong>Fiori CDS Dashboards</strong> son herramientas <em>Analíticas y Estratégicas</em>. Los gerentes las usan para ver gráficos circulares, tendencias semanales y cuellos de botella globales, pero generalmente no para intervenir en una caja específica rota.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 13: Core Data Services en Autorizaciones (DCL)</h3>
+            <p>Seguridad a nivel de fila. Un gerente regional solo puede ver gráficamente los almacenes de su región.</p>
+            <details>
+                <summary>Ver explicación a fondo (Data Control Language)</summary>
+                <div class="details-content">
+                    <p>La seguridad de los reportes ya no se hace en la interfaz visual. Al crear una Vista CDS, el desarrollador asocia un objeto de autorización de SAP en un script <strong>DCL (Data Control Language)</strong>. Si el Gerente de Colombia entra a la app Fiori global, el motor de HANA filtra a nivel de SQL (Row-level security) asegurando que el gerente no pueda ver los inventarios del Centro de México, bloqueando fugas de datos de raíz.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 14: Migración del código antiguo al nuevo paradigma (AMDP)</h3>
+            <p>ABAP Managed Database Procedures. Cómo empujar procedimientos complejos a HANA.</p>
+            <details>
+                <summary>Ver explicación a fondo (SQLScript nativo)</summary>
+                <div class="details-content">
+                    <p>Si la lógica de negocio es tan compleja que una Vista CDS no basta (ej. el algoritmo matricial de consolidación de cajas de EWM), los arquitectos escriben <strong>AMDP (ABAP Managed Database Procedures)</strong>. Básicamente, se incrusta código nativo SQLScript de HANA (Loops de base de datos ultrarrápidos) dentro de una clase ABAP, fusionando lo mejor del mantenimiento tradicional con la potencia paralela de la memoria in-memory.</p>
+                </div>
+            </details>`,
+
+            `<h3>Capítulo 15: Fin del Viaje del Arquitecto EWM</h3>
+            <p>La maestría técnica exige visión holística: el almacén no es una isla, es el corazón del comercio digital.</p>
+            <details>
+                <summary>Ver explicación a fondo (De Configurador a Arquitecto)</summary>
+                <div class="details-content">
+                    <p>¡Felicidades! Has completado el programa maestro. Como Arquitecto S/4HANA EWM, tu valor ya no reside en memorizar transacciones, sino en comprender cómo la Estructura Empresarial (Semestre 1) fluye hacia la Física del Inbound (Semestre 2) y el Ritmo del Outbound (Semestre 3), cómo la mecatrónica MFS y los recursos humanos escalan la operación (Semestre 4), cómo la industria de la Calidad y Producción dictan las reglas logísticas (Semestre 5) y finalmente, cómo exponer toda esta maquinaria mediante APIs modernas a la Inteligencia Artificial y Fiori (Semestre 6). Estás listo para certificar y liderar la Supply Chain global.</p>
+                </div>
+            </details>`
+        ],
+        exam: [
+            { question: "¿En qué consiste el paradigma tecnológico 'Code-to-Data' introducido por la base de datos SAP HANA?", options: [{text:"Delegar la carga de cálculos masivos (sumas, agrupaciones) directamente a los motores de la base de datos en memoria (HANA), en lugar de traer millones de registros a la memoria RAM de aplicación ABAP.", correct:true}, {text:"Extraer la información a discos duros lentos para archivado.", correct:false}, {text:"Imprimir en papel todo el código fuente.", correct:false}, {text:"Usar bases de datos Oracle como almacenamiento en la nube.", correct:false}] },
+            { question: "En el moderno S/4HANA, ¿qué es una Vista CDS (Core Data Services)?", options: [{text:"Una vista SQL avanzada que, además de realizar uniones de tablas (Joins), integra semántica de negocio y anotaciones directas para seguridad, interfaces Fiori (UI) y publicación como servicios web.", correct:true}, {text:"Una pantalla verde antigua de SAP GUI.", correct:false}, {text:"Un disco de instalación de software en CD-ROM.", correct:false}, {text:"Una herramienta de recursos humanos para contratar gerentes.", correct:false}] },
+            { question: "¿Qué característica poderosa proporcionan las 'Anotaciones' (@Annotations) dentro del código fuente de una Vista CDS?", options: [{text:"Permiten inyectar comportamientos automáticos, como @OData.publish:true, que expone inmediatamente la consulta de base de datos como una API RESTful sin tener que programar infraestructura backend.", correct:true}, {text:"Permiten escribir comentarios de texto para que los lean los auditores legales.", correct:false}, {text:"Eliminan por completo la necesidad de tener tablas SQL.", correct:false}, {text:"Apagan el servidor HANA durante los fines de semana.", correct:false}] },
+            { question: "En la arquitectura analítica de SAP (Virtual Data Model - VDM), ¿qué diferencia hay entre las Basic Views y las Consumption Views (C-Views)?", options: [{text:"Las Basic Views leen las tablas físicas 1:1 (son privadas/base). Las Consumption Views están en la punta de la pirámide, adaptadas con filtros y gráficos específicos para ser consumidas directamente por SAP Fiori.", correct:true}, {text:"Las Basic Views están en Fiori y las Consumption Views son para Oracle.", correct:false}, {text:"Las Basic Views son gratuitas y las Consumption Views cuestan dinero.", correct:false}, {text:"Son exactamente lo mismo.", correct:false}] },
+            { question: "¿Qué herramienta del ecosistema SAP UI permite a los desarrolladores o arquitectos generar aplicaciones Fiori (listas, tablas y dashboards) leyendo automáticamente las anotaciones de las Vistas CDS sin programar JavaScript/HTML5 desde cero?", options: [{text:"SAP Fiori Elements (Smart Templates).", correct:true}, {text:"Microsoft Excel.", correct:false}, {text:"Adobe Acrobat Reader.", correct:false}, {text:"SAP Logon Pad (GUI).", correct:false}] },
+            { question: "¿Cuál es el beneficio de 'S/4HANA Embedded Analytics' en la operación diaria de EWM frente al uso histórico de SAP BW (Business Warehouse)?", options: [{text:"Permite ejecutar tableros y KPIs gráficos pesados en tiempo real directo sobre la misma máquina transaccional EWM sin bloquear el almacén, eliminando los retrasos (latencia) de la extracción nocturna.", correct:true}, {text:"Requiere comprar servidores nuevos cada año.", correct:false}, {text:"Obliga a detener el almacén durante 2 horas al día para procesar los datos.", correct:false}, {text:"Envía la información de inventario por fax a los clientes.", correct:false}] },
+            { question: "Para integrar SAP S/4HANA EWM con aplicaciones externas modernas (como drones, apps móviles de clientes en AWS o Azure), ¿qué protocolo estándar y ligero expone SAP a través del SAP Gateway?", options: [{text:"OData v2/v4 APIs (RESTful web services respondiendo típicamente en JSON o XML).", correct:true}, {text:"Floppy Disks de 3.5 pulgadas.", correct:false}, {text:"Documentos físicos impresos en matricial.", correct:false}, {text:"Mensajes SMS analógicos.", correct:false}] },
+            { question: "¿Qué es 'SAP Business Technology Platform' (BTP) en el paradigma del 'Clean Core' corporativo?", options: [{text:"El entorno y plataforma en la nube (PaaS) de SAP donde los desarrolladores construyen integraciones complejas y apps satélite (Side-by-Side Extensibility) sin contaminar o modificar el código fuente estándar del servidor S/4HANA local.", correct:true}, {text:"Una empresa de transporte de camiones físicos.", correct:false}, {text:"Un sistema operativo para teléfonos Android.", correct:false}, {text:"La herramienta para compilar código ABAP clásico en terminales de texto.", correct:false}] },
+            { question: "En una arquitectura donde el almacén SAP EWM se aloja de forma local (On-Premise) en los servidores corporativos físicos, ¿cómo se conecta de manera segura a las apps y servicios de la nube pública SAP BTP sin abrir puertos de entrada vulnerables en el firewall?", options: [{text:"Utilizando SAP Cloud Connector, que establece un túnel VPN saliente (TLS) desde la red interna hacia la nube BTP de SAP, garantizando control y cifrado de grado militar.", correct:true}, {text:"Publicando la base de datos HANA abierta a Internet para todos.", correct:false}, {text:"Mediante memorias USB enviadas por correo certificado.", correct:false}, {text:"Cambiando temporalmente las contraseñas a '1234'.", correct:false}] },
+            { question: "A diferencia de las comunicaciones síncronas clásicas punto-a-punto (API/RFC) que fallan si el receptor está caído, ¿qué arquitectura moderna usa SAP Event Mesh (Event-Driven Architecture) para ser resiliente?", options: [{text:"Publish-Subscribe Pattern: EWM publica eventos de negocio ('Se confirmó un despacho') asíncronamente en un Bus o Topic en la nube, y múltiples sistemas suscritos pueden consumirlos a su propio ritmo sin bloquear a EWM.", correct:true}, {text:"Llamadas telefónicas de emergencia del gerente.", correct:false}, {text:"Transmisión de radio FM local.", correct:false}, {text:"Peticiones sincrónicas que congelan EWM hasta que el sistema destino responde.", correct:false}] },
+            { question: "Si el negocio logístico exige añadir un campo personalizado (Z) llamado 'Temperatura Camión' al documento Inbound Delivery de EWM, ¿qué herramienta de S/4HANA permite a un Key User hacerlo en minutos sin requerir un programador ABAP?", options: [{text:"La aplicación Fiori 'Custom Fields and Logic' (In-App Extensibility), que adapta automáticamente la BD, CDS y APIs subyacentes.", correct:true}, {text:"Un script en lenguaje C++ ensamblado desde cero.", correct:false}, {text:"Alterar directamente las celdas en SQL Developer como DBA.", correct:false}, {text:"No se pueden agregar campos en S/4HANA EWM.", correct:false}] },
+            { question: "En el mundo analítico, ¿qué rol juegan los archivos DCL (Data Control Language) unidos a una Vista CDS de EWM?", options: [{text:"Aplican reglas de autorización y seguridad a nivel de fila (Row-Level Security), bloqueando directamente en la base de datos SQL el acceso a datos (ej. un centro logístico) que el usuario no tiene permiso de ver.", correct:true}, {text:"Generan colores bonitos en el gráfico de pastel de Fiori.", correct:false}, {text:"Borran el disco duro si detectan un ataque cibernético.", correct:false}, {text:"Traducen las consultas de inglés a español.", correct:false}] },
+            { question: "¿Cuál es la distinción primordial en los casos de uso entre el EWM Warehouse Monitor (/SCWM/MON) y un Dashboard de KPIs en SAP Fiori CDS?", options: [{text:"El Monitor es táctico/operativo (permite resolver excepciones, cancelar WTs o interactuar activamente). Los Fiori Dashboards son analíticos/estratégicos (para visualizar métricas históricas, tendencias y sumatorias directivas).", correct:true}, {text:"Fiori solo funciona en blanco y negro, el Monitor es a color.", correct:false}, {text:"No hay diferencia, son el mismo programa con distinto nombre.", correct:false}, {text:"El Monitor es solo para Finanzas (FI) y Fiori es solo para EWM.", correct:false}] },
+            { question: "Cuando un algoritmo logístico requiere matemáticas iterativas tan complejas y densas que las sentencias SQL estándar de una Vista CDS no son suficientes, ¿qué tecnología permite a los desarrolladores empujar lógicas potentes a la memoria de HANA?", options: [{text:"AMDP (ABAP Managed Database Procedures), donde el código nativo de HANA (SQLScript) se incrusta y encapsula dentro de clases ABAP.", correct:true}, {text:"BAdIs clásicas corriendo en la RAM del servidor de aplicación.", correct:false}, {text:"Macros de Microsoft Excel.", correct:false}, {text:"SmartForms.", correct:false}] },
+            { question: "¿Qué característica de SAP HANA (PAL) permite implementar algoritmos predictivos en EWM, como prever demoras en salidas basándose en el clima y la eficiencia histórica?", options: [{text:"Las bibliotecas nativas de Machine Learning e Inteligencia Artificial embebidas (ISLM), que entrenan y ejecutan predicciones directamente sobre los datos operativos sin exportarlos.", correct:true}, {text:"Un generador de números aleatorios simple.", correct:false}, {text:"El catálogo de piezas de repuesto en formato PDF.", correct:false}, {text:"El sistema de control de accesos (molinetes) de la garita de seguridad.", correct:false}] },
+            { question: "En S/4HANA In-App Extensibility, ¿qué tecnología se utiliza si un Key User necesita aplicar una regla de validación de negocio simple en Fiori (ej. si campo X > 10, mostrar error)?", options: [{text:"ABAP para Cloud (Restricted ABAP / Cloud BAdIs), que es un subconjunto seguro del lenguaje ABAP que garantiza que la lógica no romperá el sistema en futuras actualizaciones (Clean Core).", correct:true}, {text:"Ensamblador de 16 bits.", correct:false}, {text:"BAdIs clásicas sin restricciones donde se puede borrar toda la base de datos.", correct:false}, {text:"Modificación del kernel de Linux de SAP.", correct:false}] },
+            { question: "Si creas una CDS View Consumption en S/4HANA EWM, ¿cómo es que SAP Fiori sabe que debe presentar un 'Gráfico de Barras' en lugar de una simple tabla al usuario final?", options: [{text:"Porque el desarrollador inyectó las Anotaciones de Interfaz Gráfica de Fiori Elements (@UI.chart, @UI.lineItem) directamente en el código de la Vista CDS, indicando el tipo de renderizado esperado.", correct:true}, {text:"Fiori adivina aleatoriamente el gráfico cada vez que el usuario se conecta.", correct:false}, {text:"El gerente llama a soporte técnico de SAP para configurar el gráfico manualmente.", correct:false}, {text:"HANA envía un correo pidiendo instrucciones al usuario.", correct:false}] },
+            { question: "En un ecosistema BTP (Business Technology Platform) integrado a EWM local (On-Premise), ¿cómo se considera arquitectónicamente a la aplicación en la nube que consume las APIs de EWM para pronosticar stock?", options: [{text:"Una aplicación de extensibilidad paralela o Side-by-Side Extensibility, que escala el poder de cómputo en AWS/Azure sin poner en riesgo la máquina EWM local.", correct:true}, {text:"Un virus de red.", correct:false}, {text:"Una versión pirata de SAP.", correct:false}, {text:"Un add-on (plug-in) que se instala con CD-ROM en el servidor físico local.", correct:false}] },
+            { question: "¿Cuál de las siguientes afirmaciones describe mejor el verdadero rol moderno de un 'Consultor Arquitecto Senior' en SAP S/4HANA EWM (como tú al finalizar este curso)?", options: [{text:"Un orquestador holístico que no solo configura almacenes, sino que entiende cómo la EWM se integra con Finanzas, Manufactura, Calidad, Mecatrónica y APIs modernas para construir la Cadena de Suministro Digital del futuro.", correct:true}, {text:"Alguien que memoriza transacciones antiguas pero se niega a usar Fiori o CDS.", correct:false}, {text:"Un operador de montacargas que aprobó un examen teórico.", correct:false}, {text:"Un desarrollador web frontend que no sabe nada de logística.", correct:false}] },
+            { question: "¿Cuál es la misión tecnológica de S/4HANA como pilar en la revolución logística y Supply Chain?", options: [{text:"Convertir operaciones complejas, asiladas y reactivas en procesos empresariales integrados, en tiempo real (In-Memory), predecibles y escalables hacia ecosistemas de automatización y nube (Intelligent Enterprise).", correct:true}, {text:"Hacer que los reportes se impriman con letras más oscuras en papel.", correct:false}, {text:"Cobrar suscripciones más baratas para bases de datos de texto plano.", correct:false}, {text:"Vender montacargas diésel pintados de color azul corporativo.", correct:false}] }
+        ]
+    },
+    {
+        id: "s6_l2",
+        semester: 6,
+        type: "lab",
+        title: "6.4 Lab Multi-Paso: Creación Analítica (CDS, API & Fiori)",
+        duration: "2 Horas 30 Min • Certificación Arquitecto Cloud",
+        req: "s6_m2",
+        description: "El Director de Logística requiere ver en su celular la eficiencia del almacén. Asume el rol de Arquitecto HANA: consulta las tablas transaccionales EWM, publica una CDS View como API OData RESTful (Code-to-Data), y configura el Smart Template en el KPI Workspace de Fiori Elements. Celebra la culminación de tu maestría.",
+        simTask: { hint: "Fases: HANA-STUDIO -> CREATE-CDS-VIEW -> ADD-ODATA-ANNOTATION -> ACTIVATE-API -> FIORI-LAUNCHPAD -> KPI-WORKSPACE -> LINK-API -> PUBLISH-DASHBOARD -> MASTERY-ACHIEVED." },
+        simSteps: [
+            { instruction: "Iniciar Entorno de Desarrollo (Eclipse/HANA)", expectedCmd: "HANA-STUDIO", hint: "HANA-STUDIO", successMessage: "> SAP HANA Studio (ABAP Development Tools - ADT) iniciado." },
+            { instruction: "Codificar CDS View (Consumption)", expectedCmd: "CREATE-CDS-VIEW", hint: "CREATE-CDS-VIEW", successMessage: "> Vista 'ZC_EWM_Productivity' creada uniendo /SCWM/WHO y /SCWM/RSRC." },
+            { instruction: "Inyectar Anotaciones de API y UI", expectedCmd: "ADD-ODATA-ANNOTATION", hint: "ADD-ODATA-ANNOTATION", successMessage: "> @OData.publish:true y @UI.chart inyectados. SQLScript compilado y empujado a Base de Datos." },
+            { instruction: "Activar Servicio OData (SAP Gateway)", expectedCmd: "ACTIVATE-API", hint: "ACTIVATE-API", successMessage: "> RESTful API Endpoint Activo: /sap/opu/odata/sap/ZC_EWM_PRODUCTIVITY_CDS" },
+            { instruction: "Abrir Entorno Directivo Web", expectedCmd: "FIORI-LAUNCHPAD", hint: "FIORI-LAUNCHPAD", successMessage: "> Fiori Launchpad logueado. Perfil: Director Global Supply Chain." },
+            { instruction: "Entrar al Modelador Analítico", expectedCmd: "KPI-WORKSPACE", hint: "KPI-WORKSPACE", successMessage: "> App 'Manage KPIs and Reports' cargada (Fiori Elements Smart Templates)." },
+            { instruction: "Enlazar Gráfico con API CDS", expectedCmd: "LINK-API", hint: "LINK-API", successMessage: "> Datasource enlazado. Eje X (Horas), Eje Y (Warehouse Orders). Datos Live en 115 milisegundos." },
+            { instruction: "Publicar Dashboard en Catálogo", expectedCmd: "PUBLISH-DASHBOARD", hint: "PUBLISH-DASHBOARD", successMessage: "> App Fiori creada y publicada en el catálogo directivo." },
+            { instruction: "Recibir Certificación Global EWM", expectedCmd: "MASTERY-ACHIEVED", hint: "MASTERY-ACHIEVED", successMessage: "> SEMESTRES 1 a 6 SUPERADOS. Eres oficialmente Arquitecto Consultor Senior de SAP S/4HANA EWM. Misión cumplida." }
+        ]
+    }
 ];
