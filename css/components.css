@@ -526,49 +526,54 @@ body {
     50% { transform: translateY(-8px); }
 }
 /* ==========================================
-   FIX RADICAL: MASCOTA Y BURBUJA CENTRADAS
+   FIX RADICAL: MASCOTA EN CSS GRID STRICTO
    ========================================== */
 #mascot-container {
     position: fixed !important;
     bottom: 15px !important;
     right: 15px !important;
-    width: 120px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
     z-index: 9999 !important;
-    pointer-events: none; /* Permite hacer click a través del contenedor vacío */
+    pointer-events: none !important;
+    width: auto !important;
+}
+#mascot-container > * { 
+    pointer-events: auto !important; 
 }
 
-#mascot-container * {
-    pointer-events: auto; /* Restaura los clicks en los elementos internos */
-}
-
-#svg-mecharidds, #svg-mechanizer {
-    width: 90px !important;
-    height: auto !important;
-    display: block !important;
-    margin: 0 auto !important;
-}
-
-#mascot-name {
-    position: relative !important;
-    bottom: auto !important;
-    left: auto !important;
-    transform: translateY(-12px) !important; /* Superpone sutilmente el nombre en la cabeza */
-    margin: 0 auto !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-    z-index: 10 !important;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.4) !important;
-}
-
+/* Fila 1: Burbuja de texto (Crece hacia arriba y a los lados sin romperse) */
 #mascot-message {
-    position: absolute !important;
-    bottom: 110px !important;
-    right: 10px !important;
-    width: 200px !important;
-    z-index: 5 !important;
+    grid-row: 1 !important;
+    position: relative !important;
+    margin: 0 0 10px 0 !important;
+    top: auto !important; bottom: auto !important; left: auto !important; right: auto !important;
+    max-width: 250px !important;
+    width: max-content !important;
+    transform: none !important;
+}
+
+/* Fila 2: Letrero con el nombre (Empujado ligeramente hacia abajo para pisar la cabeza) */
+#mascot-name {
+    grid-row: 2 !important;
+    position: relative !important;
+    margin: 0 !important;
+    top: 15px !important; /* Esto lo clava exactamente en la frente */
+    left: auto !important; bottom: auto !important; right: auto !important;
+    transform: none !important;
+    z-index: 10 !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4) !important;
+}
+
+/* Fila 3: El Robot SVG */
+#svg-mecharidds, #svg-mechanizer {
+    grid-row: 3 !important;
+    position: relative !important;
+    width: 100px !important;
+    height: auto !important;
+    margin: 0 !important;
+    top: auto !important; left: auto !important; bottom: auto !important; right: auto !important;
 }
 /* ==========================================
    ESTILOS PREMIUM PARA SETTINGS Y PERFIL
