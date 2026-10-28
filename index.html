@@ -59,11 +59,33 @@
         </nav>
     </div>
 
-    <!-- Overlay Global (Simulador SAP y Alertas) -->
-    <div id="global-overlay" class="overlay hidden">
-        <div class="modal-box">
-            <button class="close-btn" id="close-modal-btn">✕ CERRAR TERMINAL</button>
-            <div id="modal-content"></div>
+  <!-- ==========================================
+         SIMULADOR DE TERMINAL SAP S/4HANA (T-CODES)
+         ========================================== -->
+    <div id="sap-terminal-overlay" class="terminal-hidden">
+        <div class="terminal-header">
+            <div class="terminal-status">
+                <span class="status-dot"></span> CONECTADO A S/4HANA PRD
+            </div>
+            <button id="terminal-close-btn" class="terminal-close" aria-label="Cerrar Terminal">✕</button>
+        </div>
+        
+        <div id="terminal-body" class="terminal-body">
+            <div id="terminal-history">
+                <div class="log-system">SAP EWM Kernel 7.89 - Terminal Emulator Inicializado.</div>
+                <div class="log-system">Cargando escenario de laboratorio...</div>
+            </div>
+            
+            <div class="terminal-input-wrapper">
+                <span class="terminal-prompt">EWM_PRD:/></span>
+                <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" autocapitalize="characters" placeholder="">
+            </div>
+        </div>
+        
+        <!-- Panel de Instrucciones Flotante -->
+        <div id="terminal-instruction-panel">
+            <span class="inst-label">MISIÓN ACTUAL:</span>
+            <span id="terminal-current-instruction">Inicia sesión para comenzar.</span>
         </div>
     </div>
 
