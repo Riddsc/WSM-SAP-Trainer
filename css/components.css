@@ -571,3 +571,9 @@ body {
     background: rgba(239, 68, 68, 0.1);
     transform: scale(0.98);
 }
+/* Clase para ocultar solo el texto, dejando al robot visible */
+.bubble-hidden {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+    pointer-events: none;
+}
