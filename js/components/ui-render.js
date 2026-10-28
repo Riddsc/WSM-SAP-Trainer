@@ -580,3 +580,20 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+/**
+ * PUENTE GLOBAL DE COMPATIBILIDAD
+ * Garantiza que cualquier llamada antigua a renderGlossary funcione de inmediato 
+ * aunque esté dentro de UIRenderer.
+ */
+window.renderGlossary = function() {
+    if (typeof UIRenderer !== 'undefined' && UIRenderer.renderGlossary) {
+        UIRenderer.renderGlossary();
+    }
+};
+
+// Aseguramos también el Router global por si acaso
+if (typeof Router !== 'undefined') {
+    Router.renderGlossary = function() {
+        window.renderGlossary();
+    };
+}
