@@ -578,23 +578,40 @@ body {
     pointer-events: none;
 }
 /* ==========================================
-   FIX: REPOSICIONAMIENTO DEL NOMBRE DE LA MASCOTA
+   FIX DEFINITIVO: ALINEACIÓN PERFECTA (FLEXBOX)
    ========================================== */
-#mascot-name {
-    position: absolute !important;
-    bottom: 85px !important; /* Lo pega exactamente encima de la cabeza */
-    top: auto !important;    /* Desconecta el anclaje a la burbuja invisible */
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 20 !important;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+/* Convertimos el contenedor en una columna apilada al centro */
+#mascot-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
 }
 
-/* Elevamos ligeramente la burbuja de texto para que cuando hablen no tape el nombre */
-#mascot-message {
-    margin-bottom: 35px !important;
+/* Quitamos cualquier posición flotante de los SVG para que respeten la columna */
+#svg-mecharidds, #svg-mechanizer {
     position: relative !important;
+    left: auto !important;
+    bottom: auto !important;
+}
+
+/* El letrero descansa justo en el medio, bajándolo un poco hacia la frente */
+#mascot-name {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    bottom: auto !important;
+    transform: translateY(12px) !important; /* Efecto de solapamiento con la cabeza */
+    z-index: 20 !important;
+    margin: 0 !important;
+}
+
+/* Movemos el globo de texto ligeramente a la derecha estilo cómic */
+#mascot-message {
+    position: relative !important;
+    margin-bottom: 0 !important;
     z-index: 10 !important;
+    transform: translateX(25px) !important; 
 }
 /* ==========================================
    NUEVOS CONTROLES: TOGGLES Y SLIDERS
