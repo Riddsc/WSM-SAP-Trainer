@@ -216,3 +216,112 @@ const UIRenderer = {
         container.scrollTop = 0;
     }
 };
+/**
+ * ==========================================
+ * GESTOR DE APUNTES CONTEXTUALES (SMART NOTES)
+ * ==========================================
+ */
+class SmartNotesManager {
+    constructor() {
+        this.fab = document.getElementById('fab-notes');
+        this.overlay = document.getElementById('notes-overlay');
+        this.closeBtn = document.getElementById('notes-close-btn');
+        this.textarea = document.getElementById('notes-textarea');
+        this.titleText = document.getElementById('notes-context-title');
+        this.saveStatus = document.getElementById('notes-save-status');
+        this.exportBtn = document.getElementById('notes-export-btn');
+
+        this.currentLessonId = 'general';
+        this.currentLessonTitle = 'Apuntes Generales';
+        this.saveTimeout = null;
+
+        this.init();
+    }
+
+    init() {
+        if (!this.fab) return; // Si no existe el botón en el DOM, aborta
+
+        // Eventos de apertura y cierre
+        this.fab.addEventListener('click', () => this.openNotes());
+        this.closeBtn.addEventListener('click', () => this.closeNotes());
+        
+        // Evento de exportación
+        this.exportBtn.addEventListener('click', () => this.exportToTXT());
+
+        // Evento de auto-guardado (Debounce de 1 segundo)
+        this.textarea.addEventListener('input', () => {
+            clearTimeout(this.saveTimeout);
+            this.saveStatus.classList.remove('visible'); // Oculta el "check" mientras escribe
+            
+            this.saveTimeout = setTimeout(() => {
+                this.saveNotes();
+            }, 1000); // Guarda 1 segundo después de que deja de teclear
+        });
+    }
+
+    /**
+     * Llama a este método desde tu router.js cuando cambies de vista/lección
+     * Ej: smartNotes.setContext('s4_m1', '4.1 Cross-Docking Avanzado');
+     */
+    setContext(lessonId, lessonTitle) {
+        this.currentLessonId = lessonId || 'general';
+        this.currentLessonTitle = lessonTitle || 'Apuntes Generales';
+        this.titleText.innerText = this.currentLessonTitle;
+        
+        // Carga las notas de esta lección específica al cambiar el contexto
+        this.loadNotes();
+    }
+
+    openNotes() {
+        this.loadNotes(); // Refresca por si hubo cambios
+        this.overlay.classList.remove('notes-hidden');
+    }
+
+    closeNotes() {
+        this.overlay.classList.add('notes-hidden');
+        this.textarea.blur(); // Oculta el teclado en móviles
+    }
+
+    saveNotes() {
+        const content = this.textarea.value;
+        const storageKey = `logistica_pro_notes_${this.currentLessonId}`;
+        
+        localStorage.setItem(storageKey, content);
+        
+        // Muestra el mensaje de éxito "Guardado Automático ✓"
+        this.saveStatus.classList.add('visible');
+    }
+
+    loadNotes() {
+        const storageKey = `logistica_pro_notes_${this.currentLessonId}`;
+        const savedContent = localStorage.getItem(storageKey);
+        
+        this.textarea.value = savedContent ? savedContent : '';
+        this.saveStatus.classList.remove('visible');
+    }
+
+    exportToTXT() {
+        const content = this.textarea.value;
+        if (!content.trim()) {
+            alert("No hay apuntes para exportar en esta lección.");
+            return;
+        }
+
+        // Crear un Blob con el texto y descargar
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        
+        a.href = url;
+        a.download = `Apuntes_${this.currentLessonId}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Limpieza
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+}
+
+// Instanciamos el gestor de notas globalmente
+const smartNotes = new SmartNotesManager();
