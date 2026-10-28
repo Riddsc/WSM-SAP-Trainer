@@ -59,7 +59,7 @@
         </nav>
     </div>
 
-  <!-- ==========================================
+    <!-- ==========================================
          SIMULADOR DE TERMINAL SAP S/4HANA (T-CODES)
          ========================================== -->
     <div id="sap-terminal-overlay" class="terminal-hidden">
@@ -88,6 +88,32 @@
             <span id="terminal-current-instruction">Inicia sesión para comenzar.</span>
         </div>
     </div>
+
+    <!-- ==========================================
+         PANEL DESLIZABLE DE APUNTES (SMART NOTES)
+         ========================================== -->
+    <div id="notes-overlay" class="notes-hidden">
+        <div class="notes-header">
+            <h3>📝 Mis Apuntes</h3>
+            <button id="notes-close-btn" class="terminal-close" aria-label="Cerrar Apuntes">✕</button>
+        </div>
+        <div class="notes-body">
+            <p class="notes-context" id="notes-context-title">Apuntes Generales</p>
+            <textarea id="notes-textarea" placeholder="Escribe tus notas aquí. Se guardarán automáticamente de forma local..." spellcheck="true"></textarea>
+        </div>
+        <div class="notes-footer">
+            <span id="notes-save-status" class="save-status">Guardado Automático ✓</span>
+            <button id="notes-export-btn" class="export-btn">Exportar TXT</button>
+        </div>
+    </div>
+    
+    <!-- Botón Flotante Global (FAB) para abrir los Apuntes -->
+    <button id="fab-notes" class="fab-btn" aria-label="Abrir Apuntes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+        </svg>
+    </button>
 
     <!-- Orden Estricto de Carga (Arquitectura MVC) -->
     <script src="js/data/syllabus.js"></script>
