@@ -1,132 +1,209 @@
 /**
  * Logística Pro - Simulador de Terminal SAP S/4HANA / EWM
  * Nivel: Estricto. Incluye sistema de bloqueos de seguridad (3 Strikes).
+ * Visual: Interfaz Retro Hacker (Glassmorphism) + Capacitor Haptics.
  */
 let currentSapItemId = null;
 let currentSapStep = 0;
-let currentStrikes = 0; // NUEVO: Contador de errores
+let currentStrikes = 0; 
 
 const MAX_STRIKES = 3;
 
 const SAPEngine = {
+    // 1. Inicializa los eventos del nuevo HTML (Enter y Botón Cerrar)
+    init() {
+        const inputEl = document.getElementById('terminal-input');
+        const closeBtn = document.getElementById('terminal-close-btn');
+
+        if (inputEl) {
+            inputEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.execute();
+                }
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.closeTerminal();
+            });
+        }
+    },
+
     open(itemId) {
-        AudioEngine.play('click');
+        if (typeof AudioEngine !== 'undefined') AudioEngine.play('click');
         const item = syllabusData.find(i => i.id === itemId);
         if (!item || !item.simSteps) return;
         
         currentSapItemId = itemId;
         currentSapStep = 0;
-        currentStrikes = 0; // Reiniciamos errores al entrar
+        currentStrikes = 0; 
+        
+        // Limpiamos el historial visual de la nueva terminal e inyectamos el contexto
+        const historyContainer = document.getElementById('terminal-history');
+        if (historyContainer) {
+            historyContainer.innerHTML = `
+                <div class="log-system">SAP EWM Kernel 7.89 - Terminal Emulator Inicializado.</div>
+                <div class="log-system">--- INICIANDO SESIÓN: ${item.title.toUpperCase()} ---</div>
+                <div class="log-hint">CASO DE NEGOCIO: ${item.description}</div>
+                <div class="log-system">--------------------------------------------------</div>
+            `;
+        }
+
+        // Mostramos el nuevo overlay (reemplaza a tu antiguo global-overlay)
+        document.getElementById('sap-terminal-overlay').classList.remove('terminal-hidden');
         this.renderStep();
+    },
+
+    closeTerminal() {
+        document.getElementById('sap-terminal-overlay').classList.add('terminal-hidden');
+        const inputEl = document.getElementById('terminal-input');
+        if (inputEl) {
+            inputEl.value = '';
+            inputEl.blur(); // Oculta el teclado
+        }
     },
 
     renderStep() {
         const item = syllabusData.find(i => i.id === currentSapItemId);
         const step = item.simSteps[currentSapStep];
-        const modalBody = document.getElementById('modal-content');
         
-        modalBody.innerHTML = `
-            <div class="sap-engine-ui">
-                <div class="sap-topbar">
-                    <div class="sap-dot"></div><div class="sap-dot"></div><div class="sap-dot"></div>
-                    <span class="sap-title">S4HANA-PRD // PASO ${currentSapStep + 1} DE ${item.simSteps.length}</span>
-                </div>
-                <div class="sap-body">
-                    <div class="sap-instruction">${step.instruction}</div>
-                    
-                    <div class="sap-cmd-line" id="sap-input-container">
-                        <span class="sap-prompt">${step.prompt || '/N'}</span>
-                        <input type="text" id="sap-input-code" class="sap-input" placeholder="${step.placeholder || 'T-CODE O VALOR'}" autocomplete="off" oninput="AudioEngine.play('key')">
-                    </div>
-                    
-                    <button id="sap-btn-run" class="sap-btn-execute" onclick="SAPEngine.execute()">EJECUTAR ACCIÓN (F8)</button>
-                    <div id="sap-console-output" class="sap-console-log"></div>
-                    
-                    <!-- Pista nativa del simulador -->
-                    <div style="margin-top: 20px; text-align: left;">
-                        <button class="hint-btn" onclick="document.getElementById('sap-step-hint').style.display='block'" style="padding: 8px; font-size: 0.8rem;">💡 Pista del Paso</button>
-                        <div id="sap-step-hint" class="hint-box" style="display:none; font-size: 0.8rem; margin-top: 8px;">${step.hint}</div>
-                    </div>
-                </div>
-            </div>
-        `;
-        document.getElementById('global-overlay').classList.remove('hidden');
-        setTimeout(() => {
-            const input = document.getElementById('sap-input-code');
-            if (input) input.focus();
-        }, 300);
+        // Actualizamos el panel de instrucciones de la nueva UI
+        const instructionText = document.getElementById('terminal-current-instruction');
+        const inputEl = document.getElementById('terminal-input');
+        
+        if (instructionText) {
+            instructionText.innerText = `PASO ${currentSapStep + 1}/${item.simSteps.length}: ${step.instruction}`;
+        }
+        
+        if (inputEl) {
+            inputEl.placeholder = step.placeholder || 'T-CODE O VALOR';
+            inputEl.disabled = false;
+            setTimeout(() => inputEl.focus(), 300);
+        }
+    },
+
+    printLog(message, type) {
+        const historyContainer = document.getElementById('terminal-history');
+        const bodyContainer = document.getElementById('terminal-body');
+        if (!historyContainer) return;
+
+        const div = document.createElement('div');
+        div.className = `log-${type}`;
+        div.innerHTML = message; // Usamos innerHTML para soportar los <br> de tus mensajes de error
+        historyContainer.appendChild(div);
+
+        // Auto-scroll hacia abajo
+        if (bodyContainer) {
+            bodyContainer.scrollTop = bodyContainer.scrollHeight;
+        }
+    },
+
+    triggerHaptic(type) {
+        if (window.Capacitor && window.Capacitor.Plugins.Haptics) {
+            const Haptics = window.Capacitor.Plugins.Haptics;
+            try {
+                if (type === 'success') Haptics.impact({ style: 'Light' });
+                else if (type === 'error') Haptics.notification({ type: 'ERROR' });
+                else if (type === 'heavy') Haptics.impact({ style: 'Heavy' });
+            } catch (e) { console.warn("Haptics no soportado."); }
+        }
     },
 
     execute() {
-        AudioEngine.play('click');
-        const inputEl = document.getElementById('sap-input-code');
-        const outputEl = document.getElementById('sap-console-output');
+        const inputEl = document.getElementById('terminal-input');
         const item = syllabusData.find(i => i.id === currentSapItemId);
         const step = item.simSteps[currentSapStep];
 
-        if (!inputEl || !outputEl) return;
-        const val = inputEl.value.toUpperCase().trim();
-        
-        outputEl.className = 'sap-console-log'; 
-        outputEl.innerHTML = '';
+        if (!inputEl || !item) return;
 
-        if (val === step.expectedCmd || val === `/N${step.expectedCmd}`) {
-            // ACIERTO
-            AudioEngine.play('success');
-            currentStrikes = 0; // Resetea los errores al acertar el paso
+        const val = inputEl.value.toUpperCase().trim();
+        if (val === '') return;
+
+        // Imprimir lo que el usuario digitó
+        this.printLog(`EWM_PRD:/> ${val}`, 'user');
+        inputEl.value = ''; 
+        
+        if (typeof AudioEngine !== 'undefined') AudioEngine.play('click');
+
+        if (val === step.expectedCmd.toUpperCase() || val === `/N${step.expectedCmd.toUpperCase()}`) {
+            // ==========================================
+            // ACIERTO (Usando tu lógica original)
+            // ==========================================
+            if (typeof AudioEngine !== 'undefined') AudioEngine.play('success');
+            this.triggerHaptic('success');
+            currentStrikes = 0; 
+            
+            inputEl.disabled = true; 
+
+            // Tu efecto de máquina de escribir adaptado al nuevo DOM
             let text = step.successMessage;
             let i = 0;
-            
-            // Bloquea input para evitar spam
-            inputEl.disabled = true;
-            document.getElementById('sap-btn-run').disabled = true;
+            let typingLog = document.createElement('div');
+            typingLog.className = 'log-success';
+            document.getElementById('terminal-history').appendChild(typingLog);
 
             let typingInterval = setInterval(() => {
                 if (i < text.length) {
-                    outputEl.innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
-                    if (i % 4 === 0) AudioEngine.play('key');
+                    typingLog.innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
+                    if (i % 4 === 0 && typeof AudioEngine !== 'undefined') AudioEngine.play('key');
+                    document.getElementById('terminal-body').scrollTop = document.getElementById('terminal-body').scrollHeight;
                     i++;
                 } else {
                     clearInterval(typingInterval);
                     currentSapStep++;
                     
                     if (currentSapStep < item.simSteps.length) {
-                        setTimeout(() => { this.renderStep(); }, 2500);
+                        setTimeout(() => { this.renderStep(); }, 1500); // Pausa corta antes del siguiente paso
                     } else {
-                        outputEl.innerHTML += `<br><br><span style="color:var(--success);">✅ LABORATORIO COMPLETADO CON ÉXITO. Sistema actualizado.</span>`;
-                        AppState.markComplete(currentSapItemId);
+                        // Fin del laboratorio
+                        this.printLog("<br><br>✅ LABORATORIO COMPLETADO CON ÉXITO. Sistema actualizado.", 'success');
+                        this.triggerHaptic('heavy');
+                        
+                        if (typeof AppState !== 'undefined') AppState.markComplete(currentSapItemId);
+                        
                         setTimeout(() => { 
-                            Router.closeModal(); 
-                            Router.renderDashboard(); 
-                        }, 4000);
+                            this.closeTerminal(); 
+                            if (typeof Router !== 'undefined') Router.renderDashboard(); 
+                        }, 3000);
                     }
                 }
             }, 20);
+            
         } else {
-            // FALLO (STRIKE SYSTEM)
-            AudioEngine.play('error');
+            // ==========================================
+            // FALLO / STRIKE SYSTEM (Usando tu lógica original)
+            // ==========================================
+            if (typeof AudioEngine !== 'undefined') AudioEngine.play('error');
+            this.triggerHaptic('error');
             currentStrikes++;
-            outputEl.classList.add('sap-error');
             
             if (currentStrikes >= MAX_STRIKES) {
                 // FATAL ERROR: Expulsión
-                outputEl.innerHTML = `> FATAL ERROR: Se han detectado ${currentStrikes} intentos fallidos consecutivos.<br>> Violación de protocolo operativo.<br>> CERRANDO CONEXIÓN DEL TERMINAL...`;
+                this.printLog(`> FATAL ERROR: Se han detectado ${currentStrikes} intentos fallidos.<br>> Violación de protocolo operativo.<br>> CERRANDO CONEXIÓN DEL TERMINAL...`, 'error');
                 
-                // Bloquear UI
                 inputEl.disabled = true;
-                document.getElementById('sap-input-container').style.borderColor = 'var(--danger)';
-                document.getElementById('sap-btn-run').style.display = 'none';
                 
-                // Forzar cierre del modal después de 4 segundos
                 setTimeout(() => {
-                    Router.closeModal();
+                    this.closeTerminal();
                     alert("Has sido expulsado de la terminal SAP por demasiados errores. Repasa la teoría y vuelve a intentar el laboratorio desde cero.");
                 }, 4000);
             } else {
                 // Advertencia regular
                 const intentosRestantes = MAX_STRIKES - currentStrikes;
-                outputEl.innerHTML = `> ER_INPUT_INVALID: El valor '${val}' es incorrecto.<br>> ADVERTENCIA: ${intentosRestantes} intento(s) restante(s) antes del bloqueo.`;
+                this.printLog(`> ER_INPUT_INVALID: El valor '${val}' es incorrecto.<br>> ADVERTENCIA: ${intentosRestantes} intento(s) restante(s) antes del bloqueo.`, 'error');
+                
+                // Mostrar la pista después de un error
+                setTimeout(() => {
+                    this.printLog(`PISTA DEL SISTEMA: Se esperaba [ ${step.hint} ]`, 'hint');
+                }, 600);
             }
         }
     }
 };
+
+// Autoinicializar el event listener del teclado cuando cargue el DOM
+document.addEventListener('DOMContentLoaded', () => {
+    SAPEngine.init();
+});
