@@ -1,0 +1,191 @@
+{
+ "id": "c2_l5",
+ "paginas": [
+  {
+   "caso": "Un supermercado pide 96 bolsas de café para mañana. Ventas crea el pedido, pero la bodega no sabe cuándo alistarlo ni por qué muelle sale.",
+   "capas": {
+    "idea": "<p>El proceso de <strong>pedido a cobro</strong> (order to cash) básico:</p><ol><li><strong>Pedido de venta</strong> (VA01).</li><li><strong>Entrega de salida</strong> (VL01N): le dice a la bodega qué alistar, cuánto y desde qué punto de expedición.</li><li><strong>Alistamiento</strong> (picking) y empaque.</li><li><strong>Salida de mercancía</strong>: se contabiliza desde la entrega (VL02N), con la clase <strong>601</strong>.</li><li><strong>Factura</strong> al cliente.</li></ol>",
+    "detalle": "<p>La entrega de salida es el documento de trabajo de la bodega. Cuando la cantidad alistada se confirma, se contabiliza la <strong>salida de mercancía</strong> (post goods issue): en ese momento baja el stock y se registra el costo de la venta.</p><p>Si la bodega usa WM o EWM, el alistamiento se hace con órdenes o tareas de almacén; lo verás en los próximos ciclos.</p>",
+    "sap": "<div class=\"tabla\"><table><thead><tr><th>Paso</th><th>Transacción</th></tr></thead><tbody><tr><td>Pedido de venta</td><td>VA01</td></tr><tr><td>Crear entrega de salida</td><td>VL01N</td></tr><tr><td>Modificar entrega y contabilizar salida</td><td>VL02N</td></tr></tbody></table></div>"
+   },
+   "glosario": [
+    {
+     "es": "pedido de venta",
+     "en": "sales order"
+    },
+    {
+     "es": "entrega de salida",
+     "en": "outbound delivery"
+    },
+    {
+     "es": "contabilizar salida de mercancía",
+     "en": "post goods issue"
+    },
+    {
+     "es": "pedido a cobro",
+     "en": "order to cash"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>El <strong>inventario físico</strong> compara lo que dice SAP con lo que realmente hay, y corrige las diferencias.</p><p>Se hace de dos formas:</p><ul><li><strong>Anual</strong>: se cuenta todo en una fecha, muchas veces con la operación detenida.</li><li><strong>Cíclico</strong> (cycle counting): se cuenta un poco cada semana o mes, con más frecuencia los productos A.</li></ul>",
+    "detalle": "<p>Pasos en SAP:</p><div class=\"tabla\"><table><thead><tr><th>Paso</th><th>Transacción</th></tr></thead><tbody><tr><td>Crear el documento de inventario</td><td>MI01</td></tr><tr><td>Registrar el conteo</td><td>MI04</td></tr><tr><td>Ver la lista de diferencias</td><td>MI20</td></tr><tr><td>Contabilizar las diferencias</td><td>MI07</td></tr></tbody></table></div><p>Al contabilizar, SAP usa la clase <strong>701</strong> para sobrantes y <strong>702</strong> para faltantes.</p>",
+    "sap": "<p>Durante el conteo se puede activar el <strong>bloqueo de contabilización</strong> en el documento de inventario, para que nadie mueva ese material mientras se cuenta. Al terminar, el bloqueo se levanta.</p>"
+   },
+   "glosario": [
+    {
+     "es": "inventario físico",
+     "en": "physical inventory"
+    },
+    {
+     "es": "conteo cíclico",
+     "en": "cycle counting"
+    },
+    {
+     "es": "documento de inventario",
+     "en": "physical inventory document"
+    },
+    {
+     "es": "bloqueo de contabilización",
+     "en": "posting block"
+    }
+   ],
+   "error": {
+    "titulo": "contabilizar diferencias sin investigar",
+    "texto": "Antes de MI07, revisa en MB51 si hay movimientos sin registrar o errores de unidad. Muchas \"diferencias\" son una entrada en cajas registrada como unidades, o un traslado olvidado."
+   }
+  },
+  {
+   "capas": {
+    "idea": "<p>El objetivo del inventario no es \"cuadrar a la fuerza\", sino mantener la <strong>exactitud de inventario</strong> alta y encontrar las causas de los errores.</p>",
+    "detalle": "<p>Causas frecuentes de diferencias:</p><ul><li>Salidas físicas sin registro (consumos, daños).</li><li>Errores de unidad de medida.</li><li>Productos en la ubicación equivocada.</li><li>Entradas registradas antes de que llegue la mercancía.</li></ul><p>Cada diferencia contabilizada tiene un costo y queda en el documento de material para el análisis.</p>",
+    "sap": "<p>En el laboratorio de este ciclo vas a hacer el ciclo completo de un conteo: crear el documento, registrar lo contado y contabilizar la diferencia.</p>"
+   },
+   "glosario": [
+    {
+     "es": "exactitud de inventario",
+     "en": "inventory accuracy"
+    },
+    {
+     "es": "causa raíz",
+     "en": "root cause"
+    }
+   ],
+   "puente": "Seguramente ya participaste en un conteo. En SAP, cada paso de ese conteo deja un documento que se puede auditar."
+  }
+ ],
+ "resumen": "Pedido a cobro: pedido de venta (VA01), entrega de salida (VL01N), alistamiento, salida de mercancía desde la entrega (VL02N, clase 601) y factura. Inventario físico: MI01 crea el documento, MI04 registra el conteo, MI20 muestra diferencias, MI07 las contabiliza (701 sobrante, 702 faltante). Puede ser anual o cíclico; se investiga antes de ajustar.",
+ "examen": [
+  {
+   "pregunta": "¿Con qué clase de movimiento sale la mercancía de una entrega a cliente?",
+   "opciones": [
+    {
+     "texto": "601",
+     "correcta": true
+    },
+    {
+     "texto": "201",
+     "correcta": false
+    },
+    {
+     "texto": "641",
+     "correcta": false
+    },
+    {
+     "texto": "551",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La salida de mercancía de una entrega de venta es 601."
+  },
+  {
+   "pregunta": "¿Qué transacción registra las cantidades contadas en el inventario?",
+   "opciones": [
+    {
+     "texto": "MI04",
+     "correcta": true
+    },
+    {
+     "texto": "MI01",
+     "correcta": false
+    },
+    {
+     "texto": "MI07",
+     "correcta": false
+    },
+    {
+     "texto": "MI20",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MI01 crea, MI04 registra el conteo, MI20 lista diferencias y MI07 contabiliza."
+  },
+  {
+   "pregunta": "¿Qué clase usa SAP para contabilizar un faltante de inventario?",
+   "opciones": [
+    {
+     "texto": "702",
+     "correcta": true
+    },
+    {
+     "texto": "701",
+     "correcta": false
+    },
+    {
+     "texto": "551",
+     "correcta": false
+    },
+    {
+     "texto": "102",
+     "correcta": false
+    }
+   ],
+   "explicacion": "701 es sobrante; 702 es faltante."
+  },
+  {
+   "pregunta": "¿Qué es cierto sobre el conteo cíclico? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Se cuenta una parte del inventario cada periodo",
+     "correcta": true
+    },
+    {
+     "texto": "Los productos A se cuentan con más frecuencia",
+     "correcta": true
+    },
+    {
+     "texto": "Se cuenta todo en un solo día al año",
+     "correcta": false
+    },
+    {
+     "texto": "Solo aplica a materiales de consignación",
+     "correcta": false
+    }
+   ],
+   "explicacion": "El conteo cíclico reparte el conteo en el año y prioriza por importancia."
+  },
+  {
+   "pregunta": "¿Qué documento le dice a la bodega qué alistar para un cliente?",
+   "opciones": [
+    {
+     "texto": "La entrega de salida",
+     "correcta": true
+    },
+    {
+     "texto": "El pedido de compra",
+     "correcta": false
+    },
+    {
+     "texto": "El documento de inventario",
+     "correcta": false
+    },
+    {
+     "texto": "El registro info",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La entrega de salida (VL01N) es el documento de trabajo del despacho."
+  }
+ ]
+}

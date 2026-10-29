@@ -1,0 +1,208 @@
+{
+ "id": "c0_l3",
+ "paginas": [
+  {
+   "caso": "Primer día en Distribuidora Cordillera. Te dan usuario y clave, y tu jefa te dice: \"Revisa cuánto café molido hay en la bodega\". Tienes SAP abierto y no sabes por dónde empezar.",
+   "capas": {
+    "idea": "<p>En <strong>SAP GUI</strong> (la interfaz clásica) se entra con <strong>mandante</strong>, <strong>usuario</strong>, <strong>clave</strong> e <strong>idioma</strong>. Luego aparece el menú SAP Easy Access.</p><p>La forma más rápida de trabajar es el <strong>campo de comando</strong>: escribes el <strong>código de transacción</strong> y presionas Enter. Por ejemplo, <code>MMBE</code> abre el resumen de stock.</p>",
+    "detalle": "<p>Comandos útiles en el campo de comando:</p><div class=\"tabla\"><table><thead><tr><th>Comando</th><th>Qué hace</th></tr></thead><tbody><tr><td>/n + código</td><td>Cierra la transacción actual y abre otra en la misma ventana (ej. <code>/nMMBE</code>).</td></tr><tr><td>/o + código</td><td>Abre la transacción en una ventana (sesión) nueva.</td></tr><tr><td>/n</td><td>Sale de la transacción actual sin guardar.</td></tr><tr><td>/nend</td><td>Cierra la sesión pidiendo confirmación.</td></tr><tr><td>/nex</td><td>Cierra la sesión sin preguntar (lo no guardado se pierde).</td></tr></tbody></table></div>",
+    "sap": "<p>Puedes guardar tus transacciones más usadas en <strong>Favoritos</strong>. Y si activas la opción de ver los códigos técnicos en el menú, aprendes los códigos mientras navegas.</p>"
+   },
+   "glosario": [
+    {
+     "es": "código de transacción",
+     "en": "transaction code"
+    },
+    {
+     "es": "campo de comando",
+     "en": "command field"
+    },
+    {
+     "es": "cerrar sesión",
+     "en": "log off"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>Las teclas de función ahorran mucho tiempo:</p><div class=\"tabla\"><table><thead><tr><th>Tecla</th><th>Uso</th></tr></thead><tbody><tr><td>F1</td><td>Ayuda: explica el campo donde estás.</td></tr><tr><td>F4</td><td>Ayuda de búsqueda: muestra los valores posibles (matchcode).</td></tr><tr><td>F3</td><td>Atrás.</td></tr><tr><td>F12</td><td>Cancelar.</td></tr><tr><td>F8</td><td>Ejecutar (en reportes).</td></tr><tr><td>Ctrl + S</td><td>Guardar.</td></tr></tbody></table></div>",
+    "detalle": "<p>La <strong>barra de estado</strong>, abajo, te habla. Sus mensajes son de tres tipos:</p><ul><li><strong>Éxito</strong> (verde): la operación se hizo, por ejemplo \"Documento 4900000012 contabilizado\".</li><li><strong>Advertencia</strong> (amarillo): puedes seguir con Enter, pero revisa.</li><li><strong>Error</strong> (rojo): no te deja continuar hasta corregir.</li></ul>",
+    "sap": "<p>Siempre lee la barra de estado después de guardar. El número de documento que aparece es la prueba de que el movimiento quedó registrado.</p>"
+   },
+   "glosario": [
+    {
+     "es": "ayuda de búsqueda",
+     "en": "search help"
+    },
+    {
+     "es": "barra de estado",
+     "en": "status bar"
+    },
+    {
+     "es": "advertencia",
+     "en": "warning"
+    }
+   ],
+   "error": {
+    "titulo": "guardar y no leer el mensaje",
+    "texto": "Muchos errores de inventario nacen de creer que algo quedó registrado cuando SAP mostró un error o una advertencia. Sin número de documento, no hay movimiento."
+   }
+  },
+  {
+   "capas": {
+    "idea": "<p><strong>SAP Fiori</strong> es la interfaz moderna que se usa en el navegador, el computador o el celular. Se entra por el <strong>Fiori launchpad</strong>, donde cada <strong>mosaico</strong> (tile) abre una aplicación.</p>",
+    "detalle": "<p>Qué aplicaciones ves depende de tu <strong>rol</strong>: un analista de inventarios no ve lo mismo que un comprador. Hay apps para registrar operaciones, apps analíticas con indicadores y fichas que resumen un objeto (un material, un pedido).</p><p>Muchas transacciones clásicas también se abren en Fiori en formato web, así que lo que aprendas de SAP GUI te sirve en ambos lados.</p>",
+    "sap": "<p>En el día a día conviven ambas interfaces: hay empresas que trabajan casi todo en SAP GUI y otras que ya pasaron a Fiori. Un buen profesional se mueve en las dos.</p>"
+   },
+   "glosario": [
+    {
+     "es": "mosaico",
+     "en": "tile"
+    },
+    {
+     "es": "rol",
+     "en": "role"
+    },
+    {
+     "es": "launchpad",
+     "en": "launchpad"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>Los reportes de SAP muestran listas (llamadas ALV) que puedes <strong>ordenar</strong>, <strong>filtrar</strong>, <strong>sumar</strong> y <strong>exportar</strong> a una hoja de cálculo.</p>",
+    "detalle": "<p>Antes de ejecutar un reporte aparece una pantalla de selección: ahí delimitas qué quieres ver (material, centro, fechas). Si siempre usas los mismos filtros, guárdalos como <strong>variante</strong>. Y si siempre quieres las mismas columnas, guarda un <strong>layout</strong>.</p>",
+    "sap": "<p>En el laboratorio de este ciclo vas a usar <code>MM03</code> para ver un material y <code>MMBE</code> para consultar su stock, cambiando de transacción con <code>/n</code>.</p>"
+   },
+   "glosario": [
+    {
+     "es": "pantalla de selección",
+     "en": "selection screen"
+    },
+    {
+     "es": "variante",
+     "en": "variant"
+    },
+    {
+     "es": "exportar",
+     "en": "export"
+    }
+   ],
+   "puente": "Si ya manejas hojas de cálculo con filtros, los reportes de SAP te van a parecer familiares: la diferencia es que los datos están al día."
+  }
+ ],
+ "resumen": "En SAP GUI se trabaja con códigos de transacción en el campo de comando (/n cambia de transacción, /o abre otra sesión). F1 explica un campo, F4 muestra valores posibles y la barra de estado confirma o rechaza cada operación. Fiori se usa por roles desde el launchpad. Los reportes ALV se filtran, ordenan y exportan.",
+ "examen": [
+  {
+   "pregunta": "¿Qué hace el comando /nMMBE?",
+   "opciones": [
+    {
+     "texto": "Cierra la transacción actual y abre MMBE",
+     "correcta": true
+    },
+    {
+     "texto": "Abre MMBE en una ventana nueva",
+     "correcta": false
+    },
+    {
+     "texto": "Cierra la sesión sin preguntar",
+     "correcta": false
+    },
+    {
+     "texto": "Guarda la transacción y abre MMBE",
+     "correcta": false
+    }
+   ],
+   "explicacion": "/n cambia de transacción en la misma ventana; /o abre una sesión nueva."
+  },
+  {
+   "pregunta": "¿Qué tecla muestra los valores posibles de un campo?",
+   "opciones": [
+    {
+     "texto": "F4",
+     "correcta": true
+    },
+    {
+     "texto": "F1",
+     "correcta": false
+    },
+    {
+     "texto": "F3",
+     "correcta": false
+    },
+    {
+     "texto": "F8",
+     "correcta": false
+    }
+   ],
+   "explicacion": "F4 es la ayuda de búsqueda; F1 explica el campo; F3 es atrás; F8 ejecuta."
+  },
+  {
+   "pregunta": "Guardaste un movimiento y la barra de estado muestra un mensaje en rojo. ¿Qué significa?",
+   "opciones": [
+    {
+     "texto": "Que hay un error y el movimiento no se registró",
+     "correcta": true
+    },
+    {
+     "texto": "Que se registró con una advertencia menor",
+     "correcta": false
+    },
+    {
+     "texto": "Que se registró y se envió por correo",
+     "correcta": false
+    },
+    {
+     "texto": "Que la sesión se cerró automáticamente",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Los mensajes rojos son errores: no se puede continuar hasta corregir."
+  },
+  {
+   "pregunta": "¿De qué depende qué aplicaciones ves en el Fiori launchpad?",
+   "opciones": [
+    {
+     "texto": "De los roles asignados a tu usuario",
+     "correcta": true
+    },
+    {
+     "texto": "Del idioma de inicio de sesión",
+     "correcta": false
+    },
+    {
+     "texto": "Del navegador que uses",
+     "correcta": false
+    },
+    {
+     "texto": "De la hora en que entras",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Fiori se organiza por roles: cada perfil ve las apps de su trabajo."
+  },
+  {
+   "pregunta": "¿Para qué sirve guardar una variante en un reporte? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Para reutilizar los mismos filtros",
+     "correcta": true
+    },
+    {
+     "texto": "Para no escribir la selección cada vez",
+     "correcta": true
+    },
+    {
+     "texto": "Para cambiar el idioma del reporte",
+     "correcta": false
+    },
+    {
+     "texto": "Para borrar los datos del reporte",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Una variante guarda los valores de la pantalla de selección para usarlos de nuevo."
+  }
+ ]
+}

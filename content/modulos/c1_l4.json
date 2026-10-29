@@ -1,0 +1,148 @@
+{
+ "id": "c1_l4",
+ "paginas": [
+  {
+   "caso": "Un proveedor de empaques también le compra café a la distribuidora. En el sistema anterior existía dos veces: una como proveedor y otra como cliente, con direcciones distintas.",
+   "capas": {
+    "idea": "<p>En S/4HANA, proveedores y clientes se manejan como <strong>socios comerciales</strong> (Business Partner, BP). Una misma empresa o persona se crea <strong>una sola vez</strong> y se le asignan <strong>roles</strong>: proveedor, cliente o ambos.</p>",
+    "detalle": "<p>Roles frecuentes:</p><div class=\"tabla\"><table><thead><tr><th>Rol</th><th>Para qué</th></tr></thead><tbody><tr><td>FLVN00</td><td>Proveedor en contabilidad financiera</td></tr><tr><td>FLVN01</td><td>Proveedor para compras</td></tr><tr><td>FLCU00</td><td>Cliente en contabilidad financiera</td></tr><tr><td>FLCU01</td><td>Cliente para ventas</td></tr></tbody></table></div><p>Los datos generales (nombre, dirección, identificación fiscal) se comparten; los de cada rol se completan por separado.</p>",
+    "sap": "<p>Se trabaja con la transacción <code>BP</code>. En S/4HANA, las transacciones antiguas para crear proveedores y clientes por separado redirigen al socio comercial.</p>"
+   },
+   "glosario": [
+    {
+     "es": "socio comercial",
+     "en": "business partner"
+    },
+    {
+     "es": "proveedor",
+     "en": "supplier"
+    },
+    {
+     "es": "cliente",
+     "en": "customer"
+    },
+    {
+     "es": "rol",
+     "en": "role"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>Para comprar bien no basta con el proveedor: se necesita saber <strong>qué material</strong> le compramos y <strong>a qué precio</strong>.</p>",
+    "detalle": "<ul><li>El <strong>registro info</strong> (purchasing info record) une material + proveedor: precio, plazo de entrega y unidad de pedido.</li><li>La <strong>lista de fuentes</strong> (source list) indica qué proveedores están autorizados para un material en un centro.</li></ul><p>Con esos datos, SAP propone precio y proveedor al crear el pedido de compra.</p>",
+    "sap": "<p>En el siguiente ciclo verás cómo estos datos maestros alimentan el pedido de compra (<code>ME21N</code>) y la entrada de mercancía (<code>MIGO</code>).</p>"
+   },
+   "glosario": [
+    {
+     "es": "registro info de compras",
+     "en": "purchasing info record"
+    },
+    {
+     "es": "lista de fuentes",
+     "en": "source list"
+    },
+    {
+     "es": "plazo de entrega",
+     "en": "delivery time"
+    }
+   ],
+   "puente": "Conoces bien la diferencia entre proveedor y cliente. En S/4HANA la novedad es que ambos viven en un mismo registro con roles distintos.",
+   "error": {
+    "titulo": "crear el mismo tercero dos veces",
+    "texto": "Si un proveedor también es cliente, se le agrega el rol de cliente al mismo socio comercial. Duplicarlo divide su historial y complica conciliaciones."
+   }
+  }
+ ],
+ "resumen": "En S/4HANA los proveedores y clientes son socios comerciales (transacción BP) con roles como FLVN00/FLVN01 (proveedor) y FLCU00/FLCU01 (cliente). Un tercero se crea una sola vez. El registro info une material y proveedor con precio y plazo; la lista de fuentes define proveedores autorizados.",
+ "examen": [
+  {
+   "pregunta": "¿Con qué transacción se crean proveedores y clientes en S/4HANA?",
+   "opciones": [
+    {
+     "texto": "BP",
+     "correcta": true
+    },
+    {
+     "texto": "MM01",
+     "correcta": false
+    },
+    {
+     "texto": "OX18",
+     "correcta": false
+    },
+    {
+     "texto": "MMBE",
+     "correcta": false
+    }
+   ],
+   "explicacion": "En S/4HANA el socio comercial (BP) es el maestro único para clientes y proveedores."
+  },
+  {
+   "pregunta": "Una empresa es proveedor y cliente a la vez. ¿Qué se hace?",
+   "opciones": [
+    {
+     "texto": "Se crea un solo socio con los dos roles",
+     "correcta": true
+    },
+    {
+     "texto": "Se crean dos socios distintos",
+     "correcta": false
+    },
+    {
+     "texto": "Se crea solo como proveedor",
+     "correcta": false
+    },
+    {
+     "texto": "Se crea un nuevo mandante",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Un solo socio comercial con los roles de proveedor y cliente."
+  },
+  {
+   "pregunta": "¿Qué une el registro info de compras?",
+   "opciones": [
+    {
+     "texto": "Un material y un proveedor, con precio y plazo",
+     "correcta": true
+    },
+    {
+     "texto": "Un cliente y un centro",
+     "correcta": false
+    },
+    {
+     "texto": "Una sociedad y un mandante",
+     "correcta": false
+    },
+    {
+     "texto": "Un almacén y una ubicación",
+     "correcta": false
+    }
+   ],
+   "explicacion": "El registro info guarda las condiciones de compra de un material a un proveedor."
+  },
+  {
+   "pregunta": "¿Qué roles corresponden a proveedor? Elige 2.",
+   "opciones": [
+    {
+     "texto": "FLVN00",
+     "correcta": true
+    },
+    {
+     "texto": "FLVN01",
+     "correcta": true
+    },
+    {
+     "texto": "FLCU00",
+     "correcta": false
+    },
+    {
+     "texto": "FLCU01",
+     "correcta": false
+    }
+   ],
+   "explicacion": "FLVN son roles de proveedor (vendor); FLCU son de cliente (customer)."
+  }
+ ]
+}

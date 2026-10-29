@@ -1,0 +1,191 @@
+{
+ "id": "c2_l1",
+ "paginas": [
+  {
+   "caso": "Llegan 200 bolsas de café con el empaque húmedo. El jefe de bodega no quiere que se vendan hasta que calidad las revise, pero tampoco quiere que desaparezcan del inventario.",
+   "capas": {
+    "idea": "<p>El stock de un material no solo tiene una cantidad: también tiene un <strong>tipo de stock</strong> que dice si se puede usar.</p><ul><li><strong>Libre utilización</strong> (unrestricted): disponible para vender o consumir.</li><li><strong>Control de calidad</strong> (quality inspection): pendiente de revisión; no se puede vender.</li><li><strong>Bloqueado</strong> (blocked): retenido por daños u otros motivos.</li></ul><p>En el caso, las bolsas húmedas deben quedar en <strong>control de calidad</strong> o <strong>bloqueado</strong>: siguen en el inventario, pero nadie puede venderlas.</p>",
+    "detalle": "<p>Además existen los <strong>stocks especiales</strong>, que se manejan por separado porque tienen un dueño o un destino particular. Por ejemplo:</p><ul><li><strong>Consignación</strong> de proveedor: está en nuestra bodega, pero sigue siendo del proveedor hasta que lo usamos.</li><li><strong>Stock de pedido de cliente</strong>: reservado para un pedido concreto.</li><li><strong>Stock en tránsito</strong>: salió de un centro y aún no llega al otro.</li></ul>",
+    "sap": "<p>En <code>MMBE</code> ves el stock separado por tipo: libre utilización, control de calidad y bloqueado, para cada centro y almacén.</p>"
+   },
+   "glosario": [
+    {
+     "es": "libre utilización",
+     "en": "unrestricted use"
+    },
+    {
+     "es": "control de calidad",
+     "en": "quality inspection"
+    },
+    {
+     "es": "stock bloqueado",
+     "en": "blocked stock"
+    },
+    {
+     "es": "consignación",
+     "en": "consignment"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>Cada movimiento de inventario lleva una <strong>clase de movimiento</strong>: un código de 3 dígitos que le dice a SAP qué pasa con la cantidad, con el valor y con las cuentas contables.</p>",
+    "detalle": "<div class=\"tabla\"><table><thead><tr><th>Clase</th><th>Qué hace</th></tr></thead><tbody><tr><td>101</td><td>Entrada de mercancía por pedido de compra</td></tr><tr><td>122</td><td>Devolución al proveedor</td></tr><tr><td>201</td><td>Salida para centro de costo (consumo)</td></tr><tr><td>261</td><td>Salida para orden de producción</td></tr><tr><td>301</td><td>Traslado entre centros en un paso</td></tr><tr><td>311</td><td>Traslado entre almacenes del mismo centro en un paso</td></tr><tr><td>321</td><td>De control de calidad a libre utilización</td></tr><tr><td>501</td><td>Entrada sin pedido de compra</td></tr><tr><td>551</td><td>Salida por desguace (baja)</td></tr><tr><td>561</td><td>Carga inicial de stock</td></tr><tr><td>601</td><td>Salida por entrega a cliente</td></tr><tr><td>701 / 702</td><td>Diferencias de inventario físico (sobrante / faltante)</td></tr></tbody></table></div>",
+    "sap": "<p>Regla práctica: la clase que <strong>anula</strong> un movimiento suele ser el número siguiente. La 102 anula la 101; la 202 anula la 201; la 312 anula la 311.</p>"
+   },
+   "glosario": [
+    {
+     "es": "clase de movimiento",
+     "en": "movement type"
+    },
+    {
+     "es": "anulación",
+     "en": "reversal"
+    },
+    {
+     "es": "desguace",
+     "en": "scrapping"
+    }
+   ],
+   "error": {
+    "titulo": "anular \"a mano\" con otro movimiento",
+    "texto": "Si una entrada 101 quedó mal, no se corrige con una salida 201: se anula con la 102 (o con la opción de anulación en MIGO). Así el documento queda ligado al original y la contabilidad cuadra."
+   }
+  },
+  {
+   "capas": {
+    "idea": "<p>Cada movimiento contabilizado crea un <strong>documento de material</strong>. Si el movimiento cambia el valor del inventario, también crea un <strong>documento contable</strong>.</p>",
+    "detalle": "<p>Dos fechas importan:</p><ul><li><strong>Fecha de documento</strong>: la del papel o soporte (por ejemplo, la remisión del proveedor).</li><li><strong>Fecha de contabilización</strong>: la que define en qué periodo contable entra el movimiento.</li></ul><p>Solo se puede contabilizar en los <strong>periodos abiertos</strong>. Al cerrar un mes, se abre el siguiente con la transacción de cierre de periodo de materiales.</p>",
+    "sap": "<p>Un documento de material tiene número, año y posiciones. En S/4HANA todos se guardan en la tabla <code>MATDOC</code>, y se consultan con <code>MB51</code> o con la visualización de <code>MIGO</code>.</p>"
+   },
+   "glosario": [
+    {
+     "es": "fecha de contabilización",
+     "en": "posting date"
+    },
+    {
+     "es": "fecha de documento",
+     "en": "document date"
+    },
+    {
+     "es": "periodo contable",
+     "en": "posting period"
+    }
+   ],
+   "puente": "Es la misma idea del soporte contable que acompaña cada movimiento de kárdex: aquí el sistema lo genera solo y lo enlaza con la contabilidad."
+  }
+ ],
+ "resumen": "El stock puede estar en libre utilización, control de calidad o bloqueado; además hay stocks especiales (consignación, pedido de cliente, en tránsito). La clase de movimiento (3 dígitos) define qué pasa con cantidad, valor y cuentas: 101 entrada por pedido, 201 consumo, 311 traslado entre almacenes, 601 entrega, 701/702 diferencias. La anulación suele ser el número siguiente. Cada movimiento crea un documento de material.",
+ "examen": [
+  {
+   "pregunta": "¿En qué tipo de stock se puede vender o consumir un material?",
+   "opciones": [
+    {
+     "texto": "Libre utilización",
+     "correcta": true
+    },
+    {
+     "texto": "Control de calidad",
+     "correcta": false
+    },
+    {
+     "texto": "Bloqueado",
+     "correcta": false
+    },
+    {
+     "texto": "En tránsito",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Solo el stock de libre utilización está disponible para venta y consumo."
+  },
+  {
+   "pregunta": "¿Qué clase de movimiento anula una entrada 101?",
+   "opciones": [
+    {
+     "texto": "102",
+     "correcta": true
+    },
+    {
+     "texto": "201",
+     "correcta": false
+    },
+    {
+     "texto": "122",
+     "correcta": false
+    },
+    {
+     "texto": "561",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La anulación suele ser el número siguiente: 102 anula 101."
+  },
+  {
+   "pregunta": "¿Qué clase traslada stock entre almacenes del mismo centro en un paso?",
+   "opciones": [
+    {
+     "texto": "311",
+     "correcta": true
+    },
+    {
+     "texto": "301",
+     "correcta": false
+    },
+    {
+     "texto": "601",
+     "correcta": false
+    },
+    {
+     "texto": "321",
+     "correcta": false
+    }
+   ],
+   "explicacion": "311 es almacén a almacén; 301 es centro a centro."
+  },
+  {
+   "pregunta": "¿Qué crea un movimiento que cambia el valor del inventario? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Un documento de material",
+     "correcta": true
+    },
+    {
+     "texto": "Un documento contable",
+     "correcta": true
+    },
+    {
+     "texto": "Un pedido de compra",
+     "correcta": false
+    },
+    {
+     "texto": "Un socio comercial",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Siempre hay documento de material; si cambia el valor, también documento contable."
+  },
+  {
+   "pregunta": "¿Qué fecha define el periodo contable del movimiento?",
+   "opciones": [
+    {
+     "texto": "La fecha de contabilización",
+     "correcta": true
+    },
+    {
+     "texto": "La fecha de documento",
+     "correcta": false
+    },
+    {
+     "texto": "La fecha de creación del material",
+     "correcta": false
+    },
+    {
+     "texto": "La fecha de vencimiento",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La fecha de contabilización (posting date) determina el periodo."
+  }
+ ]
+}

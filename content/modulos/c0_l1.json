@@ -1,0 +1,205 @@
+{
+ "id": "c0_l1",
+ "paginas": [
+  {
+   "caso": "Distribuidora Cordillera promete entregar en 24 horas, pero la mitad de los pedidos sale tarde. Ventas culpa a la bodega, la bodega culpa a compras y compras culpa al proveedor. ¿Quién tiene la razón?",
+   "capas": {
+    "idea": "<p>La <strong>cadena de suministro</strong> es todo el recorrido de un producto: desde el proveedor de la materia prima hasta el cliente final, y de regreso cuando hay devoluciones.</p><p>Ningún eslabón trabaja solo. Si compras pide tarde, la bodega no tiene qué despachar; si la bodega no registra bien, ventas promete lo que no hay. Por eso el caso no tiene un solo culpable: es un problema de <strong>coordinación</strong>.</p>",
+    "detalle": "<p>Un modelo muy usado para describir la cadena es <strong>SCOR</strong> (Supply Chain Operations Reference). Organiza el trabajo en procesos:</p><ul><li><strong>Planear</strong>: equilibrar demanda y abastecimiento.</li><li><strong>Abastecer</strong>: comprar y recibir.</li><li><strong>Producir</strong>: transformar (si la empresa fabrica).</li><li><strong>Entregar</strong>: almacenar, alistar, despachar y transportar.</li><li><strong>Devolver</strong>: recibir devoluciones de clientes o devolver a proveedores.</li></ul><p>Las versiones recientes del modelo agregan <strong>Habilitar</strong>: las reglas, datos y sistemas que hacen posible todo lo anterior.</p>",
+    "sap": "<p>En SAP cada eslabón tiene su área: planificación de necesidades, compras e inventarios (<strong>MM</strong>), producción (<strong>PP</strong>), ventas y distribución (<strong>SD</strong>), bodega (<strong>EWM</strong> o el WM clásico) y transporte (<strong>TM</strong>).</p><p>La ventaja es que todas comparten la misma información: cuando la bodega registra una entrada, ventas ve el stock disponible en ese mismo momento.</p>"
+   },
+   "glosario": [
+    {
+     "es": "cadena de suministro",
+     "en": "supply chain"
+    },
+    {
+     "es": "abastecimiento",
+     "en": "sourcing"
+    },
+    {
+     "es": "devolución",
+     "en": "return"
+    }
+   ],
+   "puente": "Ya conoces los eslabones de la cadena. Aquí aprenderás cómo se registran en un sistema que usan miles de empresas en el mundo."
+  },
+  {
+   "capas": {
+    "idea": "<p>Por la cadena circulan tres flujos al mismo tiempo:</p><ul><li><strong>Materiales</strong>: lo físico, de proveedor a cliente.</li><li><strong>Información</strong>: pedidos, pronósticos, existencias. Va en ambos sentidos.</li><li><strong>Dinero</strong>: pagos del cliente hacia atrás, hasta el proveedor.</li></ul>",
+    "detalle": "<p>Cuando la información no fluye, aparece el <strong>efecto látigo</strong> (bullwhip effect): una pequeña variación en la demanda del cliente se convierte en cambios cada vez más grandes en los pedidos hacia atrás. Cada eslabón \"se protege\" pidiendo de más, y la cadena termina con exceso de inventario en unos puntos y faltantes en otros.</p><p>La cura es compartir información confiable y a tiempo: ventas reales, existencias reales, pedidos en curso.</p>",
+    "sap": "<p>Un ERP como SAP reduce el efecto látigo porque las áreas no se pasan datos en archivos sueltos: consultan los mismos registros. El pedido de un cliente, la existencia en bodega y la compra en curso están conectados.</p>"
+   },
+   "glosario": [
+    {
+     "es": "flujo de información",
+     "en": "information flow"
+    },
+    {
+     "es": "efecto látigo",
+     "en": "bullwhip effect"
+    }
+   ],
+   "error": {
+    "titulo": "pensar que la bodega solo \"guarda cosas\"",
+    "texto": "La bodega es un punto de control de la cadena: si sus registros fallan, fallan las promesas de ventas, las compras y la contabilidad. Un error de conteo se convierte en un pedido incumplido."
+   }
+  },
+  {
+   "capas": {
+    "idea": "<p>Una bodega hace seis cosas: <strong>recibir</strong>, <strong>almacenar</strong>, <strong>alistar</strong> (picking), <strong>empacar</strong>, <strong>despachar</strong> y <strong>controlar el inventario</strong>.</p>",
+    "detalle": "<p>Para saber si funciona bien se usan indicadores (KPI):</p><div class=\"tabla\"><table><thead><tr><th>Indicador</th><th>Qué mide</th></tr></thead><tbody><tr><td>Exactitud de inventario</td><td>Qué tanto coincide lo que dice el sistema con lo que hay físicamente.</td></tr><tr><td>OTIF</td><td>Pedidos entregados a tiempo y completos (On Time In Full).</td></tr><tr><td>Tasa de cumplimiento</td><td>Porcentaje de lo pedido que sí se pudo despachar (fill rate).</td></tr><tr><td>Rotación</td><td>Cuántas veces se renueva el inventario en un periodo.</td></tr><tr><td>Productividad</td><td>Líneas alistadas por hora, costo por pedido.</td></tr></tbody></table></div>",
+    "sap": "<p>SAP guarda cada movimiento con fecha, hora, usuario y documento. Por eso estos indicadores se pueden calcular con datos del sistema y no con conteos a mano.</p>"
+   },
+   "glosario": [
+    {
+     "es": "alistamiento",
+     "en": "picking"
+    },
+    {
+     "es": "recepción",
+     "en": "receiving"
+    },
+    {
+     "es": "despacho",
+     "en": "shipping"
+    },
+    {
+     "es": "exactitud de inventario",
+     "en": "inventory accuracy"
+    }
+   ],
+   "puente": "Seguramente ya calculaste rotación o llevaste un kárdex. En SAP esos mismos conceptos salen de los documentos que registra cada movimiento."
+  },
+  {
+   "capas": {
+    "idea": "<p>Las empresas tienen inventario para responder rápido a la demanda y protegerse de imprevistos. Pero el inventario cuesta: ocupa espacio, inmoviliza dinero y puede vencerse o dañarse.</p>",
+    "detalle": "<p>Una herramienta clásica para decidir dónde poner más atención es la <strong>clasificación ABC</strong> (basada en el principio de Pareto):</p><ul><li><strong>A</strong>: pocos productos que concentran la mayor parte del valor (a menudo cerca del 80 %). Control estricto y conteos frecuentes.</li><li><strong>B</strong>: valor intermedio.</li><li><strong>C</strong>: muchos productos de poco valor. Control más simple.</li></ul><p>También se distingue el <strong>stock de seguridad</strong> (colchón contra imprevistos) del <strong>stock de ciclo</strong> (el que se consume entre una compra y la siguiente).</p>",
+    "sap": "<p>En el maestro de materiales de SAP existe el campo <strong>indicador ABC</strong> (vista de planificación MRP 1). Se usa, por ejemplo, para definir con qué frecuencia contar cada producto en el inventario cíclico.</p>"
+   },
+   "glosario": [
+    {
+     "es": "stock de seguridad",
+     "en": "safety stock"
+    },
+    {
+     "es": "clasificación ABC",
+     "en": "ABC analysis"
+    }
+   ]
+  }
+ ],
+ "resumen": "La cadena de suministro conecta proveedores, empresa y clientes con flujos de materiales, información y dinero. La bodega recibe, almacena, alista, empaca, despacha y controla, y se mide con indicadores como exactitud de inventario, OTIF y rotación. La clasificación ABC ayuda a enfocar el control.",
+ "examen": [
+  {
+   "pregunta": "¿Qué procesos describe el modelo SCOR?",
+   "opciones": [
+    {
+     "texto": "Planear, abastecer, producir, entregar y devolver",
+     "correcta": true
+    },
+    {
+     "texto": "Comprar, vender, facturar, cobrar y pagar",
+     "correcta": false
+    },
+    {
+     "texto": "Recibir, almacenar, contar, empacar y cerrar",
+     "correcta": false
+    },
+    {
+     "texto": "Pronosticar, costear, auditar, pagar y cobrar",
+     "correcta": false
+    }
+   ],
+   "explicacion": "SCOR organiza la cadena en planear, abastecer, producir, entregar y devolver; las versiones recientes agregan habilitar."
+  },
+  {
+   "pregunta": "¿Qué causa principalmente el efecto látigo?",
+   "opciones": [
+    {
+     "texto": "Que cada eslabón decida sin información compartida",
+     "correcta": true
+    },
+    {
+     "texto": "Que los camiones lleguen tarde a la bodega",
+     "correcta": false
+    },
+    {
+     "texto": "Que el inventario se cuente una sola vez al año",
+     "correcta": false
+    },
+    {
+     "texto": "Que los clientes paguen con varios medios",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Sin información compartida, cada eslabón pide de más para protegerse y las variaciones crecen hacia atrás en la cadena."
+  },
+  {
+   "pregunta": "¿Qué mide el indicador OTIF?",
+   "opciones": [
+    {
+     "texto": "Pedidos entregados a tiempo y completos",
+     "correcta": true
+    },
+    {
+     "texto": "Pedidos facturados en el mismo día",
+     "correcta": false
+    },
+    {
+     "texto": "Productos con fecha de vencimiento vigente",
+     "correcta": false
+    },
+    {
+     "texto": "Ubicaciones ocupadas sobre ubicaciones totales",
+     "correcta": false
+    }
+   ],
+   "explicacion": "OTIF significa On Time In Full: a tiempo y completo."
+  },
+  {
+   "pregunta": "En la clasificación ABC, ¿qué caracteriza a los productos A? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Concentran la mayor parte del valor",
+     "correcta": true
+    },
+    {
+     "texto": "Requieren control y conteos más frecuentes",
+     "correcta": true
+    },
+    {
+     "texto": "Son la mayoría de los productos de la bodega",
+     "correcta": false
+    },
+    {
+     "texto": "Se pueden contar una vez cada varios años",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Los productos A son pocos pero valiosos; por eso se controlan con más rigor."
+  },
+  {
+   "pregunta": "¿Cuál de estas es una función de la bodega?",
+   "opciones": [
+    {
+     "texto": "Alistar los pedidos (picking)",
+     "correcta": true
+    },
+    {
+     "texto": "Definir el precio de venta",
+     "correcta": false
+    },
+    {
+     "texto": "Aprobar el crédito del cliente",
+     "correcta": false
+    },
+    {
+     "texto": "Calcular la nómina del personal",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Las funciones de la bodega son recibir, almacenar, alistar, empacar, despachar y controlar el inventario."
+  }
+ ]
+}

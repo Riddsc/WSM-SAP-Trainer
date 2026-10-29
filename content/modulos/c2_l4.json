@@ -1,0 +1,140 @@
+{
+ "id": "c2_l4",
+ "paginas": [
+  {
+   "caso": "Auditoría pregunta: \"¿Cuánto café había el 31 de marzo y quién movió las 48 bolsas a despachos?\". Tienes diez minutos para responder.",
+   "capas": {
+    "idea": "<p>Cada pregunta tiene su reporte:</p><div class=\"tabla\"><table><thead><tr><th>Pregunta</th><th>Transacción</th></tr></thead><tbody><tr><td>¿Cuánto hay hoy de un material, por centro, almacén y tipo de stock?</td><td>MMBE</td></tr><tr><td>¿Cuánto hay hoy de muchos materiales a la vez?</td><td>MB52</td></tr><tr><td>¿Qué movimientos hubo y quién los hizo?</td><td>MB51</td></tr><tr><td>¿Cuánto había en una fecha pasada?</td><td>MB5B</td></tr></tbody></table></div>",
+    "detalle": "<p>En el caso: el stock al 31 de marzo sale de <code>MB5B</code> y el responsable del traslado sale de <code>MB51</code>, filtrando por la clase 311 y el material: el documento muestra el usuario y la fecha.</p>",
+    "sap": "<p>Para ver un documento puntual se usa <code>MIGO</code> con la acción A04 Visualizar e indicando el número del documento de material.</p>"
+   },
+   "glosario": [
+    {
+     "es": "resumen de stock",
+     "en": "stock overview"
+    },
+    {
+     "es": "lista de documentos de material",
+     "en": "material document list"
+    },
+    {
+     "es": "stock a una fecha",
+     "en": "stock on posting date"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>Consejos para usar bien los reportes:</p><ul><li>Delimita siempre por centro y, si puedes, por almacén y material: los reportes sin filtros tardan.</li><li>Guarda <strong>variantes</strong> con tus filtros de cada día.</li><li>Exporta a hoja de cálculo solo cuando necesites cruzar datos.</li></ul>",
+    "detalle": "<p><code>MB52</code> muestra el stock valorado por material y almacén, ideal para revisar todo un grupo de artículos. <code>MB51</code> permite filtrar por clase de movimiento, fechas y usuario: es la herramienta para investigar diferencias.</p><p>En Fiori existen apps equivalentes de stock por material y por varios materiales, y de resumen de documentos de material.</p>",
+    "sap": "<p>Una rutina diaria típica de un analista: revisar con <code>MB52</code> el stock de los productos A, investigar en <code>MB51</code> los movimientos raros y resolver con bodega antes del cierre.</p>"
+   },
+   "glosario": [
+    {
+     "es": "analista de inventarios",
+     "en": "inventory analyst"
+    },
+    {
+     "es": "diferencia",
+     "en": "discrepancy"
+    }
+   ],
+   "puente": "Lo que antes hacías revisando el kárdex línea por línea, aquí lo haces con un filtro en MB51.",
+   "error": {
+    "titulo": "confiar solo en el stock de hoy",
+    "texto": "Para conciliar con contabilidad o con auditoría muchas veces se necesita el stock a una fecha de cierre. Ese dato sale de MB5B, no de MMBE."
+   }
+  }
+ ],
+ "resumen": "MMBE: stock actual de un material por centro, almacén y tipo. MB52: stock actual de muchos materiales. MB51: lista de movimientos (quién, cuándo, qué clase). MB5B: stock a una fecha pasada. MIGO A04 visualiza un documento. Usa filtros y variantes.",
+ "examen": [
+  {
+   "pregunta": "¿Qué transacción muestra el stock que había en una fecha pasada?",
+   "opciones": [
+    {
+     "texto": "MB5B",
+     "correcta": true
+    },
+    {
+     "texto": "MMBE",
+     "correcta": false
+    },
+    {
+     "texto": "MB52",
+     "correcta": false
+    },
+    {
+     "texto": "MIGO",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MB5B calcula el stock a una fecha de contabilización."
+  },
+  {
+   "pregunta": "¿Con qué reporte averiguas quién hizo un movimiento?",
+   "opciones": [
+    {
+     "texto": "MB51",
+     "correcta": true
+    },
+    {
+     "texto": "MB52",
+     "correcta": false
+    },
+    {
+     "texto": "MMBE",
+     "correcta": false
+    },
+    {
+     "texto": "MM03",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MB51 lista los documentos de material con usuario, fecha y clase."
+  },
+  {
+   "pregunta": "¿Qué reporte usarías para ver el stock de todo un grupo de artículos a la vez?",
+   "opciones": [
+    {
+     "texto": "MB52",
+     "correcta": true
+    },
+    {
+     "texto": "MMBE",
+     "correcta": false
+    },
+    {
+     "texto": "MB5B",
+     "correcta": false
+    },
+    {
+     "texto": "ME23N",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MB52 lista el stock de varios materiales; MMBE es por material."
+  },
+  {
+   "pregunta": "¿Qué buenas prácticas aplican a los reportes? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Delimitar por centro y material",
+     "correcta": true
+    },
+    {
+     "texto": "Guardar variantes con los filtros diarios",
+     "correcta": true
+    },
+    {
+     "texto": "Ejecutar siempre sin filtros",
+     "correcta": false
+    },
+    {
+     "texto": "Exportar todo antes de mirarlo",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Filtrar y guardar variantes hace los reportes rápidos y repetibles."
+  }
+ ]
+}

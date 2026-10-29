@@ -56,7 +56,14 @@
       "horas": 15,
       "fase": 2,
       "temas": "Cadena de suministro, qué es un ERP, S/4HANA, navegar SAP GUI y Fiori, inglés técnico logístico I",
-      "modulos": []
+      "modulos": [
+        "c0_l1",
+        "c0_l2",
+        "c0_l3",
+        "c0_lab1",
+        "c0_l4",
+        "c0_ex"
+      ]
     },
     {
       "id": "c1",
@@ -68,10 +75,14 @@
       "fase": 2,
       "temas": "Mandante, sociedad, centro y almacén; maestro de materiales; unidades de medida",
       "modulos": [
-        "s1_m1",
-        "s1_l1",
-        "s1_m2",
-        "s1_l2"
+        "c1_l1",
+        "c1_lab1",
+        "c1_l2",
+        "c1_lab2",
+        "c1_l3",
+        "c1_l4",
+        "c1_lab3",
+        "c1_ex"
       ]
     },
     {
@@ -83,7 +94,17 @@
       "horas": 25,
       "fase": 2,
       "temas": "Tipos de movimiento, entradas y salidas de mercancía, traslados, consulta de stock, compras y entregas básicas",
-      "modulos": []
+      "modulos": [
+        "c2_l1",
+        "c2_l2",
+        "c2_lab1",
+        "c2_l3",
+        "c2_lab2",
+        "c2_l4",
+        "c2_l5",
+        "c2_lab3",
+        "c2_ex"
+      ]
     },
     {
       "id": "c3",
@@ -211,40 +232,211 @@
   ],
   "modulos": [
     {
-      "id": "s1_m1",
-      "semestre": 1,
+      "id": "c0_l1",
+      "semestre": 0,
       "tipo": "theory",
-      "titulo": "1.1 Arquitectura Empresarial Definitiva",
-      "duracion": "15 Horas • Certificación",
-      "descripcion": "Inmersión absoluta en el mapeo legal, financiero y operativo de SAP S/4HANA. 15 capítulos de teoría y 50 preguntas de certificación.",
+      "titulo": "La cadena de suministro y el lugar de la bodega",
+      "duracion": "3 h",
+      "descripcion": "Cómo fluyen materiales, información y dinero, qué hace una bodega y cómo se mide.",
       "requisito": null
     },
     {
-      "id": "s1_l1",
-      "semestre": 1,
-      "tipo": "lab",
-      "titulo": "1.2 Lab Multi-Paso: Arquitectura (SPRO)",
-      "duracion": "1 Hora",
-      "descripcion": "Crear un Almacén Lógico (OX09).",
-      "requisito": "s1_m1"
+      "id": "c0_l2",
+      "semestre": 0,
+      "tipo": "theory",
+      "titulo": "Qué es un ERP y qué trae SAP S/4HANA",
+      "duracion": "3 h",
+      "descripcion": "Por qué las empresas usan un sistema integrado y qué cambió con S/4HANA.",
+      "requisito": "c0_l1"
     },
     {
-      "id": "s1_m2",
+      "id": "c0_l3",
+      "semestre": 0,
+      "tipo": "theory",
+      "titulo": "Navegar en SAP GUI y en Fiori",
+      "duracion": "3 h",
+      "descripcion": "Entrar al sistema, usar transacciones, atajos de teclado y el launchpad de Fiori.",
+      "requisito": "c0_l2"
+    },
+    {
+      "id": "c0_lab1",
+      "semestre": 0,
+      "tipo": "lab",
+      "titulo": "Primer recorrido por SAP",
+      "duracion": "1 h",
+      "descripcion": "Tu primer día en Distribuidora Cordillera: revisa el café molido CAFE-500 y su stock en el centro 1010.",
+      "requisito": "c0_l3"
+    },
+    {
+      "id": "c0_l4",
+      "semestre": 0,
+      "tipo": "theory",
+      "titulo": "Inglés técnico logístico I",
+      "duracion": "3 h",
+      "descripcion": "El vocabulario en inglés que vas a ver en bodegas, en SAP y en entrevistas de trabajo.",
+      "requisito": "c0_lab1"
+    },
+    {
+      "id": "c0_ex",
+      "semestre": 0,
+      "tipo": "exam",
+      "titulo": "Examen del ciclo 0: De la logística a SAP",
+      "duracion": "1 h",
+      "descripcion": "Cadena de suministro, ERP y S/4HANA, navegación en SAP e inglés técnico.",
+      "requisito": "c0_l4"
+    },
+    {
+      "id": "c1_l1",
       "semestre": 1,
       "tipo": "theory",
-      "titulo": "1.3 Material Master Definitivo (El ADN del Inventario)",
-      "duracion": "18 Horas • Certificación Avanzada",
-      "descripcion": "Disección absoluta de las vistas logísticas del Material Master (MARA, MARC, MARD). 10 capítulos teóricos y un examen bloqueante de 40 preguntas.",
-      "requisito": "s1_l1"
+      "titulo": "La estructura organizacional en SAP",
+      "duracion": "4 h",
+      "descripcion": "Mandante, sociedad, centro, almacén y las unidades de compras, ventas y bodega.",
+      "requisito": "c0_ex"
     },
     {
-      "id": "s1_l2",
+      "id": "c1_lab1",
       "semestre": 1,
       "tipo": "lab",
-      "titulo": "1.4 Lab Multi-Paso: Alta de Producto Terminado",
-      "duracion": "1 Hora 15 Min",
-      "descripcion": "Crea un Producto Terminado (FERT) y define sus métricas críticas de almacén.",
-      "requisito": "s1_m2"
+      "titulo": "Configurar la estructura de la distribuidora",
+      "duracion": "1 h",
+      "descripcion": "Asigna el nuevo centro 1010 a la sociedad 1000 y crea su almacén de despachos 0002.",
+      "requisito": "c1_l1"
+    },
+    {
+      "id": "c1_l2",
+      "semestre": 1,
+      "tipo": "theory",
+      "titulo": "El maestro de materiales",
+      "duracion": "5 h",
+      "descripcion": "Tipos de material, vistas, niveles organizativos y valoración.",
+      "requisito": "c1_lab1"
+    },
+    {
+      "id": "c1_lab2",
+      "semestre": 1,
+      "tipo": "lab",
+      "titulo": "Crear un material de mercadería (MM01)",
+      "duracion": "1 h 30 min",
+      "descripcion": "Crea la bolsa de café molido de 1 kg (CAFE-1000) para venderla desde el centro 1010.",
+      "requisito": "c1_l2"
+    },
+    {
+      "id": "c1_l3",
+      "semestre": 1,
+      "tipo": "theory",
+      "titulo": "Unidades de medida",
+      "duracion": "3 h",
+      "descripcion": "Unidad base, unidades alternativas, conversiones y por qué importan en bodega.",
+      "requisito": "c1_lab2"
+    },
+    {
+      "id": "c1_l4",
+      "semestre": 1,
+      "tipo": "theory",
+      "titulo": "Proveedores, clientes y el socio comercial",
+      "duracion": "3 h",
+      "descripcion": "Cómo maneja S/4HANA a proveedores y clientes con el socio comercial (BP).",
+      "requisito": "c1_l3"
+    },
+    {
+      "id": "c1_lab3",
+      "semestre": 1,
+      "tipo": "lab",
+      "titulo": "Revisar el material antes de comprarlo",
+      "duracion": "45 min",
+      "descripcion": "Antes de la primera compra, verifica los datos del CAFE-1000 y confirma que aún no tiene stock.",
+      "requisito": "c1_l4"
+    },
+    {
+      "id": "c1_ex",
+      "semestre": 1,
+      "tipo": "exam",
+      "titulo": "Examen del ciclo 1: Estructura y materiales",
+      "duracion": "1 h 15 min",
+      "descripcion": "Estructura organizacional, maestro de materiales, unidades de medida y socios comerciales.",
+      "requisito": "c1_lab3"
+    },
+    {
+      "id": "c2_l1",
+      "semestre": 2,
+      "tipo": "theory",
+      "titulo": "Tipos de stock y clases de movimiento",
+      "duracion": "4 h",
+      "descripcion": "En qué estado puede estar el stock y cómo cada movimiento lo cambia.",
+      "requisito": "c1_ex"
+    },
+    {
+      "id": "c2_l2",
+      "semestre": 2,
+      "tipo": "theory",
+      "titulo": "Compras y entrada de mercancía",
+      "duracion": "5 h",
+      "descripcion": "Del pedido de compra a la entrada en bodega: el proceso de compra a pago.",
+      "requisito": "c2_l1"
+    },
+    {
+      "id": "c2_lab1",
+      "semestre": 2,
+      "tipo": "lab",
+      "titulo": "Recibir el pedido del proveedor (MIGO 101)",
+      "duracion": "1 h 30 min",
+      "descripcion": "El proveedor trae 20 cajas de CAFE-1000 del pedido 4500000010. Regístralas y confirma el stock.",
+      "requisito": "c2_l2"
+    },
+    {
+      "id": "c2_l3",
+      "semestre": 2,
+      "tipo": "theory",
+      "titulo": "Salidas de mercancía y traslados",
+      "duracion": "4 h",
+      "descripcion": "Consumos, bajas, devoluciones y movimientos entre almacenes, centros y tipos de stock.",
+      "requisito": "c2_lab1"
+    },
+    {
+      "id": "c2_lab2",
+      "semestre": 2,
+      "tipo": "lab",
+      "titulo": "Trasladar stock a la zona de despachos (311)",
+      "duracion": "1 h",
+      "descripcion": "Mueve 48 bolsas de CAFE-1000 de la bodega principal (0001) a la zona de despachos (0002).",
+      "requisito": "c2_l3"
+    },
+    {
+      "id": "c2_l4",
+      "semestre": 2,
+      "tipo": "theory",
+      "titulo": "Consultar stock y documentos",
+      "duracion": "3 h",
+      "descripcion": "Los reportes que usa todos los días un analista de inventarios.",
+      "requisito": "c2_lab2"
+    },
+    {
+      "id": "c2_l5",
+      "semestre": 2,
+      "tipo": "theory",
+      "titulo": "Entregas de venta e inventario físico",
+      "duracion": "5 h",
+      "descripcion": "El despacho básico a clientes y cómo se cuenta y se ajusta el inventario.",
+      "requisito": "c2_l4"
+    },
+    {
+      "id": "c2_lab3",
+      "semestre": 2,
+      "tipo": "lab",
+      "titulo": "Conteo de inventario físico",
+      "duracion": "1 h 30 min",
+      "descripcion": "Cuenta el CAFE-1000 en la bodega principal, registra el conteo y contabiliza la diferencia.",
+      "requisito": "c2_l5"
+    },
+    {
+      "id": "c2_ex",
+      "semestre": 2,
+      "tipo": "exam",
+      "titulo": "Examen del ciclo 2: Gestión de inventarios",
+      "duracion": "1 h 15 min",
+      "descripcion": "Tipos de stock, clases de movimiento, compras, salidas, traslados, reportes, entregas e inventario físico.",
+      "requisito": "c2_lab3"
     },
     {
       "id": "s2_m1",
@@ -253,7 +445,8 @@
       "titulo": "2.1 Ingeniería Inbound: ASN, MIGO y Yard Management",
       "duracion": "20 Horas • Especialización Inbound",
       "descripcion": "Domina el proceso de recepción de clase mundial. Diferencias entre MIGO y VL31N, gestión de patios (Yard Management), y unidades de manipulación (HUM).",
-      "requisito": "s1_l2"
+      "requisito": "c2_ex",
+      "requisitoLegado": "s1_l2"
     },
     {
       "id": "s2_l1",

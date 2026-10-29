@@ -1,0 +1,446 @@
+{
+ "id": "c0_ex",
+ "banco": [
+  {
+   "pregunta": "¿Cuál de estos procesos NO forma parte del modelo SCOR?",
+   "opciones": [
+    {
+     "texto": "Auditar",
+     "correcta": true
+    },
+    {
+     "texto": "Abastecer",
+     "correcta": false
+    },
+    {
+     "texto": "Entregar",
+     "correcta": false
+    },
+    {
+     "texto": "Devolver",
+     "correcta": false
+    }
+   ],
+   "explicacion": "SCOR incluye planear, abastecer, producir, entregar, devolver y habilitar; auditar no es uno de sus procesos."
+  },
+  {
+   "pregunta": "¿Qué tres flujos recorren la cadena de suministro?",
+   "opciones": [
+    {
+     "texto": "Materiales, información y dinero",
+     "correcta": true
+    },
+    {
+     "texto": "Materiales, personas y vehículos",
+     "correcta": false
+    },
+    {
+     "texto": "Información, energía y agua",
+     "correcta": false
+    },
+    {
+     "texto": "Dinero, impuestos y personal",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Los tres flujos de la cadena son el físico, el de información y el financiero."
+  },
+  {
+   "pregunta": "Un cliente sube su pedido un 10 % y la fábrica termina produciendo un 40 % más. ¿Cómo se llama el fenómeno?",
+   "opciones": [
+    {
+     "texto": "Efecto látigo",
+     "correcta": true
+    },
+    {
+     "texto": "Rotación de inventario",
+     "correcta": false
+    },
+    {
+     "texto": "Clasificación ABC",
+     "correcta": false
+    },
+    {
+     "texto": "Stock de seguridad",
+     "correcta": false
+    }
+   ],
+   "explicacion": "El efecto látigo amplifica las variaciones de demanda hacia atrás en la cadena."
+  },
+  {
+   "pregunta": "¿Qué indicador compara lo que dice el sistema con lo que hay físicamente?",
+   "opciones": [
+    {
+     "texto": "Exactitud de inventario",
+     "correcta": true
+    },
+    {
+     "texto": "OTIF",
+     "correcta": false
+    },
+    {
+     "texto": "Rotación",
+     "correcta": false
+    },
+    {
+     "texto": "Costo por pedido",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La exactitud de inventario mide la coincidencia entre registros y existencias reales."
+  },
+  {
+   "pregunta": "¿Qué productos se cuentan con mayor frecuencia en un esquema ABC?",
+   "opciones": [
+    {
+     "texto": "Los productos A",
+     "correcta": true
+    },
+    {
+     "texto": "Los productos C",
+     "correcta": false
+    },
+    {
+     "texto": "Los productos B",
+     "correcta": false
+    },
+    {
+     "texto": "Todos con la misma frecuencia",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Los A concentran el valor y se controlan con más rigor."
+  },
+  {
+   "pregunta": "¿Dónde se registra el indicador ABC en el maestro de materiales?",
+   "opciones": [
+    {
+     "texto": "En la vista de planificación MRP 1",
+     "correcta": true
+    },
+    {
+     "texto": "En la vista de ventas",
+     "correcta": false
+    },
+    {
+     "texto": "En la vista de contabilidad",
+     "correcta": false
+    },
+    {
+     "texto": "En los datos básicos 2",
+     "correcta": false
+    }
+   ],
+   "explicacion": "El indicador ABC está en la vista MRP 1, a nivel de centro."
+  },
+  {
+   "pregunta": "¿Qué ventajas trae un ERP integrado? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Todas las áreas consultan los mismos datos",
+     "correcta": true
+    },
+    {
+     "texto": "Un movimiento actualiza cantidades y valores a la vez",
+     "correcta": true
+    },
+    {
+     "texto": "Cada área conserva su propio archivo",
+     "correcta": false
+    },
+    {
+     "texto": "Los datos se pasan por correo al cierre de mes",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La integración evita copias de datos y hace que cada registro afecte a todas las áreas."
+  },
+  {
+   "pregunta": "¿Qué área de SAP se encarga de compras e inventarios?",
+   "opciones": [
+    {
+     "texto": "MM",
+     "correcta": true
+    },
+    {
+     "texto": "SD",
+     "correcta": false
+    },
+    {
+     "texto": "FI",
+     "correcta": false
+    },
+    {
+     "texto": "PP",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MM es Materials Management: compras e inventarios."
+  },
+  {
+   "pregunta": "¿Sobre qué base de datos funciona SAP S/4HANA?",
+   "opciones": [
+    {
+     "texto": "SAP HANA",
+     "correcta": true
+    },
+    {
+     "texto": "Una hoja de cálculo central",
+     "correcta": false
+    },
+    {
+     "texto": "Una base de datos en papel",
+     "correcta": false
+    },
+    {
+     "texto": "Un servidor de correo",
+     "correcta": false
+    }
+   ],
+   "explicacion": "S/4HANA funciona exclusivamente sobre SAP HANA, una base de datos en memoria."
+  },
+  {
+   "pregunta": "¿Qué tablas antiguas reemplazó MATDOC en S/4HANA? Elige 2.",
+   "opciones": [
+    {
+     "texto": "MKPF",
+     "correcta": true
+    },
+    {
+     "texto": "MSEG",
+     "correcta": true
+    },
+    {
+     "texto": "MARA",
+     "correcta": false
+    },
+    {
+     "texto": "T001",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MATDOC unificó la cabecera (MKPF) y las posiciones (MSEG) de los documentos de material."
+  },
+  {
+   "pregunta": "¿Cuál es un dato transaccional?",
+   "opciones": [
+    {
+     "texto": "Una entrada de mercancía",
+     "correcta": true
+    },
+    {
+     "texto": "Un proveedor",
+     "correcta": false
+    },
+    {
+     "texto": "Un material",
+     "correcta": false
+    },
+    {
+     "texto": "Un centro",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Las entradas, pedidos y despachos son transacciones; materiales y proveedores son datos maestros; el centro es configuración."
+  },
+  {
+   "pregunta": "¿En qué ambiente NO se debe configurar directamente?",
+   "opciones": [
+    {
+     "texto": "PRD",
+     "correcta": true
+    },
+    {
+     "texto": "DEV",
+     "correcta": false
+    },
+    {
+     "texto": "Ninguno: se configura en todos",
+     "correcta": false
+    },
+    {
+     "texto": "QAS y DEV por igual",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La configuración se hace en DEV, se prueba en QAS y llega a PRD por órdenes de transporte."
+  },
+  {
+   "pregunta": "¿Qué es un mandante en SAP?",
+   "opciones": [
+    {
+     "texto": "Un conjunto de datos independiente dentro del sistema",
+     "correcta": true
+    },
+    {
+     "texto": "El jefe del área de bodega",
+     "correcta": false
+    },
+    {
+     "texto": "Un tipo de material",
+     "correcta": false
+    },
+    {
+     "texto": "Una transacción de consulta",
+     "correcta": false
+    }
+   ],
+   "explicacion": "El mandante (client) separa los datos; se identifica con tres dígitos."
+  },
+  {
+   "pregunta": "¿Qué perfil prueba los cambios y capacita a los demás usuarios?",
+   "opciones": [
+    {
+     "texto": "El usuario clave",
+     "correcta": true
+    },
+    {
+     "texto": "El usuario final",
+     "correcta": false
+    },
+    {
+     "texto": "El administrador Basis",
+     "correcta": false
+    },
+    {
+     "texto": "El programador ABAP",
+     "correcta": false
+    }
+   ],
+   "explicacion": "El usuario clave domina el proceso, prueba en QAS y capacita."
+  },
+  {
+   "pregunta": "¿Qué hace el comando /o seguido de un código de transacción?",
+   "opciones": [
+    {
+     "texto": "Abre la transacción en una sesión nueva",
+     "correcta": true
+    },
+    {
+     "texto": "Cierra todas las sesiones",
+     "correcta": false
+    },
+    {
+     "texto": "Guarda y sale de SAP",
+     "correcta": false
+    },
+    {
+     "texto": "Abre la transacción en la misma ventana",
+     "correcta": false
+    }
+   ],
+   "explicacion": "/o abre una nueva sesión; /n reemplaza la transacción actual."
+  },
+  {
+   "pregunta": "¿Qué tecla da la explicación del campo donde está el cursor?",
+   "opciones": [
+    {
+     "texto": "F1",
+     "correcta": true
+    },
+    {
+     "texto": "F4",
+     "correcta": false
+    },
+    {
+     "texto": "F12",
+     "correcta": false
+    },
+    {
+     "texto": "F8",
+     "correcta": false
+    }
+   ],
+   "explicacion": "F1 es la ayuda del campo; F4 muestra los valores posibles."
+  },
+  {
+   "pregunta": "¿Qué confirma que un movimiento quedó registrado en SAP?",
+   "opciones": [
+    {
+     "texto": "Un mensaje de éxito con número de documento",
+     "correcta": true
+    },
+    {
+     "texto": "Que la pantalla se cierre",
+     "correcta": false
+    },
+    {
+     "texto": "Un mensaje de advertencia",
+     "correcta": false
+    },
+    {
+     "texto": "Que el campo quede vacío",
+     "correcta": false
+    }
+   ],
+   "explicacion": "El número de documento en la barra de estado es la prueba del registro."
+  },
+  {
+   "pregunta": "¿Cómo se dice \"alistamiento\" en inglés?",
+   "opciones": [
+    {
+     "texto": "Picking",
+     "correcta": true
+    },
+    {
+     "texto": "Packing",
+     "correcta": false
+    },
+    {
+     "texto": "Shipping",
+     "correcta": false
+    },
+    {
+     "texto": "Receiving",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Picking es alistar; packing es empacar; shipping es despachar; receiving es recibir."
+  },
+  {
+   "pregunta": "¿Qué significa la sigla GR?",
+   "opciones": [
+    {
+     "texto": "Goods receipt: entrada de mercancía",
+     "correcta": true
+    },
+    {
+     "texto": "General report: reporte general",
+     "correcta": false
+    },
+    {
+     "texto": "Goods return: devolución",
+     "correcta": false
+    },
+    {
+     "texto": "Gross revenue: ingreso bruto",
+     "correcta": false
+    }
+   ],
+   "explicacion": "GR es goods receipt; GI es goods issue."
+  },
+  {
+   "pregunta": "¿Cuáles son documentos de compras o ventas? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Purchase order",
+     "correcta": true
+    },
+    {
+     "texto": "Sales order",
+     "correcta": true
+    },
+    {
+     "texto": "Forklift",
+     "correcta": false
+    },
+    {
+     "texto": "Storage bin",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Purchase order y sales order son documentos; forklift es un equipo y storage bin una ubicación."
+  }
+ ],
+ "preguntasPorIntento": 12
+}

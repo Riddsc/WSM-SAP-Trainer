@@ -1,0 +1,208 @@
+{
+ "id": "c0_l2",
+ "paginas": [
+  {
+   "caso": "En la distribuidora, compras lleva un archivo, bodega otro y contabilidad un tercero. A fin de mes, el inventario de bodega no cuadra con el de contabilidad y nadie sabe cuál está bien.",
+   "capas": {
+    "idea": "<p>Un <strong>ERP</strong> (Enterprise Resource Planning) es un sistema que integra los procesos de la empresa en una sola base de datos. Lo que registra un área lo ven todas las demás, sin copiar datos.</p><p>Con un ERP, el problema del caso desaparece: el inventario de bodega y el de contabilidad salen del mismo registro.</p>",
+    "detalle": "<p>SAP organiza sus funciones en áreas o módulos:</p><div class=\"tabla\"><table><thead><tr><th>Sigla</th><th>Área</th></tr></thead><tbody><tr><td>FI</td><td>Contabilidad financiera</td></tr><tr><td>CO</td><td>Controlling (costos)</td></tr><tr><td>MM</td><td>Compras e inventarios</td></tr><tr><td>SD</td><td>Ventas y distribución</td></tr><tr><td>PP</td><td>Planificación de la producción</td></tr><tr><td>QM</td><td>Gestión de calidad</td></tr><tr><td>PM</td><td>Mantenimiento</td></tr><tr><td>EWM</td><td>Gestión extendida de bodegas</td></tr><tr><td>TM</td><td>Gestión de transporte</td></tr></tbody></table></div>",
+    "sap": "<p>Un ejemplo de integración: cuando la bodega registra una <strong>entrada de mercancía</strong> por un pedido de compra, SAP crea un <strong>documento de material</strong> (cantidad) y, al mismo tiempo, un <strong>documento contable</strong> (valor). Nadie tiene que avisarle a contabilidad.</p>"
+   },
+   "glosario": [
+    {
+     "es": "planificación de recursos empresariales",
+     "en": "enterprise resource planning"
+    },
+    {
+     "es": "entrada de mercancía",
+     "en": "goods receipt"
+    },
+    {
+     "es": "documento de material",
+     "en": "material document"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p><strong>SAP S/4HANA</strong> es la generación actual del ERP de SAP. Funciona sobre la base de datos <strong>SAP HANA</strong>, que trabaja en memoria y permite consultar grandes volúmenes de datos casi al instante.</p>",
+    "detalle": "<p>Cambios importantes frente a la versión anterior (SAP ECC):</p><ul><li><strong>Modelo de datos simplificado</strong>: menos tablas duplicadas. Por ejemplo, los documentos de material se guardan en la tabla <code>MATDOC</code>, que reemplaza a las antiguas <code>MKPF</code> y <code>MSEG</code>.</li><li><strong>Diario universal</strong> en finanzas: contabilidad y costos en una sola tabla (<code>ACDOCA</code>).</li><li><strong>Socio comercial</strong> (Business Partner): un solo maestro para clientes y proveedores.</li><li><strong>SAP Fiori</strong>: una interfaz moderna en el navegador, además de la clásica SAP GUI.</li><li><strong>EWM embebido</strong>: la gestión de bodegas puede ir dentro del mismo sistema.</li></ul>",
+    "sap": "<p>Para tu carrera esto importa: SAP anunció el fin del mantenimiento estándar de SAP ECC a finales de 2027 (con mantenimiento extendido opcional hasta 2030). Muchas empresas están migrando, y necesitan personas que conozcan los procesos en S/4HANA.</p>"
+   },
+   "glosario": [
+    {
+     "es": "base de datos en memoria",
+     "en": "in-memory database"
+    },
+    {
+     "es": "socio comercial",
+     "en": "business partner"
+    },
+    {
+     "es": "migración",
+     "en": "migration"
+    }
+   ],
+   "error": {
+    "titulo": "creer que S/4HANA es \"solo una versión nueva\"",
+    "texto": "S/4HANA cambia tablas, transacciones y formas de trabajo. Un usuario que solo conoce ECC debe actualizarse; por ejemplo, proveedores y clientes ya no se crean por separado, sino como socios comerciales."
+   }
+  },
+  {
+   "capas": {
+    "idea": "<p>En SAP hay tres tipos de información:</p><ul><li><strong>Datos maestros</strong>: lo que casi no cambia (materiales, proveedores, clientes).</li><li><strong>Datos transaccionales</strong>: lo que pasa cada día (pedidos, entradas, despachos).</li><li><strong>Configuración</strong> (customizing): las reglas del sistema (estructura de la empresa, tipos de movimiento).</li></ul>",
+    "detalle": "<p>La configuración se hace en la guía de implementación (<code>SPRO</code>) y nunca directamente en producción. Las empresas tienen tres ambientes:</p><ul><li><strong>DEV</strong> (desarrollo): donde se configura.</li><li><strong>QAS</strong> (calidad): donde los usuarios clave prueban.</li><li><strong>PRD</strong> (producción): donde se trabaja de verdad.</li></ul><p>Los cambios viajan de un ambiente a otro en <strong>órdenes de transporte</strong>. Las de customizing llevan configuración; las de workbench llevan desarrollos de programación (ABAP).</p>",
+    "sap": "<p>Cada sistema tiene uno o varios <strong>mandantes</strong> (clientes, en inglés client), identificados con tres dígitos, por ejemplo 100. Un mandante es un conjunto de datos independiente: lo que creas en el mandante 100 no aparece en el 200.</p>"
+   },
+   "glosario": [
+    {
+     "es": "datos maestros",
+     "en": "master data"
+    },
+    {
+     "es": "configuración",
+     "en": "customizing"
+    },
+    {
+     "es": "orden de transporte",
+     "en": "transport request"
+    },
+    {
+     "es": "mandante",
+     "en": "client"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>Alrededor de SAP trabajan varios perfiles:</p><ul><li><strong>Usuario final</strong>: registra la operación diaria.</li><li><strong>Usuario clave</strong> (key user): domina el proceso, prueba cambios y capacita.</li><li><strong>Consultor funcional</strong>: diseña y configura los procesos (por ejemplo, EWM o MM).</li><li><strong>Consultor técnico</strong>: programa en ABAP e integra sistemas.</li><li><strong>Basis</strong>: administra la plataforma.</li></ul>",
+    "detalle": "<p>Una ruta realista para alguien de logística: empezar como usuario final o analista de inventarios, crecer como usuario clave en proyectos, y luego dar el salto a consultor funcional junior. El conocimiento del proceso de bodega es tu ventaja frente a quien solo sabe del sistema.</p>",
+    "sap": "<p>Las certificaciones oficiales de SAP (por ejemplo, la de EWM) las otorga SAP después de presentar su examen. Esta app te prepara, pero no las reemplaza.</p>"
+   },
+   "glosario": [
+    {
+     "es": "usuario clave",
+     "en": "key user"
+    },
+    {
+     "es": "consultor funcional",
+     "en": "functional consultant"
+    }
+   ],
+   "puente": "Lo que ya sabes de bodega, inventarios y despachos es justo lo que un consultor necesita entender del negocio. Ahora le sumas el sistema."
+  }
+ ],
+ "resumen": "Un ERP integra los procesos en una sola base de datos. SAP S/4HANA funciona sobre HANA, simplifica el modelo de datos (MATDOC, ACDOCA), usa el socio comercial y la interfaz Fiori. Se distinguen datos maestros, transaccionales y configuración; los cambios viajan de DEV a QAS y a PRD en órdenes de transporte.",
+ "examen": [
+  {
+   "pregunta": "¿Qué crea SAP cuando se registra una entrada de mercancía valorada?",
+   "opciones": [
+    {
+     "texto": "Un documento de material",
+     "correcta": true
+    },
+    {
+     "texto": "Un documento contable",
+     "correcta": true
+    },
+    {
+     "texto": "Una orden de transporte",
+     "correcta": false
+    },
+    {
+     "texto": "Un nuevo mandante",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La entrada genera el documento de material (cantidades) y el contable (valor) al mismo tiempo: eso es integración."
+  },
+  {
+   "pregunta": "En S/4HANA, ¿qué tabla guarda los documentos de material?",
+   "opciones": [
+    {
+     "texto": "MATDOC",
+     "correcta": true
+    },
+    {
+     "texto": "ACDOCA",
+     "correcta": false
+    },
+    {
+     "texto": "T001W",
+     "correcta": false
+    },
+    {
+     "texto": "MARA",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MATDOC reemplaza a MKPF y MSEG. ACDOCA es el diario universal de finanzas."
+  },
+  {
+   "pregunta": "¿Cuál es un dato maestro?",
+   "opciones": [
+    {
+     "texto": "Un material",
+     "correcta": true
+    },
+    {
+     "texto": "Un pedido de compra",
+     "correcta": false
+    },
+    {
+     "texto": "Una entrada de mercancía",
+     "correcta": false
+    },
+    {
+     "texto": "Un despacho del día",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Los datos maestros cambian poco; los pedidos y movimientos son datos transaccionales."
+  },
+  {
+   "pregunta": "¿En qué ambiente prueban los usuarios clave antes de pasar a producción?",
+   "opciones": [
+    {
+     "texto": "QAS",
+     "correcta": true
+    },
+    {
+     "texto": "DEV",
+     "correcta": false
+    },
+    {
+     "texto": "PRD",
+     "correcta": false
+    },
+    {
+     "texto": "ABAP",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Se configura en DEV, se prueba en QAS y se trabaja en PRD."
+  },
+  {
+   "pregunta": "¿Qué reemplaza en S/4HANA a los maestros separados de clientes y proveedores?",
+   "opciones": [
+    {
+     "texto": "El socio comercial (Business Partner)",
+     "correcta": true
+    },
+    {
+     "texto": "El mandante de producción",
+     "correcta": false
+    },
+    {
+     "texto": "La orden de transporte",
+     "correcta": false
+    },
+    {
+     "texto": "El documento de material",
+     "correcta": false
+    }
+   ],
+   "explicacion": "En S/4HANA clientes y proveedores se manejan como socios comerciales con distintos roles."
+  }
+ ]
+}

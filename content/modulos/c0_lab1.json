@@ -1,0 +1,77 @@
+{
+ "id": "c0_lab1",
+ "pasos": [
+  {
+   "tipo": "comando",
+   "comando": "MM03",
+   "mision": "Abre la transacción para visualizar un material (solo consulta, sin cambiar nada).",
+   "instruccion": "MM03",
+   "pista": "Visualizar material: MM03.",
+   "exito": "Visualizar material: pantalla inicial.",
+   "placeholder": "",
+   "porque": "MM01 crea, MM02 modifica y MM03 solo visualiza. Para consultar, usa siempre MM03 y así no cambias nada por error."
+  },
+  {
+   "tipo": "valor",
+   "comando": "CAFE-500",
+   "mision": "Escribe el código del café molido de 500 g.",
+   "instruccion": "Material",
+   "pista": "El código es CAFE-500.",
+   "exito": "Material encontrado: CAFE MOLIDO 500 G.",
+   "placeholder": "",
+   "campo": "Material"
+  },
+  {
+   "tipo": "valor",
+   "comando": "DATOS BASICOS 1",
+   "mision": "Elige la vista que muestra la descripción y la unidad de medida base. Escribe su nombre sin tildes.",
+   "instruccion": "Vista",
+   "pista": "La vista se llama Datos básicos 1.",
+   "exito": "Vista Datos básicos 1 abierta: unidad base UN.",
+   "placeholder": "",
+   "campo": "Vista",
+   "porque": "Los datos básicos son generales para toda la empresa (nivel mandante): los ven todos los centros."
+  },
+  {
+   "tipo": "comando",
+   "comando": "MMBE",
+   "mision": "Sin cerrar sesión, salta a la consulta de stock. Usa /n delante del código.",
+   "instruccion": "MMBE",
+   "pista": "Escribe /nMMBE.",
+   "exito": "Resumen de stock: pantalla de selección.",
+   "placeholder": "",
+   "porque": "Con /n cierras la transacción actual y abres otra en la misma ventana."
+  },
+  {
+   "tipo": "valor",
+   "comando": "CAFE-500",
+   "mision": "Indica el material que quieres consultar.",
+   "instruccion": "Material",
+   "pista": "Es el mismo material: CAFE-500.",
+   "exito": "Material válido.",
+   "placeholder": "",
+   "campo": "Material"
+  },
+  {
+   "tipo": "valor",
+   "comando": "1010",
+   "mision": "Delimita la consulta al centro de distribución principal.",
+   "instruccion": "Centro",
+   "pista": "El centro es 1010.",
+   "exito": "Centro 1010: CD principal Distribuidora Cordillera.",
+   "placeholder": "",
+   "campo": "Centro"
+  },
+  {
+   "tipo": "valor",
+   "comando": "F8",
+   "mision": "Ejecuta el reporte. Escribe el nombre de la tecla que usarías.",
+   "instruccion": "Tecla",
+   "pista": "Para ejecutar se usa F8.",
+   "exito": "Stock libre utilización en 1010 / 0001: 240 UN.",
+   "placeholder": "",
+   "campo": "Tecla",
+   "porque": "F8 ejecuta los reportes. El resultado muestra el stock por centro, almacén y tipo de stock."
+  }
+ ]
+}

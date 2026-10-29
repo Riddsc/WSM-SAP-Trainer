@@ -1,0 +1,534 @@
+{
+ "id": "c2_ex",
+ "banco": [
+  {
+   "pregunta": "¿Qué tipo de stock NO se puede vender?",
+   "opciones": [
+    {
+     "texto": "Control de calidad",
+     "correcta": true
+    },
+    {
+     "texto": "Libre utilización",
+     "correcta": false
+    },
+    {
+     "texto": "Ninguno: todos se pueden vender",
+     "correcta": false
+    },
+    {
+     "texto": "El stock del almacén 0001",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Solo el stock de libre utilización está disponible para la venta."
+  },
+  {
+   "pregunta": "El stock en consignación de proveedor está en nuestra bodega. ¿De quién es?",
+   "opciones": [
+    {
+     "texto": "Del proveedor, hasta que lo usamos",
+     "correcta": true
+    },
+    {
+     "texto": "Nuestro desde que llega",
+     "correcta": false
+    },
+    {
+     "texto": "Del cliente final",
+     "correcta": false
+    },
+    {
+     "texto": "Del transportador",
+     "correcta": false
+    }
+   ],
+   "explicacion": "En consignación, la propiedad pasa a la empresa solo al consumir o retirar."
+  },
+  {
+   "pregunta": "¿Qué clase de movimiento registra la carga inicial de stock al arrancar SAP?",
+   "opciones": [
+    {
+     "texto": "561",
+     "correcta": true
+    },
+    {
+     "texto": "501",
+     "correcta": false
+    },
+    {
+     "texto": "101",
+     "correcta": false
+    },
+    {
+     "texto": "701",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La 561 se usa para la carga inicial de inventario."
+  },
+  {
+   "pregunta": "¿Qué clase registra una entrada sin pedido de compra?",
+   "opciones": [
+    {
+     "texto": "501",
+     "correcta": true
+    },
+    {
+     "texto": "101",
+     "correcta": false
+    },
+    {
+     "texto": "561",
+     "correcta": false
+    },
+    {
+     "texto": "122",
+     "correcta": false
+    }
+   ],
+   "explicacion": "501 es entrada sin pedido; 101 es con pedido."
+  },
+  {
+   "pregunta": "¿Cuál es la regla habitual para anular un movimiento?",
+   "opciones": [
+    {
+     "texto": "Usar la clase siguiente (101 → 102)",
+     "correcta": true
+    },
+    {
+     "texto": "Repetir el mismo movimiento",
+     "correcta": false
+    },
+    {
+     "texto": "Hacer una salida 201",
+     "correcta": false
+    },
+    {
+     "texto": "Borrar el documento",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Las anulaciones usan, por lo general, el número siguiente y quedan ligadas al original."
+  },
+  {
+   "pregunta": "¿Qué determina el periodo contable de un movimiento?",
+   "opciones": [
+    {
+     "texto": "La fecha de contabilización",
+     "correcta": true
+    },
+    {
+     "texto": "La fecha de documento",
+     "correcta": false
+    },
+    {
+     "texto": "La fecha de creación del pedido",
+     "correcta": false
+    },
+    {
+     "texto": "La fecha del último conteo",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La fecha de contabilización define el periodo."
+  },
+  {
+   "pregunta": "En S/4HANA, ¿dónde se guardan los documentos de material?",
+   "opciones": [
+    {
+     "texto": "En la tabla MATDOC",
+     "correcta": true
+    },
+    {
+     "texto": "En la tabla ACDOCA",
+     "correcta": false
+    },
+    {
+     "texto": "En el maestro de materiales",
+     "correcta": false
+    },
+    {
+     "texto": "En la orden de transporte",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MATDOC guarda los documentos de material en S/4HANA."
+  },
+  {
+   "pregunta": "¿Cuál es el orden correcto del proceso de compra a pago?",
+   "opciones": [
+    {
+     "texto": "Solicitud, pedido, entrada, factura, pago",
+     "correcta": true
+    },
+    {
+     "texto": "Pedido, factura, solicitud, entrada, pago",
+     "correcta": false
+    },
+    {
+     "texto": "Entrada, pedido, pago, factura, solicitud",
+     "correcta": false
+    },
+    {
+     "texto": "Factura, entrada, pedido, solicitud, pago",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Primero la necesidad, luego el compromiso, la recepción, la factura y el pago."
+  },
+  {
+   "pregunta": "¿Qué cuenta queda pendiente entre la entrada de mercancía y la factura?",
+   "opciones": [
+    {
+     "texto": "La cuenta de entradas/facturas pendientes (GR/IR)",
+     "correcta": true
+    },
+    {
+     "texto": "La cuenta de ventas",
+     "correcta": false
+    },
+    {
+     "texto": "La cuenta de nómina",
+     "correcta": false
+    },
+    {
+     "texto": "La cuenta de caja",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La GR/IR se compensa cuando se registra la factura."
+  },
+  {
+   "pregunta": "En MIGO, ¿qué referencia se usa para recibir contra un pedido de compra?",
+   "opciones": [
+    {
+     "texto": "R01",
+     "correcta": true
+    },
+    {
+     "texto": "R10",
+     "correcta": false
+    },
+    {
+     "texto": "A01",
+     "correcta": false
+    },
+    {
+     "texto": "A08",
+     "correcta": false
+    }
+   ],
+   "explicacion": "R01 es pedido de compra; R10 es otros. A01 y A08 son acciones."
+  },
+  {
+   "pregunta": "¿Qué pasos se hacen en MIGO antes de terminar una entrada? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Marcar cada posición como OK",
+     "correcta": true
+    },
+    {
+     "texto": "Contabilizar",
+     "correcta": true
+    },
+    {
+     "texto": "Crear el socio comercial",
+     "correcta": false
+    },
+    {
+     "texto": "Definir el centro",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Se marca OK, se verifica y se contabiliza."
+  },
+  {
+   "pregunta": "El proveedor manda 24 cajas y el pedido decía 20. ¿Qué decide si se aceptan?",
+   "opciones": [
+    {
+     "texto": "La tolerancia de entrega en exceso",
+     "correcta": true
+    },
+    {
+     "texto": "El tipo de material",
+     "correcta": false
+    },
+    {
+     "texto": "El punto de expedición",
+     "correcta": false
+    },
+    {
+     "texto": "La clase de valoración",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Las tolerancias del pedido definen cuánto exceso se acepta."
+  },
+  {
+   "pregunta": "La cafetería de la empresa consume 10 bolsas. ¿Qué clase se usa?",
+   "opciones": [
+    {
+     "texto": "201",
+     "correcta": true
+    },
+    {
+     "texto": "261",
+     "correcta": false
+    },
+    {
+     "texto": "551",
+     "correcta": false
+    },
+    {
+     "texto": "601",
+     "correcta": false
+    }
+   ],
+   "explicacion": "201 es consumo para centro de costo."
+  },
+  {
+   "pregunta": "¿Qué clase traslada stock entre centros en un paso?",
+   "opciones": [
+    {
+     "texto": "301",
+     "correcta": true
+    },
+    {
+     "texto": "311",
+     "correcta": false
+    },
+    {
+     "texto": "313",
+     "correcta": false
+    },
+    {
+     "texto": "641",
+     "correcta": false
+    }
+   ],
+   "explicacion": "301 es centro a centro en un paso; 311 es almacén a almacén."
+  },
+  {
+   "pregunta": "En un traslado en dos pasos entre almacenes, ¿qué clases se usan?",
+   "opciones": [
+    {
+     "texto": "313 y 315",
+     "correcta": true
+    },
+    {
+     "texto": "311 y 312",
+     "correcta": false
+    },
+    {
+     "texto": "303 y 305",
+     "correcta": false
+    },
+    {
+     "texto": "101 y 102",
+     "correcta": false
+    }
+   ],
+   "explicacion": "313 saca al stock en traslado y 315 confirma la entrada; 303/305 son entre centros."
+  },
+  {
+   "pregunta": "¿Qué clase pasa stock bloqueado a libre utilización?",
+   "opciones": [
+    {
+     "texto": "343",
+     "correcta": true
+    },
+    {
+     "texto": "344",
+     "correcta": false
+    },
+    {
+     "texto": "321",
+     "correcta": false
+    },
+    {
+     "texto": "349",
+     "correcta": false
+    }
+   ],
+   "explicacion": "343: bloqueado → libre; 344: libre → bloqueado; 321: calidad → libre."
+  },
+  {
+   "pregunta": "¿Qué reporte usarías para saber cuánto había el día del cierre anterior?",
+   "opciones": [
+    {
+     "texto": "MB5B",
+     "correcta": true
+    },
+    {
+     "texto": "MMBE",
+     "correcta": false
+    },
+    {
+     "texto": "MB52",
+     "correcta": false
+    },
+    {
+     "texto": "MI04",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MB5B calcula el stock a una fecha pasada."
+  },
+  {
+   "pregunta": "¿Qué datos muestra MB51 sobre cada movimiento? Elige 2.",
+   "opciones": [
+    {
+     "texto": "La clase de movimiento",
+     "correcta": true
+    },
+    {
+     "texto": "El usuario que lo registró",
+     "correcta": true
+    },
+    {
+     "texto": "El precio de venta al cliente",
+     "correcta": false
+    },
+    {
+     "texto": "La clave del usuario",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MB51 lista documentos con clase, fecha, cantidades y usuario."
+  },
+  {
+   "pregunta": "¿Con qué transacción se contabiliza la salida de una entrega de venta?",
+   "opciones": [
+    {
+     "texto": "VL02N",
+     "correcta": true
+    },
+    {
+     "texto": "VA01",
+     "correcta": false
+    },
+    {
+     "texto": "MIRO",
+     "correcta": false
+    },
+    {
+     "texto": "MI07",
+     "correcta": false
+    }
+   ],
+   "explicacion": "En VL02N se modifica la entrega y se contabiliza la salida de mercancía."
+  },
+  {
+   "pregunta": "¿Qué documento se crea con VL01N?",
+   "opciones": [
+    {
+     "texto": "La entrega de salida",
+     "correcta": true
+    },
+    {
+     "texto": "El pedido de venta",
+     "correcta": false
+    },
+    {
+     "texto": "La factura",
+     "correcta": false
+    },
+    {
+     "texto": "El documento de inventario",
+     "correcta": false
+    }
+   ],
+   "explicacion": "VL01N crea la entrega de salida; VA01 crea el pedido de venta."
+  },
+  {
+   "pregunta": "¿Cuál es el orden correcto del inventario físico en SAP?",
+   "opciones": [
+    {
+     "texto": "MI01, MI04, MI20, MI07",
+     "correcta": true
+    },
+    {
+     "texto": "MI07, MI01, MI04, MI20",
+     "correcta": false
+    },
+    {
+     "texto": "MI04, MI01, MI07, MI20",
+     "correcta": false
+    },
+    {
+     "texto": "MI20, MI07, MI04, MI01",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Crear el documento, registrar el conteo, revisar diferencias y contabilizar."
+  },
+  {
+   "pregunta": "¿Para qué sirve el bloqueo de contabilización en el inventario?",
+   "opciones": [
+    {
+     "texto": "Para que nadie mueva el material mientras se cuenta",
+     "correcta": true
+    },
+    {
+     "texto": "Para impedir que se cree el material",
+     "correcta": false
+    },
+    {
+     "texto": "Para bloquear al proveedor",
+     "correcta": false
+    },
+    {
+     "texto": "Para cerrar el periodo contable",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Evita movimientos durante el conteo, que lo invalidarían."
+  },
+  {
+   "pregunta": "El sistema tiene 100 UN y se contaron 103. ¿Con qué clase se contabiliza?",
+   "opciones": [
+    {
+     "texto": "701",
+     "correcta": true
+    },
+    {
+     "texto": "702",
+     "correcta": false
+    },
+    {
+     "texto": "561",
+     "correcta": false
+    },
+    {
+     "texto": "501",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Un sobrante se contabiliza con 701."
+  },
+  {
+   "pregunta": "¿Qué deberías revisar antes de contabilizar diferencias? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Movimientos sin registrar en MB51",
+     "correcta": true
+    },
+    {
+     "texto": "Errores de unidad de medida",
+     "correcta": true
+    },
+    {
+     "texto": "El color del empaque",
+     "correcta": false
+    },
+    {
+     "texto": "La dirección del proveedor",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Muchas diferencias vienen de movimientos olvidados o de unidades mal registradas."
+  }
+ ],
+ "preguntasPorIntento": 15
+}

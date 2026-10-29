@@ -1,0 +1,85 @@
+{
+ "id": "c1_lab3",
+ "pasos": [
+  {
+   "tipo": "comando",
+   "comando": "MM03",
+   "mision": "Abre la transacción para visualizar el material que creaste.",
+   "instruccion": "MM03",
+   "pista": "Visualizar material: MM03.",
+   "exito": "Visualizar material: pantalla inicial.",
+   "placeholder": ""
+  },
+  {
+   "tipo": "valor",
+   "comando": "CAFE-1000",
+   "mision": "Escribe el código del café de 1 kg.",
+   "instruccion": "Material",
+   "pista": "El material es CAFE-1000.",
+   "exito": "CAFE MOLIDO 1 KG.",
+   "placeholder": "",
+   "campo": "Material"
+  },
+  {
+   "tipo": "valor",
+   "comando": "1010",
+   "mision": "Para ver las vistas de centro, indica el centro.",
+   "instruccion": "Centro",
+   "pista": "El centro es 1010.",
+   "exito": "Vistas del centro 1010 disponibles.",
+   "placeholder": "",
+   "campo": "Centro"
+  },
+  {
+   "tipo": "valor",
+   "comando": "V",
+   "mision": "En Contabilidad 1, ¿qué control de precio tiene? Escribe la letra.",
+   "instruccion": "Control de precio",
+   "pista": "Lo definiste como precio medio variable.",
+   "exito": "Control de precios V: precio medio variable.",
+   "placeholder": "",
+   "campo": "Control de precio",
+   "porque": "Confirmar la valoración antes de la primera compra evita sorpresas en contabilidad."
+  },
+  {
+   "tipo": "comando",
+   "comando": "MMBE",
+   "mision": "Cambia a la consulta de stock sin cerrar sesión.",
+   "instruccion": "MMBE",
+   "pista": "Escribe /nMMBE.",
+   "exito": "Resumen de stock: pantalla de selección.",
+   "placeholder": ""
+  },
+  {
+   "tipo": "valor",
+   "comando": "CAFE-1000",
+   "mision": "Indica el material.",
+   "instruccion": "Material",
+   "pista": "El material es CAFE-1000.",
+   "exito": "Material válido.",
+   "placeholder": "",
+   "campo": "Material"
+  },
+  {
+   "tipo": "valor",
+   "comando": "1010",
+   "mision": "Indica el centro.",
+   "instruccion": "Centro",
+   "pista": "El centro es 1010.",
+   "exito": "Centro 1010.",
+   "placeholder": "",
+   "campo": "Centro"
+  },
+  {
+   "tipo": "valor",
+   "comando": "0",
+   "mision": "Ejecuta con F8. ¿Cuánto stock libre hay? Escribe el número.",
+   "instruccion": "Stock libre",
+   "pista": "El material es nuevo: todavía no tiene stock.",
+   "exito": "Stock libre utilización: 0 UN. Listo para la primera compra.",
+   "placeholder": "",
+   "campo": "Stock libre",
+   "porque": "Un material nuevo no tiene stock hasta que se contabiliza la primera entrada de mercancía."
+  }
+ ]
+}

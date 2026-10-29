@@ -1,0 +1,187 @@
+{
+ "id": "c2_l2",
+ "paginas": [
+  {
+   "caso": "El proveedor llega a la portería con 20 cajas de café de 1 kg. El portero pregunta: \"¿Esto lo pedimos?\". Sin un pedido de compra, la bodega no sabe si recibir, cuánto ni a qué precio.",
+   "capas": {
+    "idea": "<p>El proceso de <strong>compra a pago</strong> (procure to pay) tiene estos pasos:</p><ol><li><strong>Solicitud de pedido</strong>: alguien necesita algo.</li><li><strong>Pedido de compra</strong>: el compromiso con el proveedor (cantidad, precio, fecha).</li><li><strong>Entrada de mercancía</strong>: la bodega recibe contra el pedido.</li><li><strong>Verificación de factura</strong>: se compara la factura con el pedido y la entrada.</li><li><strong>Pago</strong> al proveedor.</li></ol>",
+    "detalle": "<p>La comparación entre <strong>pedido, entrada y factura</strong> se llama <strong>conciliación a tres bandas</strong> (three-way match). Si el proveedor factura más de lo recibido, SAP lo detecta.</p><p>Al recibir, SAP registra el stock y una contrapartida en la cuenta de <strong>entradas/facturas pendientes</strong> (GR/IR), que se compensa cuando llega la factura.</p>",
+    "sap": "<div class=\"tabla\"><table><thead><tr><th>Paso</th><th>Transacción</th></tr></thead><tbody><tr><td>Solicitud de pedido</td><td>ME51N</td></tr><tr><td>Pedido de compra</td><td>ME21N (crear) · ME23N (visualizar)</td></tr><tr><td>Entrada de mercancía</td><td>MIGO</td></tr><tr><td>Verificación de factura</td><td>MIRO</td></tr></tbody></table></div>"
+   },
+   "glosario": [
+    {
+     "es": "solicitud de pedido",
+     "en": "purchase requisition"
+    },
+    {
+     "es": "verificación de factura",
+     "en": "invoice verification"
+    },
+    {
+     "es": "conciliación a tres bandas",
+     "en": "three-way match"
+    },
+    {
+     "es": "compra a pago",
+     "en": "procure to pay"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p><code>MIGO</code> es la transacción central de movimientos de mercancía. Arriba eliges dos cosas:</p><ul><li><strong>La acción</strong>: por ejemplo, A01 Entrada de mercancías.</li><li><strong>La referencia</strong>: por ejemplo, R01 Pedido de compra.</li></ul><p>Con el número del pedido, MIGO propone material, cantidad y almacén. Tú confirmas lo que realmente llegó.</p>",
+    "detalle": "<p>Acciones frecuentes de MIGO:</p><div class=\"tabla\"><table><thead><tr><th>Código</th><th>Acción</th></tr></thead><tbody><tr><td>A01</td><td>Entrada de mercancías</td></tr><tr><td>A02</td><td>Devolución</td></tr><tr><td>A03</td><td>Anulación</td></tr><tr><td>A04</td><td>Visualizar</td></tr><tr><td>A07</td><td>Salida de mercancías</td></tr><tr><td>A08</td><td>Traspaso</td></tr></tbody></table></div><p>Antes de contabilizar, cada posición debe marcarse como <strong>OK</strong>. Luego se usa <strong>Verificar</strong> y finalmente <strong>Contabilizar</strong>.</p>",
+    "sap": "<p>Al contabilizar, SAP muestra el número del documento de material (en el estándar, las entradas suelen empezar por 50…). Ese número va en la remisión firmada.</p>"
+   },
+   "glosario": [
+    {
+     "es": "acción",
+     "en": "action"
+    },
+    {
+     "es": "referencia",
+     "en": "reference document"
+    },
+    {
+     "es": "contabilizar",
+     "en": "post"
+    }
+   ],
+   "error": {
+    "titulo": "recibir lo que dice el pedido y no lo que llegó",
+    "texto": "Si el pedido dice 20 cajas y llegaron 18, se reciben 18. El pedido queda con 2 pendientes. Recibir de más infla el stock y paga mercancía que no existe."
+   }
+  },
+  {
+   "capas": {
+    "idea": "<p>No todo lo que llega va directo a la venta. En la entrada puedes elegir el tipo de stock:</p><ul><li><strong>Libre utilización</strong>: lo normal si todo está bien.</li><li><strong>Control de calidad</strong>: si el material requiere inspección.</li><li><strong>Bloqueado</strong>: si llegó con daños visibles.</li></ul>",
+    "detalle": "<p>También existe la entrada al <strong>stock bloqueado de entradas</strong> (clase 103): la mercancía se registra como recibida \"en revisión\", sin entrar todavía al inventario valorado. Cuando se acepta, se libera con la clase 105.</p><p>Los pedidos pueden tener <strong>tolerancias</strong> de entrega en exceso o en defecto: si el proveedor manda un poco más de lo pedido, SAP decide si lo acepta según esa tolerancia.</p>",
+    "sap": "<p>Para pasar después de control de calidad a libre utilización se usa un traspaso con la clase 321 (o la decisión de empleo, si la empresa usa el módulo de calidad).</p>"
+   },
+   "glosario": [
+    {
+     "es": "tolerancia de entrega",
+     "en": "delivery tolerance"
+    },
+    {
+     "es": "entrega en exceso",
+     "en": "overdelivery"
+    }
+   ],
+   "puente": "Es la misma revisión que haces al descargar: contar, mirar el estado y decidir qué entra a la venta y qué queda en cuarentena."
+  }
+ ],
+ "resumen": "Compra a pago: solicitud (ME51N), pedido (ME21N), entrada (MIGO, clase 101), factura (MIRO) y pago. La conciliación a tres bandas compara pedido, entrada y factura. En MIGO se elige acción (A01 entrada, A07 salida, A08 traspaso) y referencia (R01 pedido); se marca OK y se contabiliza. La entrada puede ir a libre utilización, calidad o bloqueado.",
+ "examen": [
+  {
+   "pregunta": "¿Qué transacción registra la verificación de la factura del proveedor?",
+   "opciones": [
+    {
+     "texto": "MIRO",
+     "correcta": true
+    },
+    {
+     "texto": "MIGO",
+     "correcta": false
+    },
+    {
+     "texto": "ME21N",
+     "correcta": false
+    },
+    {
+     "texto": "ME51N",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MIRO verifica facturas; MIGO registra movimientos; ME21N crea pedidos."
+  },
+  {
+   "pregunta": "¿Qué compara la conciliación a tres bandas? Elige 2 además de la factura.",
+   "opciones": [
+    {
+     "texto": "El pedido de compra",
+     "correcta": true
+    },
+    {
+     "texto": "La entrada de mercancía",
+     "correcta": true
+    },
+    {
+     "texto": "El maestro de materiales",
+     "correcta": false
+    },
+    {
+     "texto": "El socio comercial",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Se comparan pedido, entrada de mercancía y factura."
+  },
+  {
+   "pregunta": "En MIGO, ¿qué acción se usa para recibir mercancía?",
+   "opciones": [
+    {
+     "texto": "A01",
+     "correcta": true
+    },
+    {
+     "texto": "A04",
+     "correcta": false
+    },
+    {
+     "texto": "A07",
+     "correcta": false
+    },
+    {
+     "texto": "A08",
+     "correcta": false
+    }
+   ],
+   "explicacion": "A01 es entrada; A04 visualizar; A07 salida; A08 traspaso."
+  },
+  {
+   "pregunta": "El pedido dice 20 cajas y llegan 18. ¿Qué se recibe?",
+   "opciones": [
+    {
+     "texto": "18 cajas, y quedan 2 pendientes",
+     "correcta": true
+    },
+    {
+     "texto": "20 cajas, como dice el pedido",
+     "correcta": false
+    },
+    {
+     "texto": "Nada, hasta que lleguen las 20",
+     "correcta": false
+    },
+    {
+     "texto": "18 cajas y se borra el pedido",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Se recibe lo que llegó; el resto queda pendiente en el pedido."
+  },
+  {
+   "pregunta": "¿Qué clase libera el stock bloqueado de entradas (103)?",
+   "opciones": [
+    {
+     "texto": "105",
+     "correcta": true
+    },
+    {
+     "texto": "104",
+     "correcta": false
+    },
+    {
+     "texto": "321",
+     "correcta": false
+    },
+    {
+     "texto": "101",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La 103 recibe al stock bloqueado de entradas y la 105 lo libera."
+  }
+ ]
+}

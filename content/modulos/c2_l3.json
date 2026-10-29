@@ -1,0 +1,179 @@
+{
+ "id": "c2_l3",
+ "paginas": [
+  {
+   "caso": "La cafetería de la empresa necesita 10 bolsas para el consumo de la oficina, y 3 bolsas se rompieron en el montacargas. El auxiliar las saca de la estantería, pero no registra nada. A fin de mes, faltan 13 bolsas.",
+   "capas": {
+    "idea": "<p>Toda salida física debe tener una <strong>salida de mercancía</strong> en el sistema. Las más comunes:</p><ul><li><strong>201</strong>: consumo para un centro de costo (por ejemplo, la cafetería).</li><li><strong>261</strong>: consumo para una orden de producción.</li><li><strong>551</strong>: desguace o baja por daño.</li><li><strong>601</strong>: salida por entrega a un cliente (la genera el despacho).</li><li><strong>122</strong>: devolución al proveedor.</li></ul>",
+    "detalle": "<p>En el caso: las 10 bolsas de la cafetería se registran con <strong>201</strong> al centro de costo de administración, y las 3 rotas con <strong>551</strong>. Así el inventario cuadra y el costo queda en el área correcta.</p><p>En MIGO las salidas usan la acción <strong>A07 Salida de mercancías</strong>, con la referencia <strong>R10 Otros</strong> cuando no hay un documento previo.</p>",
+    "sap": "<p>Las salidas reducen el stock y su valor. El costo va a la cuenta que corresponde según la clase de movimiento y el objeto (centro de costo, orden).</p>"
+   },
+   "glosario": [
+    {
+     "es": "salida de mercancía",
+     "en": "goods issue"
+    },
+    {
+     "es": "centro de costo",
+     "en": "cost center"
+    },
+    {
+     "es": "baja",
+     "en": "write-off"
+    }
+   ],
+   "error": {
+    "titulo": "sacar mercancía sin registrar",
+    "texto": "Cada salida física sin documento se convierte en un faltante \"misterioso\" en el próximo conteo. Registrar en el momento evita ajustes y explicaciones después."
+   }
+  },
+  {
+   "capas": {
+    "idea": "<p>Los <strong>traslados</strong> mueven stock sin que salga de la empresa:</p><ul><li>Entre <strong>almacenes</strong> del mismo centro: 311 (un paso) o 313 + 315 (dos pasos).</li><li>Entre <strong>centros</strong>: 301 (un paso) o 303 + 305 (dos pasos).</li></ul>",
+    "detalle": "<p>¿Uno o dos pasos?</p><ul><li><strong>Un paso</strong>: sale y entra al mismo tiempo. Sirve cuando el movimiento es inmediato (de un pasillo a otro).</li><li><strong>Dos pasos</strong>: primero sale (queda como stock en traslado) y luego se confirma la llegada. Sirve cuando hay un tiempo de viaje o alguien debe confirmar.</li></ul><p>Para traslados entre centros con transporte y facturación interna se usa el <strong>pedido de traslado</strong> (stock transport order), con salida 641 y entrada 101.</p>",
+    "sap": "<p>En MIGO los traslados usan la acción <strong>A08 Traspaso</strong>. Indicas el almacén de origen y el de destino.</p>"
+   },
+   "glosario": [
+    {
+     "es": "traslado",
+     "en": "stock transfer"
+    },
+    {
+     "es": "traspaso",
+     "en": "transfer posting"
+    },
+    {
+     "es": "pedido de traslado",
+     "en": "stock transport order"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>También se puede cambiar el <strong>tipo de stock</strong> sin mover físicamente nada:</p><div class=\"tabla\"><table><thead><tr><th>Clase</th><th>Cambio</th></tr></thead><tbody><tr><td>321</td><td>Control de calidad → libre utilización</td></tr><tr><td>343</td><td>Bloqueado → libre utilización</td></tr><tr><td>344</td><td>Libre utilización → bloqueado</td></tr><tr><td>349</td><td>Bloqueado → control de calidad</td></tr></tbody></table></div>",
+    "detalle": "<p>Volviendo al café húmedo del inicio del ciclo: si calidad lo aprueba, se pasa a libre utilización (321); si lo rechaza, se bloquea y luego se devuelve al proveedor o se da de baja.</p>",
+    "sap": "<p>Estos traspasos también se hacen en MIGO con la acción A08. El documento de material deja constancia de quién cambió el estado y cuándo.</p>"
+   },
+   "glosario": [
+    {
+     "es": "cambio de tipo de stock",
+     "en": "stock type change"
+    }
+   ],
+   "puente": "Es como mover producto de la zona de cuarentena a la zona de despacho: el sistema refleja el estado real del producto."
+  }
+ ],
+ "resumen": "Las salidas se registran con su clase: 201 consumo a centro de costo, 261 a orden, 551 desguace, 601 entrega, 122 devolución a proveedor. Los traslados entre almacenes son 311 (o 313/315) y entre centros 301 (o 303/305); el pedido de traslado usa 641 y 101. Los cambios de tipo de stock usan 321, 343, 344 y 349. En MIGO: A07 salida, A08 traspaso.",
+ "examen": [
+  {
+   "pregunta": "Tres bolsas se rompieron en la bodega. ¿Qué clase de movimiento se usa?",
+   "opciones": [
+    {
+     "texto": "551",
+     "correcta": true
+    },
+    {
+     "texto": "201",
+     "correcta": false
+    },
+    {
+     "texto": "601",
+     "correcta": false
+    },
+    {
+     "texto": "122",
+     "correcta": false
+    }
+   ],
+   "explicacion": "551 es salida por desguace o baja."
+  },
+  {
+   "pregunta": "¿Cuándo conviene un traslado en dos pasos?",
+   "opciones": [
+    {
+     "texto": "Cuando hay un tiempo de viaje o alguien debe confirmar la llegada",
+     "correcta": true
+    },
+    {
+     "texto": "Siempre que se mueva menos de una caja",
+     "correcta": false
+    },
+    {
+     "texto": "Solo cuando se cambia de sociedad",
+     "correcta": false
+    },
+    {
+     "texto": "Cuando el material es de consignación",
+     "correcta": false
+    }
+   ],
+   "explicacion": "En dos pasos el stock queda \"en traslado\" hasta que se confirma la entrada."
+  },
+  {
+   "pregunta": "¿Qué clase pasa stock de control de calidad a libre utilización?",
+   "opciones": [
+    {
+     "texto": "321",
+     "correcta": true
+    },
+    {
+     "texto": "343",
+     "correcta": false
+    },
+    {
+     "texto": "344",
+     "correcta": false
+    },
+    {
+     "texto": "311",
+     "correcta": false
+    }
+   ],
+   "explicacion": "321: calidad → libre utilización. 343: bloqueado → libre. 344: libre → bloqueado."
+  },
+  {
+   "pregunta": "¿Qué acciones de MIGO corresponden a salidas y traspasos? Elige 2.",
+   "opciones": [
+    {
+     "texto": "A07",
+     "correcta": true
+    },
+    {
+     "texto": "A08",
+     "correcta": true
+    },
+    {
+     "texto": "A01",
+     "correcta": false
+    },
+    {
+     "texto": "A04",
+     "correcta": false
+    }
+   ],
+   "explicacion": "A07 es salida de mercancías y A08 traspaso; A01 entrada y A04 visualizar."
+  },
+  {
+   "pregunta": "¿Qué clases usa un pedido de traslado entre centros?",
+   "opciones": [
+    {
+     "texto": "641 para la salida y 101 para la entrada",
+     "correcta": true
+    },
+    {
+     "texto": "311 para la salida y 312 para la entrada",
+     "correcta": false
+    },
+    {
+     "texto": "201 para la salida y 501 para la entrada",
+     "correcta": false
+    },
+    {
+     "texto": "601 para la salida y 701 para la entrada",
+     "correcta": false
+    }
+   ],
+   "explicacion": "El pedido de traslado (stock transport order) sale con 641 y entra con 101."
+  }
+ ]
+}

@@ -1,0 +1,106 @@
+{
+ "id": "c1_lab1",
+ "pasos": [
+  {
+   "tipo": "comando",
+   "comando": "OX18",
+   "mision": "Abre la transacción que asigna centros a sociedades.",
+   "instruccion": "OX18",
+   "pista": "Asignar centro a sociedad: OX18.",
+   "exito": "Asignación centro → sociedad: vista de tabla.",
+   "placeholder": "",
+   "porque": "Un centro debe pertenecer a una sociedad para poder valorar su inventario."
+  },
+  {
+   "tipo": "valor",
+   "comando": "1010",
+   "mision": "Agrega una entrada nueva con el centro de distribución principal.",
+   "instruccion": "Centro",
+   "pista": "El centro es 1010.",
+   "exito": "Centro 1010 CD principal.",
+   "placeholder": "",
+   "campo": "Centro"
+  },
+  {
+   "tipo": "valor",
+   "comando": "1000",
+   "mision": "Asigna la sociedad de Distribuidora Cordillera.",
+   "instruccion": "Sociedad",
+   "pista": "La sociedad es 1000.",
+   "exito": "Sociedad 1000 Distribuidora Cordillera.",
+   "placeholder": "",
+   "campo": "Sociedad"
+  },
+  {
+   "tipo": "valor",
+   "comando": "GUARDAR",
+   "mision": "Guarda la asignación (en SAP: Ctrl + S). Escribe GUARDAR.",
+   "instruccion": "Acción",
+   "pista": "Escribe GUARDAR.",
+   "exito": "El sistema pide una orden de transporte de customizing.",
+   "placeholder": "",
+   "campo": "Acción"
+  },
+  {
+   "tipo": "valor",
+   "comando": "DEVK900123",
+   "mision": "Usa la orden de transporte que creó tu líder de proyecto: DEVK900123.",
+   "instruccion": "Orden de transporte",
+   "pista": "La orden es DEVK900123.",
+   "exito": "Datos grabados en la orden DEVK900123.",
+   "placeholder": "",
+   "campo": "Orden de transporte",
+   "porque": "Los cambios de configuración se guardan en una orden de transporte para llevarlos de DEV a QAS y luego a PRD."
+  },
+  {
+   "tipo": "comando",
+   "comando": "OX09",
+   "mision": "Ahora abre la transacción para definir almacenes de un centro.",
+   "instruccion": "OX09",
+   "pista": "Definir almacenes: OX09.",
+   "exito": "Determinar ámbito de trabajo: centro.",
+   "placeholder": ""
+  },
+  {
+   "tipo": "valor",
+   "comando": "1010",
+   "mision": "Indica el centro donde vas a crear el almacén.",
+   "instruccion": "Centro",
+   "pista": "El centro es 1010.",
+   "exito": "Almacenes del centro 1010: 0001 Bodega principal.",
+   "placeholder": "",
+   "campo": "Centro"
+  },
+  {
+   "tipo": "valor",
+   "comando": "0002",
+   "mision": "Crea el almacén para la zona de despachos.",
+   "instruccion": "Almacén",
+   "pista": "El almacén nuevo es 0002.",
+   "exito": "Entrada nueva 0002.",
+   "placeholder": "",
+   "campo": "Almacén",
+   "porque": "El almacén se define dentro del centro: el 0002 del centro 1010 es único para ese centro."
+  },
+  {
+   "tipo": "valor",
+   "comando": "ZONA DESPACHOS",
+   "mision": "Escribe la descripción: ZONA DESPACHOS.",
+   "instruccion": "Denominación",
+   "pista": "La descripción es ZONA DESPACHOS.",
+   "exito": "Descripción tomada.",
+   "placeholder": "",
+   "campo": "Denominación"
+  },
+  {
+   "tipo": "valor",
+   "comando": "GUARDAR",
+   "mision": "Guarda el almacén nuevo.",
+   "instruccion": "Acción",
+   "pista": "Escribe GUARDAR.",
+   "exito": "Datos grabados en la orden DEVK900123.",
+   "placeholder": "",
+   "campo": "Acción"
+  }
+ ]
+}

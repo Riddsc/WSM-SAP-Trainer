@@ -1,0 +1,220 @@
+{
+ "id": "c1_l2",
+ "paginas": [
+  {
+   "caso": "En la distribuidora alguien creó el café molido dos veces: CAFE-500 y CAFE500. Compras pide uno, la bodega recibe el otro y ventas no encuentra stock. Hay café en la bodega, pero el sistema dice que no.",
+   "capas": {
+    "idea": "<p>El <strong>maestro de materiales</strong> es la ficha única de cada producto. Compras, bodega, ventas, calidad y contabilidad leen la misma ficha, cada área en su <strong>vista</strong>.</p><p>Por eso un material duplicado es tan grave: cada área termina trabajando con un producto distinto.</p>",
+    "detalle": "<p>El número de material puede tener hasta 40 caracteres en S/4HANA. Puede asignarlo SAP (numeración interna) o el usuario (externa), según el tipo de material.</p><p>Al crear un material se eligen el <strong>ramo</strong> (industry sector) y el <strong>tipo de material</strong>, que no se cambian a la ligera.</p>",
+    "sap": "<p>Transacciones del maestro:</p><div class=\"tabla\"><table><thead><tr><th>Código</th><th>Para qué</th></tr></thead><tbody><tr><td>MM01</td><td>Crear</td></tr><tr><td>MM02</td><td>Modificar</td></tr><tr><td>MM03</td><td>Visualizar</td></tr><tr><td>MM06</td><td>Marcar para borrado</td></tr></tbody></table></div><p>En Fiori también existe la app para gestionar datos maestros de producto.</p>"
+   },
+   "glosario": [
+    {
+     "es": "maestro de materiales",
+     "en": "material master"
+    },
+    {
+     "es": "vista",
+     "en": "view"
+    },
+    {
+     "es": "tipo de material",
+     "en": "material type"
+    },
+    {
+     "es": "ramo",
+     "en": "industry sector"
+    }
+   ],
+   "error": {
+    "titulo": "crear un material sin buscarlo antes",
+    "texto": "Antes de crear, busca con MM03 y la ayuda F4 (por descripción, grupo de artículos o código antiguo). Un duplicado parte el stock y el historial en dos."
+   }
+  },
+  {
+   "capas": {
+    "idea": "<p>El <strong>tipo de material</strong> agrupa productos con el mismo comportamiento:</p><div class=\"tabla\"><table><thead><tr><th>Tipo</th><th>Uso</th></tr></thead><tbody><tr><td>ROH</td><td>Materia prima</td></tr><tr><td>HALB</td><td>Producto semielaborado</td></tr><tr><td>FERT</td><td>Producto terminado</td></tr><tr><td>HAWA</td><td>Mercadería (se compra y se vende sin transformar)</td></tr><tr><td>VERP</td><td>Material de embalaje</td></tr><tr><td>ERSA</td><td>Repuestos</td></tr><tr><td>NLAG</td><td>Material no almacenable</td></tr><tr><td>DIEN</td><td>Servicios</td></tr></tbody></table></div>",
+    "detalle": "<p>El tipo de material controla, entre otras cosas:</p><ul><li>Qué <strong>vistas</strong> se pueden crear.</li><li>Si se actualizan <strong>cantidades</strong> y <strong>valores</strong> en el inventario.</li><li>El tipo de <strong>numeración</strong>.</li><li>El <strong>control de precio</strong> propuesto.</li></ul><p>Una distribuidora compra y vende sin transformar: por eso el café molido de Cordillera es <strong>HAWA</strong>.</p>",
+    "sap": "<p>Los tipos estándar vienen con SAP. Las empresas suelen copiarlos y crear los suyos (por convención, empiezan por Z).</p>"
+   },
+   "glosario": [
+    {
+     "es": "mercadería",
+     "en": "trading goods"
+    },
+    {
+     "es": "materia prima",
+     "en": "raw material"
+    },
+    {
+     "es": "producto terminado",
+     "en": "finished product"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>Cada vista guarda sus datos en un <strong>nivel organizativo</strong>. Por eso al crear un material SAP pregunta por centro, almacén u organización de ventas.</p>",
+    "detalle": "<div class=\"tabla\"><table><thead><tr><th>Nivel</th><th>Vistas y datos típicos</th></tr></thead><tbody><tr><td>Mandante</td><td>Datos básicos: descripción, unidad de medida base, grupo de artículos, peso y volumen.</td></tr><tr><td>Org. ventas + canal</td><td>Ventas: unidad de venta, cantidad mínima de pedido.</td></tr><tr><td>Centro</td><td>Compras, planificación MRP, datos de almacenamiento del centro, calidad, contabilidad y costos (con valoración por centro).</td></tr><tr><td>Almacén</td><td>Datos de almacenamiento del almacén, como la ubicación fija simple.</td></tr><tr><td>Número de almacén / tipo</td><td>Vistas de gestión de almacenes (WM).</td></tr></tbody></table></div>",
+    "sap": "<p>Si el café se vende en dos centros, los datos básicos se crean una sola vez, pero las vistas de compras, MRP y contabilidad se crean para cada centro. Ampliar un material a un centro nuevo se hace con <code>MM01</code>, indicando el material existente y el nuevo centro.</p>"
+   },
+   "glosario": [
+    {
+     "es": "nivel organizativo",
+     "en": "organizational level"
+    },
+    {
+     "es": "grupo de artículos",
+     "en": "material group"
+    },
+    {
+     "es": "unidad de medida base",
+     "en": "base unit of measure"
+    }
+   ],
+   "puente": "Así como en una ficha de producto hay datos que valen para toda la empresa y otros por sede, SAP separa los datos por nivel."
+  },
+  {
+   "capas": {
+    "idea": "<p>La <strong>vista de contabilidad</strong> define cómo se valora el inventario. Lo más importante es el <strong>control de precio</strong>:</p><ul><li><strong>V – Precio medio variable</strong> (moving average): el precio se recalcula con cada entrada. Común en mercadería y materias primas.</li><li><strong>S – Precio estándar</strong>: el precio queda fijo durante el periodo; las diferencias van a cuentas de diferencia de precio. Común en productos terminados.</li></ul>",
+    "detalle": "<p>Ejemplo con precio medio variable: hay 100 bolsas valoradas en 10.000 (100 cada una). Entran 100 más a 120 cada una. Nuevo valor: 22.000 por 200 bolsas, es decir, <strong>110</strong> por bolsa.</p><p>La <strong>clase de valoración</strong> conecta el material con las cuentas contables. En el estándar, la mercadería usa la clase 3100.</p>",
+    "sap": "<p>Gracias a la vista de contabilidad, cada movimiento de inventario genera su asiento contable automáticamente, con la cuenta que corresponde a la clase de valoración.</p>"
+   },
+   "glosario": [
+    {
+     "es": "control de precio",
+     "en": "price control"
+    },
+    {
+     "es": "precio medio variable",
+     "en": "moving average price"
+    },
+    {
+     "es": "precio estándar",
+     "en": "standard price"
+    },
+    {
+     "es": "clase de valoración",
+     "en": "valuation class"
+    }
+   ],
+   "error": {
+    "titulo": "elegir precio estándar sin saber por qué",
+    "texto": "Con precio estándar las variaciones de costo no cambian el valor del stock: van a cuentas de diferencias. Es útil para productos fabricados, pero exige revisar los precios periódicamente."
+   }
+  }
+ ],
+ "resumen": "El maestro de materiales es la ficha única del producto, organizada en vistas por nivel (mandante, centro, almacén, ventas, bodega). El tipo de material (ROH, HALB, FERT, HAWA, VERP, ERSA, NLAG, DIEN) controla vistas, numeración y actualización de cantidades y valores. La vista de contabilidad define el control de precio (V o S) y la clase de valoración.",
+ "examen": [
+  {
+   "pregunta": "Una distribuidora compra y vende un producto sin transformarlo. ¿Qué tipo de material es?",
+   "opciones": [
+    {
+     "texto": "HAWA",
+     "correcta": true
+    },
+    {
+     "texto": "FERT",
+     "correcta": false
+    },
+    {
+     "texto": "ROH",
+     "correcta": false
+    },
+    {
+     "texto": "HALB",
+     "correcta": false
+    }
+   ],
+   "explicacion": "HAWA es mercadería (trading goods). FERT es producto terminado fabricado."
+  },
+  {
+   "pregunta": "¿En qué nivel se guardan los datos básicos, como la descripción y la unidad de medida base?",
+   "opciones": [
+    {
+     "texto": "Mandante",
+     "correcta": true
+    },
+    {
+     "texto": "Centro",
+     "correcta": false
+    },
+    {
+     "texto": "Almacén",
+     "correcta": false
+    },
+    {
+     "texto": "Organización de ventas",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Los datos básicos valen para todo el mandante."
+  },
+  {
+   "pregunta": "¿Qué controla el tipo de material? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Qué vistas se pueden crear",
+     "correcta": true
+    },
+    {
+     "texto": "Si se actualizan cantidades y valores",
+     "correcta": true
+    },
+    {
+     "texto": "El precio de venta al cliente",
+     "correcta": false
+    },
+    {
+     "texto": "El nombre del proveedor",
+     "correcta": false
+    }
+   ],
+   "explicacion": "El tipo de material define vistas, numeración y actualización de cantidades y valores, entre otros."
+  },
+  {
+   "pregunta": "Hay 100 unidades a 100 c/u y entran 100 a 120 c/u. Con precio medio variable, ¿cuál es el nuevo precio?",
+   "opciones": [
+    {
+     "texto": "110",
+     "correcta": true
+    },
+    {
+     "texto": "120",
+     "correcta": false
+    },
+    {
+     "texto": "100",
+     "correcta": false
+    },
+    {
+     "texto": "115",
+     "correcta": false
+    }
+   ],
+   "explicacion": "(10.000 + 12.000) / 200 = 110."
+  },
+  {
+   "pregunta": "¿Qué transacción se usa solo para consultar un material sin cambiarlo?",
+   "opciones": [
+    {
+     "texto": "MM03",
+     "correcta": true
+    },
+    {
+     "texto": "MM01",
+     "correcta": false
+    },
+    {
+     "texto": "MM02",
+     "correcta": false
+    },
+    {
+     "texto": "MM06",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MM03 visualiza; MM01 crea; MM02 modifica; MM06 marca para borrado."
+  }
+ ]
+}

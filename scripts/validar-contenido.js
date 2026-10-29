@@ -47,7 +47,11 @@ catalogo.modulos.forEach((m, indice) => {
     });
     if (ids.has(m.id)) errores.push(`${m.id}: id repetido`);
     ids.add(m.id);
-    if (!['theory', 'lab'].includes(m.tipo)) errores.push(`${nombre}: tipo desconocido "${m.tipo}"`);
+    if (!['theory', 'lab', 'exam'].includes(m.tipo)) errores.push(`${nombre}: tipo desconocido "${m.tipo}"`);
+    // requisitoLegado: módulo de una versión anterior (ya retirado) que también desbloquea este
+    if (m.requisitoLegado !== undefined && typeof m.requisitoLegado !== 'string') {
+        errores.push(`${nombre}: el requisito heredado debe ser un texto`);
+    }
     if (m.requisito) {
         const posicion = catalogo.modulos.findIndex(x => x.id === m.requisito);
         if (posicion === -1) errores.push(`${nombre}: el requisito "${m.requisito}" no existe`);
@@ -59,11 +63,26 @@ catalogo.modulos.forEach((m, indice) => {
     if (!datos) return;
     if (datos.id !== m.id) errores.push(`${nombre}: el archivo tiene id "${datos.id}"`);
 
-    if (m.tipo === 'theory') {
-        if (!Array.isArray(datos.paginas) || datos.paginas.length === 0) errores.push(`${nombre}: no tiene páginas`);
-        if (!datos.resumen) advertencias.push(`${nombre}: no tiene resumen`);
+    if (m.tipo === 'theory' || m.tipo === 'exam') {
+        if (m.tipo === 'theory') {
+            if (!Array.isArray(datos.paginas) || datos.paginas.length === 0) errores.push(`${nombre}: no tiene páginas`);
+            if (!datos.resumen) advertencias.push(`${nombre}: no tiene resumen`);
+            (datos.paginas || []).forEach((pg, n) => {
+                if (typeof pg === 'object' && pg !== null) {
+                    if (!pg.capas && !pg.html) errores.push(`${nombre} · página ${n + 1}: no tiene explicación (capas o html)`);
+                    if (pg.capas && !pg.capas.idea) errores.push(`${nombre} · página ${n + 1}: falta la capa "idea"`);
+                    (pg.glosario || []).forEach(t => { if (!t.es || !t.en) errores.push(`${nombre} · página ${n + 1}: término de glosario incompleto`); });
+                }
+            });
+        }
+        if (m.tipo === 'exam') {
+            datos.examen = datos.banco;
+            if (datos.preguntasPorIntento && (datos.banco || []).length < datos.preguntasPorIntento) {
+                errores.push(`${nombre}: el banco tiene menos preguntas que las de cada intento`);
+            }
+        }
         if (!Array.isArray(datos.examen) || datos.examen.length === 0) {
-            errores.push(`${nombre}: no tiene examen`);
+            errores.push(`${nombre}: no tiene ${m.tipo === 'exam' ? 'banco de preguntas' : 'examen'}`);
             return;
         }
 
@@ -82,6 +101,9 @@ catalogo.modulos.forEach((m, indice) => {
                 return;
             }
             const correctas = p.opciones.filter(o => o.correcta === true);
+            if (m.tipo === 'exam' || typeof (datos.paginas || [])[0] === 'object') {
+                if (!p.explicacion) advertencias.push(`${etiqueta}: falta la explicación (retroalimentación)`);
+            }
             if (correctas.length === 0) errores.push(`${etiqueta}: no tiene respuesta correcta`);
             if (correctas.length === p.opciones.length) errores.push(`${etiqueta}: todas las opciones son correctas`);
 
@@ -106,7 +128,9 @@ catalogo.modulos.forEach((m, indice) => {
 
             // Calidad: comandos con forma de transacción que no están verificados
             const cmd = String(paso.comando || '').toUpperCase().trim();
-            const pareceTransaccion = cmd.startsWith('/') || /^[A-Z]{2,4}\d{1,3}[A-Z]?$/.test(cmd) || /^[A-Z0-9]+(-[A-Z0-9]+)+$/.test(cmd);
+            if (paso.tipo && !['comando', 'valor'].includes(paso.tipo)) errores.push(`${etiqueta}: tipo de paso desconocido "${paso.tipo}"`);
+            if (paso.tipo === 'comando' && !listaVerificada.has(cmd)) errores.push(`${etiqueta}: "${cmd}" no está en la lista de transacciones verificadas`);
+            const pareceTransaccion = paso.tipo ? paso.tipo === 'comando' : (cmd.startsWith('/') || /^[A-Z]{2,4}\d{1,3}[A-Z]?$/.test(cmd) || /^[A-Z0-9]+(-[A-Z0-9]+)+$/.test(cmd));
             if (pareceTransaccion && !listaVerificada.has(cmd)) comandosDudosos.push(`${m.id}: ${cmd}`);
         });
     }

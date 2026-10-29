@@ -1,0 +1,208 @@
+{
+ "id": "c1_l1",
+ "paginas": [
+  {
+   "caso": "Distribuidora Cordillera abre un segundo centro de distribución en otra ciudad. El gerente pregunta: \"¿Eso es una nueva empresa en SAP, un nuevo centro o un nuevo almacén?\". La respuesta cambia impuestos, contabilidad e inventarios.",
+   "capas": {
+    "idea": "<p>SAP representa la empresa con <strong>unidades organizativas</strong>, de la más general a la más específica:</p><ul><li><strong>Mandante</strong> (client): todo el grupo de datos.</li><li><strong>Sociedad</strong> (company code): la empresa legal, con su propia contabilidad.</li><li><strong>Centro</strong> (plant): una sede donde se fabrica, se distribuye o se presta un servicio.</li><li><strong>Almacén</strong> (storage location): un lugar dentro del centro donde se guarda el stock.</li></ul><p>En el caso, si la empresa legal es la misma, el nuevo CD es un <strong>centro</strong> nuevo dentro de la misma sociedad.</p>",
+    "detalle": "<p>Reglas clave:</p><ul><li>La sociedad se identifica con 4 caracteres y es la unidad más pequeña con balance propio.</li><li>Un centro (4 caracteres) pertenece a <strong>una sola</strong> sociedad; una sociedad puede tener muchos centros.</li><li>Un almacén (4 caracteres) se define <strong>dentro</strong> de un centro. El almacén 0001 del centro 1010 es distinto del 0001 del centro 1020.</li><li>Las cantidades de stock se llevan por centro y almacén.</li></ul>",
+    "sap": "<p>Esta estructura se configura en <code>SPRO</code>. Algunas transacciones directas:</p><div class=\"tabla\"><table><thead><tr><th>Código</th><th>Para qué</th></tr></thead><tbody><tr><td>OX02</td><td>Definir la sociedad</td></tr><tr><td>OX10</td><td>Definir el centro</td></tr><tr><td>OX18</td><td>Asignar el centro a la sociedad</td></tr><tr><td>OX09</td><td>Definir almacenes de un centro</td></tr></tbody></table></div>"
+   },
+   "glosario": [
+    {
+     "es": "sociedad",
+     "en": "company code"
+    },
+    {
+     "es": "centro",
+     "en": "plant"
+    },
+    {
+     "es": "almacén",
+     "en": "storage location"
+    },
+    {
+     "es": "unidad organizativa",
+     "en": "organizational unit"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>Además de la estructura básica, cada proceso tiene sus propias unidades:</p><ul><li><strong>Compras</strong>: la organización de compras negocia con proveedores; el grupo de compras es el comprador o equipo responsable.</li><li><strong>Ventas</strong>: la organización de ventas, el canal de distribución y el sector forman el <strong>área de ventas</strong>.</li><li><strong>Expedición</strong>: el punto de expedición (shipping point) es el lugar desde donde salen los despachos.</li></ul>",
+    "detalle": "<p>Ejemplo en la distribuidora:</p><div class=\"tabla\"><table><thead><tr><th>Unidad</th><th>Valor</th></tr></thead><tbody><tr><td>Sociedad</td><td>1000 Distribuidora Cordillera</td></tr><tr><td>Centro</td><td>1010 CD principal</td></tr><tr><td>Almacenes</td><td>0001 Bodega principal · 0002 Zona de despachos</td></tr><tr><td>Org. de compras</td><td>1000 Compras nacionales</td></tr><tr><td>Org. de ventas</td><td>1000 Ventas nacionales</td></tr><tr><td>Punto de expedición</td><td>1010 Muelles CD principal</td></tr></tbody></table></div>",
+    "sap": "<p>El punto de expedición se asigna a un centro. Cuando creas una entrega de salida, SAP determina desde qué punto de expedición sale, y eso define muelles y horarios de despacho.</p>"
+   },
+   "glosario": [
+    {
+     "es": "organización de compras",
+     "en": "purchasing organization"
+    },
+    {
+     "es": "organización de ventas",
+     "en": "sales organization"
+    },
+    {
+     "es": "canal de distribución",
+     "en": "distribution channel"
+    },
+    {
+     "es": "punto de expedición",
+     "en": "shipping point"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>Para manejar la bodega con más detalle (pasillos, estanterías, ubicaciones) se usa un <strong>número de almacén</strong> (warehouse number), que pertenece al WM clásico o a EWM.</p>",
+    "detalle": "<p>Diferencias que verás en los próximos ciclos:</p><ul><li>En <strong>WM clásico</strong>, el número de almacén tiene 3 caracteres.</li><li>En <strong>EWM</strong>, tiene 4 caracteres.</li><li>En ambos casos, la combinación de <strong>centro + almacén</strong> de inventarios se asigna a un número de almacén, y dentro de él se definen tipos de almacenamiento y ubicaciones.</li></ul><p>Así, inventarios sabe \"cuánto hay en el almacén 0001\" y la gestión de bodega sabe \"en qué ubicación exacta está\".</p>",
+    "sap": "<p>Piensa en dos niveles: <strong>MM</strong> responde cuánto hay y cuánto vale; <strong>WM/EWM</strong> responde dónde está exactamente y cómo moverlo.</p>"
+   },
+   "glosario": [
+    {
+     "es": "número de almacén",
+     "en": "warehouse number"
+    },
+    {
+     "es": "tipo de almacenamiento",
+     "en": "storage type"
+    }
+   ],
+   "puente": "Es como distinguir el kárdex (cuánto hay) del plano de la bodega (dónde está). SAP lleva los dos y los mantiene sincronizados."
+  },
+  {
+   "capas": {
+    "idea": "<p>Hay datos que SAP guarda a nivel de mandante y otros a nivel de centro o de almacén. Saber en qué nivel vive cada dato evita muchos errores.</p>",
+    "detalle": "<p>El <strong>nivel de valoración</strong> define dónde se valora el inventario: casi siempre es el <strong>centro</strong> (también puede ser la sociedad). Por eso un mismo material puede tener un precio en el centro 1010 y otro en el 1020.</p><p>Se configura una sola vez al inicio del proyecto, porque cambiarlo después es muy difícil.</p>",
+    "sap": "<p>El nivel de valoración se define en la configuración con la transacción <code>OX14</code>. SAP recomienda el centro como nivel de valoración, y es obligatorio si se usa planificación de la producción o costeo de productos.</p>"
+   },
+   "glosario": [
+    {
+     "es": "nivel de valoración",
+     "en": "valuation level"
+    },
+    {
+     "es": "área de valoración",
+     "en": "valuation area"
+    }
+   ],
+   "error": {
+    "titulo": "crear un centro cuando bastaba un almacén",
+    "texto": "Un centro nuevo implica datos maestros, valoración y planificación propios. Si solo necesitas separar el stock dentro de la misma sede (por ejemplo, una zona de despachos), basta con un almacén nuevo."
+   }
+  }
+ ],
+ "resumen": "Mandante (3 dígitos) agrupa todo; la sociedad (4) es la empresa legal; el centro (4) pertenece a una sola sociedad; el almacén (4) existe dentro de un centro. Compras, ventas y expedición tienen sus unidades. El número de almacén (3 en WM, 4 en EWM) maneja ubicaciones. La valoración suele ser a nivel de centro.",
+ "examen": [
+  {
+   "pregunta": "¿Cuántas sociedades puede tener asignadas un centro?",
+   "opciones": [
+    {
+     "texto": "Una sola",
+     "correcta": true
+    },
+    {
+     "texto": "Dos como máximo",
+     "correcta": false
+    },
+    {
+     "texto": "Todas las que existan",
+     "correcta": false
+    },
+    {
+     "texto": "Ninguna: el centro es independiente",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Cada centro pertenece a exactamente una sociedad; una sociedad sí puede tener muchos centros."
+  },
+  {
+   "pregunta": "¿Con qué transacción se asigna un centro a una sociedad?",
+   "opciones": [
+    {
+     "texto": "OX18",
+     "correcta": true
+    },
+    {
+     "texto": "OX09",
+     "correcta": false
+    },
+    {
+     "texto": "OX10",
+     "correcta": false
+    },
+    {
+     "texto": "MM01",
+     "correcta": false
+    }
+   ],
+   "explicacion": "OX10 define el centro, OX09 los almacenes y OX18 asigna el centro a la sociedad."
+  },
+  {
+   "pregunta": "¿Qué unidad es la más pequeña con contabilidad y balance propios?",
+   "opciones": [
+    {
+     "texto": "La sociedad",
+     "correcta": true
+    },
+    {
+     "texto": "El centro",
+     "correcta": false
+    },
+    {
+     "texto": "El almacén",
+     "correcta": false
+    },
+    {
+     "texto": "El grupo de compras",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La sociedad (company code) es la entidad legal con su propia contabilidad."
+  },
+  {
+   "pregunta": "¿Qué forman juntos la organización de ventas, el canal de distribución y el sector?",
+   "opciones": [
+    {
+     "texto": "El área de ventas",
+     "correcta": true
+    },
+    {
+     "texto": "El punto de expedición",
+     "correcta": false
+    },
+    {
+     "texto": "El número de almacén",
+     "correcta": false
+    },
+    {
+     "texto": "El nivel de valoración",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Esas tres unidades forman el área de ventas."
+  },
+  {
+   "pregunta": "¿Qué es cierto sobre el número de almacén? Elige 2.",
+   "opciones": [
+    {
+     "texto": "En WM clásico tiene 3 caracteres",
+     "correcta": true
+    },
+    {
+     "texto": "Se asigna a una combinación de centro y almacén",
+     "correcta": true
+    },
+    {
+     "texto": "Reemplaza a la sociedad",
+     "correcta": false
+    },
+    {
+     "texto": "Siempre tiene 2 caracteres",
+     "correcta": false
+    }
+   ],
+   "explicacion": "WM usa 3 caracteres y EWM 4; ambos se asignan a centro + almacén de inventarios."
+  }
+ ]
+}

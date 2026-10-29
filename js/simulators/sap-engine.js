@@ -52,6 +52,7 @@ const SAPEngine = {
         this.tcode = null;
         this.campos = [];
         this.estado = null;
+        this.porQue = '';
         this.terminado = false;
     },
 
@@ -65,6 +66,13 @@ const SAPEngine = {
         const lista = UIRenderer.transacciones || [];
         if (lista.some(t => t.codigo.toUpperCase() === c)) return true;
         return c.startsWith('/') || /^[A-Z]{2,4}\d{1,3}[A-Z]?$/.test(c);
+    },
+
+    /** El paso puede decir si espera un comando o un valor; si no, se deduce. */
+    pasoEsComando(paso) {
+        if (paso.tipo === 'comando') return true;
+        if (paso.tipo === 'valor') return false;
+        return this.esTransaccion(paso.comando);
     },
 
     descripcionTransaccion(cmd) {
@@ -88,7 +96,7 @@ const SAPEngine = {
         const ciclo = ContentStore.cicloDe(m.id);
         const total = m.pasos.length;
         const paso = m.pasos[this.paso];
-        const pideComando = this.esTransaccion(paso.comando);
+        const pideComando = this.pasoEsComando(paso);
         const practica = this.modo === 'practica';
 
         const puntos = m.pasos.map((_, i) => `<span class="${i < this.paso ? 'hecho' : i === this.paso ? 'actual' : ''}"></span>`).join('');
@@ -97,7 +105,7 @@ const SAPEngine = {
             <span class="sap-etq">${escaparHTML(c.etq)}</span>
             <span class="sap-valor" title="${escaparHTML(c.valor)}">${escaparHTML(c.valor)}</span>`).join('');
         const campoActivo = pideComando ? '' : `
-            <label for="lab-campo">${escaparHTML(paso.instruccion)}</label>
+            <label for="lab-campo">${escaparHTML(paso.campo || paso.instruccion)}</label>
             <input id="lab-campo" autocomplete="off" spellcheck="false" autocapitalize="characters" enterkeyhint="send" placeholder="${escaparHTML(paso.placeholder || 'Valor')}">`;
         const formVacio = !campos && pideComando ? '<span class="sap-vacio">Escribe la transacción en el campo de comando y confírmala.</span>' : '';
 
@@ -151,7 +159,7 @@ const SAPEngine = {
                             <span class="mision-etiqueta">MISIÓN · PASO ${this.paso + 1} DE ${total}</span>
                             <div class="puntos" aria-hidden="true">${puntos}</div>
                         </div>
-                        <p class="mision-texto">${pideComando ? 'Abre la transacción para: ' : 'Llena el campo: '}${escaparHTML(paso.instruccion)}</p>
+                        <p class="mision-texto">${paso.mision ? escaparHTML(paso.mision) : `${pideComando ? 'Abre la transacción para: ' : 'Llena el campo: '}${escaparHTML(paso.instruccion)}`}</p>
                     </section>
 
                     <section class="sap" id="lab-sap" aria-label="Simulador de SAP">
@@ -167,6 +175,7 @@ const SAPEngine = {
                         <div class="sap-form">${campos}${campoActivo}${formVacio}</div>
                         ${estado}
                     </section>
+                    ${this.porQue ? '<p class="por-que" id="lab-porque"></p>' : ''}
 
                     ${ayuda}
                 </div>
@@ -177,6 +186,8 @@ const SAPEngine = {
             </div>`, { nav: false });
 
         // Textos que vienen del contenido: se insertan como texto, nunca como HTML
+        const porQue = document.getElementById('lab-porque');
+        if (porQue) porQue.textContent = `Por qué: ${this.porQue}`;
         const pista = document.getElementById('lab-pista');
         if (pista) pista.textContent = this._textoPista;
         const mensaje = document.querySelector('.sap-estado span:last-child');
@@ -200,7 +211,7 @@ const SAPEngine = {
     ejecutar() {
         if (!this.estaAbierta() || this.terminado) return;
         const paso = this.modulo.pasos[this.paso];
-        const pideComando = this.esTransaccion(paso.comando);
+        const pideComando = this.pasoEsComando(paso);
         const input = document.getElementById(pideComando ? 'lab-cmd' : 'lab-campo');
         if (!input) return;
         const valor = input.value.toUpperCase().trim();
@@ -221,9 +232,10 @@ const SAPEngine = {
             this.tcode = { codigo: esperado, descripcion: this.descripcionTransaccion(esperado) };
             this.campos = [];
         } else {
-            this.campos.push({ etq: paso.instruccion, valor: esperado });
+            this.campos.push({ etq: paso.campo || paso.instruccion, valor: esperado });
         }
         this.estado = { ok: true, texto: this.limpiarMensaje(paso.exito) || 'Paso completado.' };
+        this.porQue = paso.porque || '';
         this.paso++;
         this.errores = 0;
         this.pistaNivel = 0;
@@ -236,6 +248,7 @@ const SAPEngine = {
         NativeBridge.vibrarAviso('ERROR');
         this.errores++;
         this.estado = { ok: false, texto: `"${valor}" no es correcto para este paso.` };
+        this.porQue = '';
 
         if (this.modo === 'evaluacion' && this.errores >= MAX_STRIKES) {
             this.resultado(false);
@@ -340,7 +353,7 @@ const SAPEngine = {
         const cmd = String(paso.comando);
         if (cmd.startsWith('/')) return 'Se espera una transacción que empieza por "/".';
         if (/^\d+$/.test(cmd)) return `Se espera un número de ${cmd.length} dígitos.`;
-        if (this.esTransaccion(cmd)) return `Se espera un código de transacción de ${cmd.length} caracteres (letras y números).`;
+        if (this.pasoEsComando(paso)) return `Se espera un código de transacción de ${cmd.length} caracteres (letras y números).`;
         return `La respuesta tiene ${cmd.length} caracteres.`;
     }
 };

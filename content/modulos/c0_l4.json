@@ -1,0 +1,175 @@
+{
+ "id": "c0_l4",
+ "paginas": [
+  {
+   "caso": "En una entrevista para una empresa con sede en otro país te preguntan: \"How do you handle a goods receipt with damaged pallets?\". Entiendes la mitad de la pregunta.",
+   "capas": {
+    "idea": "<p>SAP, los manuales y muchas empresas usan términos en inglés. Aprenderlos te abre puertas dentro y fuera del país.</p><div class=\"tabla\"><table><thead><tr><th>Español</th><th>Inglés</th></tr></thead><tbody><tr><td>Bodega / almacén</td><td>Warehouse</td></tr><tr><td>Ubicación</td><td>Storage bin</td></tr><tr><td>Pasillo</td><td>Aisle</td></tr><tr><td>Estantería</td><td>Rack / shelf</td></tr><tr><td>Estiba</td><td>Pallet</td></tr><tr><td>Montacargas</td><td>Forklift</td></tr><tr><td>Puerta de muelle</td><td>Dock door</td></tr></tbody></table></div>",
+    "detalle": "<p>Ojo con <strong>storage location</strong> y <strong>storage bin</strong>: en SAP no son lo mismo. La <em>storage location</em> (almacén) es un lugar lógico dentro de un centro; el <em>storage bin</em> (ubicación) es el hueco físico exacto en una estantería, que se maneja en WM o EWM.</p>",
+    "sap": "<p>Si inicias sesión en SAP en inglés, verás estos términos en las pantallas. Practicar el vocabulario te permite trabajar en cualquiera de los dos idiomas.</p>"
+   },
+   "glosario": [
+    {
+     "es": "almacén (lógico)",
+     "en": "storage location"
+    },
+    {
+     "es": "ubicación",
+     "en": "storage bin"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>Los procesos de la bodega en inglés:</p><div class=\"tabla\"><table><thead><tr><th>Español</th><th>Inglés</th></tr></thead><tbody><tr><td>Recepción</td><td>Receiving</td></tr><tr><td>Entrada de mercancía</td><td>Goods receipt (GR)</td></tr><tr><td>Ubicar / almacenar</td><td>Put-away</td></tr><tr><td>Alistamiento</td><td>Picking</td></tr><tr><td>Empaque</td><td>Packing</td></tr><tr><td>Despacho</td><td>Shipping</td></tr><tr><td>Salida de mercancía</td><td>Goods issue (GI)</td></tr><tr><td>Traslado</td><td>Stock transfer</td></tr><tr><td>Conteo cíclico</td><td>Cycle count</td></tr></tbody></table></div>",
+    "detalle": "<p>Las siglas <strong>GR</strong> y <strong>GI</strong> aparecen todo el tiempo: en reportes, en correos y en reuniones. \"Post the GI\" significa \"contabiliza la salida de mercancía\".</p>",
+    "sap": "<p>En SAP el verbo <strong>post</strong> (contabilizar) significa registrar definitivamente un movimiento: después de \"post\", el documento existe y afecta el inventario.</p>"
+   },
+   "glosario": [
+    {
+     "es": "contabilizar",
+     "en": "to post"
+    },
+    {
+     "es": "salida de mercancía",
+     "en": "goods issue"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>Documentos y personas de la operación:</p><div class=\"tabla\"><table><thead><tr><th>Español</th><th>Inglés</th></tr></thead><tbody><tr><td>Pedido de compra</td><td>Purchase order (PO)</td></tr><tr><td>Pedido de venta</td><td>Sales order</td></tr><tr><td>Entrega de salida</td><td>Outbound delivery</td></tr><tr><td>Entrega entrante</td><td>Inbound delivery</td></tr><tr><td>Proveedor</td><td>Supplier / vendor</td></tr><tr><td>Cliente</td><td>Customer</td></tr><tr><td>Tiempo de entrega</td><td>Lead time</td></tr><tr><td>Pedido pendiente</td><td>Backorder</td></tr></tbody></table></div>",
+    "detalle": "<p>Frases útiles en el trabajo: \"The shipment is on hold\" (el envío está retenido); \"We are out of stock\" (no hay existencias); \"Please confirm the delivery date\" (confirme la fecha de entrega).</p>",
+    "sap": "<p>En entrevistas, practica contar un proceso completo en inglés: \"We receive the goods, check the quantity against the purchase order, post the goods receipt and put the pallets away.\"</p>"
+   },
+   "glosario": [
+    {
+     "es": "pedido de compra",
+     "en": "purchase order"
+    },
+    {
+     "es": "tiempo de entrega",
+     "en": "lead time"
+    },
+    {
+     "es": "pedido pendiente",
+     "en": "backorder"
+    }
+   ],
+   "puente": "Ya conoces los procesos; ahora solo les pones nombre en inglés. Repite las frases en voz alta: así se fijan mejor."
+  }
+ ],
+ "resumen": "Vocabulario clave: warehouse, storage location (almacén lógico) y storage bin (ubicación física), pallet, forklift, dock door; receiving, goods receipt (GR), put-away, picking, packing, shipping, goods issue (GI), stock transfer, cycle count; purchase order, sales order, inbound y outbound delivery, supplier, customer, lead time y backorder. \"Post\" significa contabilizar.",
+ "examen": [
+  {
+   "pregunta": "¿Cómo se dice \"estiba\" en inglés?",
+   "opciones": [
+    {
+     "texto": "Pallet",
+     "correcta": true
+    },
+    {
+     "texto": "Rack",
+     "correcta": false
+    },
+    {
+     "texto": "Aisle",
+     "correcta": false
+    },
+    {
+     "texto": "Bin",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Pallet es la estiba; rack es la estantería; aisle es el pasillo; bin es la ubicación."
+  },
+  {
+   "pregunta": "En SAP, ¿qué diferencia hay entre storage location y storage bin?",
+   "opciones": [
+    {
+     "texto": "La primera es un almacén lógico; la segunda, un hueco físico",
+     "correcta": true
+    },
+    {
+     "texto": "Son sinónimos y se usan igual",
+     "correcta": false
+    },
+    {
+     "texto": "La primera es un hueco físico; la segunda, una bodega",
+     "correcta": false
+    },
+    {
+     "texto": "La primera es de compras; la segunda, de ventas",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Storage location es el almacén dentro del centro; storage bin es la ubicación exacta que manejan WM y EWM."
+  },
+  {
+   "pregunta": "¿Qué significa \"post the goods issue\"?",
+   "opciones": [
+    {
+     "texto": "Contabilizar la salida de mercancía",
+     "correcta": true
+    },
+    {
+     "texto": "Publicar la salida en la cartelera",
+     "correcta": false
+    },
+    {
+     "texto": "Enviar la mercancía por correo",
+     "correcta": false
+    },
+    {
+     "texto": "Cancelar la salida de mercancía",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Post es contabilizar; goods issue es la salida de mercancía."
+  },
+  {
+   "pregunta": "¿Cuáles de estos términos se refieren a procesos de la bodega? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Put-away",
+     "correcta": true
+    },
+    {
+     "texto": "Picking",
+     "correcta": true
+    },
+    {
+     "texto": "Lead time",
+     "correcta": false
+    },
+    {
+     "texto": "Customer",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Put-away es ubicar y picking es alistar; lead time es tiempo de entrega y customer es cliente."
+  },
+  {
+   "pregunta": "¿Qué es un backorder?",
+   "opciones": [
+    {
+     "texto": "Un pedido pendiente por falta de existencias",
+     "correcta": true
+    },
+    {
+     "texto": "Una devolución al proveedor",
+     "correcta": false
+    },
+    {
+     "texto": "Una orden de transporte",
+     "correcta": false
+    },
+    {
+     "texto": "Un pedido entregado antes de tiempo",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Backorder es la parte de un pedido que no se pudo entregar y queda pendiente."
+  }
+ ]
+}

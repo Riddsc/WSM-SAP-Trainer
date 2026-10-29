@@ -1,0 +1,161 @@
+{
+ "id": "c1_l3",
+ "paginas": [
+  {
+   "caso": "El proveedor vende el café en cajas de 24 bolsas, el cliente compra por bolsas y el transportador cobra por kilos. Llega una entrada de \"10\" y nadie sabe si son 10 cajas o 10 bolsas.",
+   "capas": {
+    "idea": "<p>Cada material tiene una <strong>unidad de medida base</strong>: la unidad en la que SAP lleva todo el stock. Las demás unidades son <strong>alternativas</strong> y se convierten a la base.</p><p>En el caso: la base es la bolsa (UN) y la caja (CJ) es una unidad alternativa: <strong>1 CJ = 24 UN</strong>.</p>",
+    "detalle": "<p>Unidades que aparecen en el maestro:</p><ul><li><strong>Unidad de pedido</strong> (compras): cómo le pedimos al proveedor.</li><li><strong>Unidad de venta</strong>: cómo nos compra el cliente.</li><li><strong>Unidad de salida</strong>: cómo se entrega a producción o a otras áreas.</li></ul><p>Todas se convierten automáticamente a la unidad base al contabilizar.</p>",
+    "sap": "<p>Las conversiones se definen en el maestro de materiales, en la pantalla de unidades de medida alternativas: \"24 UN = 1 CJ\".</p>"
+   },
+   "glosario": [
+    {
+     "es": "unidad de medida alternativa",
+     "en": "alternative unit of measure"
+    },
+    {
+     "es": "unidad de pedido",
+     "en": "order unit"
+    },
+    {
+     "es": "unidad de venta",
+     "en": "sales unit"
+    },
+    {
+     "es": "factor de conversión",
+     "en": "conversion factor"
+    }
+   ]
+  },
+  {
+   "capas": {
+    "idea": "<p>Practiquemos con el café: 1 CJ = 24 UN y cada bolsa pesa 1 kg.</p><ul><li>Entran 10 CJ → el stock sube <strong>240 UN</strong>.</li><li>Un cliente pide 30 UN → equivale a 1 caja y 6 bolsas.</li><li>Un despacho de 5 CJ pesa <strong>120 kg</strong> de producto (más empaque).</li></ul>",
+    "detalle": "<p>Las dimensiones de peso y volumen (peso bruto, peso neto, volumen) también se registran en el maestro. El <strong>peso bruto</strong> incluye el empaque; el <strong>neto</strong>, solo el producto.</p><p>Esos datos se usan para planear el transporte: cuántas estibas caben en un camión y cuánto peso lleva.</p>",
+    "sap": "<p>Si la unidad de pedido es CJ, el pedido de compra se hace en cajas; al recibir, SAP muestra la cantidad en cajas y la contabiliza en unidades base.</p>"
+   },
+   "glosario": [
+    {
+     "es": "peso bruto",
+     "en": "gross weight"
+    },
+    {
+     "es": "peso neto",
+     "en": "net weight"
+    },
+    {
+     "es": "volumen",
+     "en": "volume"
+    }
+   ],
+   "puente": "Es la misma conversión que haces al recibir mercancía por cajas y registrarla por unidades. SAP la hace solo si el factor está bien definido."
+  },
+  {
+   "capas": {
+    "idea": "<p>Una unidad mal definida dispara errores en toda la cadena: compras de más, despachos incompletos e inventario descuadrado.</p>",
+    "detalle": "<p>Buenas prácticas:</p><ul><li>Elige como base la unidad <strong>más pequeña</strong> que se mueve físicamente.</li><li>Define todas las unidades alternativas antes de comprar o vender.</li><li>Confirma el factor de conversión con el proveedor (¿la caja trae 24 o 12?).</li></ul>",
+    "sap": "<p>Cuando el material ya tiene stock o documentos abiertos, SAP no permite cambiar la unidad de medida base de forma directa. Por eso se define bien desde el principio.</p>"
+   },
+   "glosario": [
+    {
+     "es": "existencias",
+     "en": "stock"
+    }
+   ],
+   "error": {
+    "titulo": "elegir la caja como unidad base",
+    "texto": "Si la base es la caja y el cliente compra bolsas sueltas, aparecen fracciones de caja difíciles de controlar. La base debe ser la unidad más pequeña que se mueve."
+   }
+  }
+ ],
+ "resumen": "La unidad de medida base es la unidad del stock; las alternativas (pedido, venta, salida) se convierten con un factor (ej. 1 CJ = 24 UN). Peso bruto, neto y volumen sirven para el transporte. La base debe ser la unidad más pequeña que se mueve, porque no se cambia fácilmente cuando ya hay stock.",
+ "examen": [
+  {
+   "pregunta": "Si 1 CJ = 24 UN y entran 12 CJ, ¿cuánto sube el stock en unidad base?",
+   "opciones": [
+    {
+     "texto": "288 UN",
+     "correcta": true
+    },
+    {
+     "texto": "12 UN",
+     "correcta": false
+    },
+    {
+     "texto": "36 UN",
+     "correcta": false
+    },
+    {
+     "texto": "240 UN",
+     "correcta": false
+    }
+   ],
+   "explicacion": "12 × 24 = 288 unidades."
+  },
+  {
+   "pregunta": "¿En qué unidad lleva SAP las cantidades de stock?",
+   "opciones": [
+    {
+     "texto": "En la unidad de medida base",
+     "correcta": true
+    },
+    {
+     "texto": "En la unidad de pedido",
+     "correcta": false
+    },
+    {
+     "texto": "En la unidad de venta",
+     "correcta": false
+    },
+    {
+     "texto": "En kilogramos siempre",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Todo el stock se lleva en la unidad base; las demás se convierten."
+  },
+  {
+   "pregunta": "¿Qué diferencia hay entre peso bruto y peso neto?",
+   "opciones": [
+    {
+     "texto": "El bruto incluye el empaque; el neto solo el producto",
+     "correcta": true
+    },
+    {
+     "texto": "El neto incluye el empaque; el bruto no",
+     "correcta": false
+    },
+    {
+     "texto": "Son iguales en SAP",
+     "correcta": false
+    },
+    {
+     "texto": "El bruto se usa solo en compras",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Peso bruto = producto + empaque; peso neto = producto."
+  },
+  {
+   "pregunta": "¿Qué buenas prácticas aplican a las unidades de medida? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Usar como base la unidad más pequeña que se mueve",
+     "correcta": true
+    },
+    {
+     "texto": "Confirmar el factor de conversión con el proveedor",
+     "correcta": true
+    },
+    {
+     "texto": "Cambiar la unidad base cada mes",
+     "correcta": false
+    },
+    {
+     "texto": "Usar la caja como base aunque se vendan bolsas",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La base debe ser la unidad mínima física y los factores deben confirmarse."
+  }
+ ]
+}

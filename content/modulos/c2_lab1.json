@@ -1,0 +1,125 @@
+{
+ "id": "c2_lab1",
+ "pasos": [
+  {
+   "tipo": "comando",
+   "comando": "MIGO",
+   "mision": "Abre la transacción de movimientos de mercancía.",
+   "instruccion": "MIGO",
+   "pista": "Movimientos de mercancía: MIGO.",
+   "exito": "MIGO abierto.",
+   "placeholder": ""
+  },
+  {
+   "tipo": "valor",
+   "comando": "A01",
+   "mision": "Elige la acción para recibir mercancía. Escribe su código.",
+   "instruccion": "Acción",
+   "pista": "La entrada de mercancías es A01.",
+   "exito": "Acción: Entrada de mercancías.",
+   "placeholder": "",
+   "campo": "Acción"
+  },
+  {
+   "tipo": "valor",
+   "comando": "R01",
+   "mision": "Elige la referencia: un pedido de compra. Escribe su código.",
+   "instruccion": "Documento de referencia",
+   "pista": "El pedido de compra es R01.",
+   "exito": "Referencia: Pedido.",
+   "placeholder": "",
+   "campo": "Documento de referencia"
+  },
+  {
+   "tipo": "valor",
+   "comando": "4500000010",
+   "mision": "Escribe el número del pedido que trae el proveedor.",
+   "instruccion": "Pedido",
+   "pista": "El pedido es 4500000010.",
+   "exito": "Pedido 4500000010: CAFE-1000, 20 CJ (480 UN).",
+   "placeholder": "",
+   "campo": "Pedido"
+  },
+  {
+   "tipo": "valor",
+   "comando": "101",
+   "mision": "Confirma la clase de movimiento para entrada por pedido de compra.",
+   "instruccion": "Clase de movimiento",
+   "pista": "La entrada por pedido es 101.",
+   "exito": "Clase de movimiento 101.",
+   "placeholder": "",
+   "campo": "Clase de movimiento"
+  },
+  {
+   "tipo": "valor",
+   "comando": "20",
+   "mision": "Contaste 20 cajas en buen estado. Escribe la cantidad recibida en cajas.",
+   "instruccion": "Cantidad en UMP",
+   "pista": "Llegaron 20 cajas.",
+   "exito": "Cantidad 20 CJ = 480 UN.",
+   "placeholder": "",
+   "campo": "Cantidad en UMP",
+   "porque": "Se recibe en la unidad del pedido (cajas) y SAP convierte a la unidad base: 20 × 24 = 480 UN."
+  },
+  {
+   "tipo": "valor",
+   "comando": "0001",
+   "mision": "Indica el almacén donde quedará el stock.",
+   "instruccion": "Almacén",
+   "pista": "El almacén es 0001.",
+   "exito": "Almacén 0001 Bodega principal.",
+   "placeholder": "",
+   "campo": "Almacén"
+  },
+  {
+   "tipo": "valor",
+   "comando": "X",
+   "mision": "Marca la posición como OK. Escribe X.",
+   "instruccion": "Posición OK",
+   "pista": "Escribe X para marcar OK.",
+   "exito": "Posición 1 OK.",
+   "placeholder": "",
+   "campo": "Posición OK"
+  },
+  {
+   "tipo": "valor",
+   "comando": "CONTABILIZAR",
+   "mision": "Contabiliza la entrada. Escribe CONTABILIZAR.",
+   "instruccion": "Acción",
+   "pista": "Escribe CONTABILIZAR.",
+   "exito": "Documento de material 5000000231 contabilizado.",
+   "placeholder": "",
+   "campo": "Acción",
+   "porque": "Al contabilizar se crean el documento de material y el contable (stock contra cuenta GR/IR)."
+  },
+  {
+   "tipo": "comando",
+   "comando": "MMBE",
+   "mision": "Verifica el stock. Cambia de transacción con /n.",
+   "instruccion": "MMBE",
+   "pista": "Escribe /nMMBE.",
+   "exito": "Resumen de stock: selección.",
+   "placeholder": ""
+  },
+  {
+   "tipo": "valor",
+   "comando": "CAFE-1000",
+   "mision": "Indica el material.",
+   "instruccion": "Material",
+   "pista": "El material es CAFE-1000.",
+   "exito": "Material válido.",
+   "placeholder": "",
+   "campo": "Material"
+  },
+  {
+   "tipo": "valor",
+   "comando": "480",
+   "mision": "Ejecuta con F8. ¿Cuántas unidades base hay ahora en libre utilización?",
+   "instruccion": "Stock libre (UN)",
+   "pista": "20 cajas × 24 unidades.",
+   "exito": "Stock libre utilización 1010 / 0001: 480 UN.",
+   "placeholder": "",
+   "campo": "Stock libre (UN)"
+  }
+ ]
+}

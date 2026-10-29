@@ -429,6 +429,12 @@ body.sin-nav .bottom-nav { display: none; }
 .contenido-leccion details[open] summary::after { transform: translateY(-30%) rotate(-135deg); }
 .contenido-leccion .details-content { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 10px; }
 
+.contenido-leccion .tabla { overflow-x: auto; }
+.contenido-leccion table { width: 100%; border-collapse: collapse; font-size: 0.95rem; line-height: 1.4; }
+.contenido-leccion th { text-align: left; font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--texto-suave); padding: 8px; border-bottom: 1.5px solid var(--linea); }
+.contenido-leccion td { padding: 8px; border-bottom: 1px solid var(--linea-suave); vertical-align: top; }
+.contenido-leccion td:first-child { font-weight: 700; }
+.contenido-leccion .nota { font-size: 0.95rem; color: var(--texto-suave); }
 .caso { background: var(--caso-fondo); border: 1px solid var(--caso-borde); border-radius: var(--r-lg); padding: 14px; display: flex; flex-direction: column; gap: 8px; }
 .caso-etiqueta { align-self: flex-start; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; background: var(--ambar); color: var(--sobre-ambar); border-radius: 6px; padding: 3px 8px; }
 .caso p { font-size: 1rem; line-height: 1.5; }
@@ -514,6 +520,7 @@ body.sin-nav .bottom-nav { display: none; }
 .sap-estado.mal { color: #B42318; }
 .sap-estado .codigo { font-weight: 500; }
 
+.por-que { font-size: 0.9rem; line-height: 1.45; color: var(--texto-suave); background: var(--superficie); border: 1px dashed var(--linea); border-radius: var(--r-md); padding: 10px 12px; }
 .lab-error { animation: sacudir 0.3s; }
 @keyframes sacudir { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 

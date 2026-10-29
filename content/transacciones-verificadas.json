@@ -1,43 +1,348 @@
 {
   "nota": "Transacciones SAP confirmadas contra fuentes. Solo estas pueden usarse como comandos en los laboratorios. Agregar una nueva exige citar la fuente.",
-  "actualizado": "2026-10-28",
+  "actualizado": "2026-10-29",
   "transacciones": [
-    { "codigo": "SPRO", "modulo": "Base", "descripcion": "Guía de implementación (IMG), árbol de configuración", "fuente": "Glosario original de la app; transacción estándar de SAP" },
-    { "codigo": "OX09", "modulo": "MM", "descripcion": "Mantener almacenes (ubicaciones de stock) por centro", "fuente": "Glosario original de la app" },
-    { "codigo": "MM01", "modulo": "MM", "descripcion": "Crear maestro de materiales", "fuente": "Transacción estándar de SAP" },
-    { "codigo": "MIGO", "modulo": "MM/IM", "descripcion": "Movimientos de mercancía", "fuente": "Glosario original de la app" },
-    { "codigo": "MMBE", "modulo": "MM/IM", "descripcion": "Resumen de stocks", "fuente": "Glosario original de la app" },
-    { "codigo": "MB52", "modulo": "MM/IM", "descripcion": "Stocks por almacén", "fuente": "Transacción estándar de SAP" },
-    { "codigo": "ME21N", "modulo": "MM", "descripcion": "Crear pedido de compras", "fuente": "Glosario original de la app" },
-    { "codigo": "VL31N", "modulo": "LE", "descripcion": "Crear entrega entrante", "fuente": "Glosario original de la app" },
-    { "codigo": "VL32N", "modulo": "LE", "descripcion": "Modificar entrega entrante", "fuente": "Transacción estándar de SAP" },
-    { "codigo": "QA32", "modulo": "QM", "descripcion": "Lista de lotes de inspección / decisión de empleo", "fuente": "Transacción estándar de SAP" },
-    { "codigo": "MFBF", "modulo": "PP", "descripcion": "Notificación de fabricación repetitiva (backflush)", "fuente": "Transacción estándar de SAP" },
-    { "codigo": "/SCWM/MON", "modulo": "EWM", "descripcion": "Monitor de gestión de almacenes", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/MAT1", "modulo": "EWM", "descripcion": "Producto de almacén", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/LS01", "modulo": "EWM", "descripcion": "Crear ubicación", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/LS03", "modulo": "EWM", "descripcion": "Visualizar ubicación", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/IDN", "modulo": "EWM", "descripcion": "Notificación de entrega entrante", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/PRDI", "modulo": "EWM", "descripcion": "Mantener entrega entrante", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/TODLV_I", "modulo": "EWM", "descripcion": "Crear tareas de ubicación para entrega entrante", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/ODR", "modulo": "EWM", "descripcion": "Solicitud de entrega de salida", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/PRDO", "modulo": "EWM", "descripcion": "Mantener orden de entrega de salida", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/TODLV_O", "modulo": "EWM", "descripcion": "Crear tareas de picking para entrega de salida", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/WAVE", "modulo": "EWM", "descripcion": "Gestión de olas", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/TO_CONF", "modulo": "EWM", "descripcion": "Confirmar tarea de almacén", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/CANCPICK", "modulo": "EWM", "descripcion": "Cancelar picking", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/ADPROD", "modulo": "EWM", "descripcion": "Tarea de almacén ad hoc para producto", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/ADHU", "modulo": "EWM", "descripcion": "Tarea de almacén ad hoc para unidad de manipulación", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/ADGI", "modulo": "EWM", "descripcion": "Salida de mercancía no planificada", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/RFUI", "modulo": "EWM", "descripcion": "Entorno de radiofrecuencia (RF)", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/PACK", "modulo": "EWM", "descripcion": "Puesto de trabajo de embalaje", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/POST", "modulo": "EWM", "descripcion": "Cambiar atributos de stock", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/PI_CREATE", "modulo": "EWM", "descripcion": "Crear documentos de inventario físico", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/PI_PROCESS", "modulo": "EWM", "descripcion": "Procesar inventario físico", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/DIFF_ANALYZER", "modulo": "EWM", "descripcion": "Analizador de diferencias de inventario", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/TU", "modulo": "EWM", "descripcion": "Unidad de transporte (patio y muelle)", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/RSRC", "modulo": "EWM", "descripcion": "Mantener recursos", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/QSEQ", "modulo": "EWM", "descripcion": "Secuencia de colas por grupo de recursos", "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes" },
-    { "codigo": "/SCWM/STAGE", "modulo": "EWM", "descripcion": "Planificar la preparación para producción", "fuente": "https://www.erplingo.com/sap-transaction-code/en/SCWM/STAGE" }
+    {
+      "codigo": "SPRO",
+      "modulo": "Base",
+      "descripcion": "Guía de implementación (IMG), árbol de configuración",
+      "fuente": "Glosario original de la app; transacción estándar de SAP"
+    },
+    {
+      "codigo": "OX09",
+      "modulo": "MM",
+      "descripcion": "Mantener almacenes (ubicaciones de stock) por centro",
+      "fuente": "Glosario original de la app"
+    },
+    {
+      "codigo": "MM01",
+      "modulo": "MM",
+      "descripcion": "Crear maestro de materiales",
+      "fuente": "Transacción estándar de SAP"
+    },
+    {
+      "codigo": "MIGO",
+      "modulo": "MM/IM",
+      "descripcion": "Movimientos de mercancía",
+      "fuente": "SAP Learning: Inventory Management and Physical Inventory in SAP S/4HANA (learning.sap.com)"
+    },
+    {
+      "codigo": "MMBE",
+      "modulo": "MM/IM",
+      "descripcion": "Resumen de stocks",
+      "fuente": "SAP Learning: Inventory Management and Physical Inventory in SAP S/4HANA (learning.sap.com)"
+    },
+    {
+      "codigo": "MB52",
+      "modulo": "MM/IM",
+      "descripcion": "Stocks por almacén",
+      "fuente": "SAP Learning: Inventory Management and Physical Inventory in SAP S/4HANA (learning.sap.com)"
+    },
+    {
+      "codigo": "ME21N",
+      "modulo": "MM",
+      "descripcion": "Crear pedido de compras",
+      "fuente": "Glosario original de la app"
+    },
+    {
+      "codigo": "VL31N",
+      "modulo": "LE",
+      "descripcion": "Crear entrega entrante",
+      "fuente": "Glosario original de la app"
+    },
+    {
+      "codigo": "VL32N",
+      "modulo": "LE",
+      "descripcion": "Modificar entrega entrante",
+      "fuente": "Transacción estándar de SAP"
+    },
+    {
+      "codigo": "QA32",
+      "modulo": "QM",
+      "descripcion": "Lista de lotes de inspección / decisión de empleo",
+      "fuente": "Transacción estándar de SAP"
+    },
+    {
+      "codigo": "MFBF",
+      "modulo": "PP",
+      "descripcion": "Notificación de fabricación repetitiva (backflush)",
+      "fuente": "Transacción estándar de SAP"
+    },
+    {
+      "codigo": "/SCWM/MON",
+      "modulo": "EWM",
+      "descripcion": "Monitor de gestión de almacenes",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/MAT1",
+      "modulo": "EWM",
+      "descripcion": "Producto de almacén",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/LS01",
+      "modulo": "EWM",
+      "descripcion": "Crear ubicación",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/LS03",
+      "modulo": "EWM",
+      "descripcion": "Visualizar ubicación",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/IDN",
+      "modulo": "EWM",
+      "descripcion": "Notificación de entrega entrante",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/PRDI",
+      "modulo": "EWM",
+      "descripcion": "Mantener entrega entrante",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/TODLV_I",
+      "modulo": "EWM",
+      "descripcion": "Crear tareas de ubicación para entrega entrante",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/ODR",
+      "modulo": "EWM",
+      "descripcion": "Solicitud de entrega de salida",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/PRDO",
+      "modulo": "EWM",
+      "descripcion": "Mantener orden de entrega de salida",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/TODLV_O",
+      "modulo": "EWM",
+      "descripcion": "Crear tareas de picking para entrega de salida",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/WAVE",
+      "modulo": "EWM",
+      "descripcion": "Gestión de olas",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/TO_CONF",
+      "modulo": "EWM",
+      "descripcion": "Confirmar tarea de almacén",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/CANCPICK",
+      "modulo": "EWM",
+      "descripcion": "Cancelar picking",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/ADPROD",
+      "modulo": "EWM",
+      "descripcion": "Tarea de almacén ad hoc para producto",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/ADHU",
+      "modulo": "EWM",
+      "descripcion": "Tarea de almacén ad hoc para unidad de manipulación",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/ADGI",
+      "modulo": "EWM",
+      "descripcion": "Salida de mercancía no planificada",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/RFUI",
+      "modulo": "EWM",
+      "descripcion": "Entorno de radiofrecuencia (RF)",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/PACK",
+      "modulo": "EWM",
+      "descripcion": "Puesto de trabajo de embalaje",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/POST",
+      "modulo": "EWM",
+      "descripcion": "Cambiar atributos de stock",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/PI_CREATE",
+      "modulo": "EWM",
+      "descripcion": "Crear documentos de inventario físico",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/PI_PROCESS",
+      "modulo": "EWM",
+      "descripcion": "Procesar inventario físico",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/DIFF_ANALYZER",
+      "modulo": "EWM",
+      "descripcion": "Analizador de diferencias de inventario",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/TU",
+      "modulo": "EWM",
+      "descripcion": "Unidad de transporte (patio y muelle)",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/RSRC",
+      "modulo": "EWM",
+      "descripcion": "Mantener recursos",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/QSEQ",
+      "modulo": "EWM",
+      "descripcion": "Secuencia de colas por grupo de recursos",
+      "fuente": "https://summit-bi.com/resources/ewm-reference/tcodes"
+    },
+    {
+      "codigo": "/SCWM/STAGE",
+      "modulo": "EWM",
+      "descripcion": "Planificar la preparación para producción",
+      "fuente": "https://www.erplingo.com/sap-transaction-code/en/SCWM/STAGE"
+    },
+    {
+      "codigo": "MM02",
+      "modulo": "MM",
+      "descripcion": "Modificar maestro de materiales",
+      "fuente": "Transacción estándar de SAP S/4HANA"
+    },
+    {
+      "codigo": "MM03",
+      "modulo": "MM",
+      "descripcion": "Visualizar maestro de materiales",
+      "fuente": "Transacción estándar de SAP S/4HANA"
+    },
+    {
+      "codigo": "MM06",
+      "modulo": "MM",
+      "descripcion": "Marcar material para borrado",
+      "fuente": "Transacción estándar de SAP S/4HANA"
+    },
+    {
+      "codigo": "OX02",
+      "modulo": "Base",
+      "descripcion": "Definir sociedad (configuración)",
+      "fuente": "SAP Help / IMG: Estructura de empresa (Enterprise Structure) en MM"
+    },
+    {
+      "codigo": "OX10",
+      "modulo": "Base",
+      "descripcion": "Definir centro (configuración)",
+      "fuente": "SAP Help / IMG: Estructura de empresa (Enterprise Structure) en MM"
+    },
+    {
+      "codigo": "OX18",
+      "modulo": "Base",
+      "descripcion": "Asignar centro a sociedad (configuración)",
+      "fuente": "SAP Help / IMG: Estructura de empresa (Enterprise Structure) en MM"
+    },
+    {
+      "codigo": "OX14",
+      "modulo": "MM",
+      "descripcion": "Definir el nivel de valoración (configuración)",
+      "fuente": "SAP Help / IMG: Estructura de empresa (Enterprise Structure) en MM"
+    },
+    {
+      "codigo": "BP",
+      "modulo": "Base",
+      "descripcion": "Socio comercial: clientes y proveedores en S/4HANA",
+      "fuente": "Transacción estándar de SAP S/4HANA"
+    },
+    {
+      "codigo": "ME51N",
+      "modulo": "MM",
+      "descripcion": "Crear solicitud de pedido",
+      "fuente": "Transacción estándar de SAP S/4HANA"
+    },
+    {
+      "codigo": "ME23N",
+      "modulo": "MM",
+      "descripcion": "Visualizar pedido de compra",
+      "fuente": "Transacción estándar de SAP S/4HANA"
+    },
+    {
+      "codigo": "MIRO",
+      "modulo": "MM",
+      "descripcion": "Registrar factura de proveedor (verificación de facturas)",
+      "fuente": "Transacción estándar de SAP S/4HANA"
+    },
+    {
+      "codigo": "MB51",
+      "modulo": "MM/IM",
+      "descripcion": "Lista de documentos de material",
+      "fuente": "SAP Learning: Inventory Management and Physical Inventory in SAP S/4HANA (learning.sap.com)"
+    },
+    {
+      "codigo": "MB5B",
+      "modulo": "MM/IM",
+      "descripcion": "Stocks a una fecha de contabilización",
+      "fuente": "SAP Learning: Inventory Management and Physical Inventory in SAP S/4HANA (learning.sap.com)"
+    },
+    {
+      "codigo": "MI01",
+      "modulo": "MM/IM",
+      "descripcion": "Crear documento de inventario físico",
+      "fuente": "SAP Help: Physical Inventory (MM-IM), help.sap.com"
+    },
+    {
+      "codigo": "MI04",
+      "modulo": "MM/IM",
+      "descripcion": "Registrar recuento de inventario físico",
+      "fuente": "SAP Help: Physical Inventory (MM-IM), help.sap.com"
+    },
+    {
+      "codigo": "MI07",
+      "modulo": "MM/IM",
+      "descripcion": "Contabilizar diferencias de inventario",
+      "fuente": "SAP Help: Physical Inventory (MM-IM), help.sap.com"
+    },
+    {
+      "codigo": "MI20",
+      "modulo": "MM/IM",
+      "descripcion": "Lista de diferencias de inventario",
+      "fuente": "SAP Help: Physical Inventory (MM-IM), help.sap.com"
+    },
+    {
+      "codigo": "VA01",
+      "modulo": "SD",
+      "descripcion": "Crear pedido de venta",
+      "fuente": "Transacción estándar de SAP S/4HANA"
+    },
+    {
+      "codigo": "VL01N",
+      "modulo": "SD/LE",
+      "descripcion": "Crear entrega de salida",
+      "fuente": "Transacción estándar de SAP S/4HANA"
+    },
+    {
+      "codigo": "VL02N",
+      "modulo": "SD/LE",
+      "descripcion": "Modificar entrega de salida y contabilizar salida de mercancía",
+      "fuente": "Transacción estándar de SAP S/4HANA"
+    }
   ]
 }

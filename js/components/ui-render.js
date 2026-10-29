@@ -229,7 +229,7 @@ const UIRenderer = {
                 <div class="lista-modulos">
                     ${mods.map(m => this.tarjetaModulo(m)).join('')}
                 </div>
-                <p class="texto-suave" style="font-size:0.85rem;">Mientras se reescriben los cursos, este ciclo usa los módulos actuales de la app. En las siguientes fases se reemplazan por los nuevos.</p>`;
+                ${mods.some(m => /^s\d/.test(m.id)) ? '<p class="texto-suave" style="font-size:0.85rem;">Mientras se reescriben los cursos, este ciclo usa los módulos de la versión anterior. En las siguientes fases se reemplazan por los nuevos.</p>' : ''}`;
         }
 
         this.mostrar(`
@@ -253,17 +253,19 @@ const UIRenderer = {
         const disponible = AppState.estaDisponible(m);
         const puntaje = AppState.getScore(m.id);
         const lab = m.tipo === 'lab';
+        const examen = m.tipo === 'exam';
+        const tipoTexto = lab ? 'Laboratorio' : examen ? 'Examen del ciclo' : 'Lección y mini quiz';
         let estado = '<span class="chip chip-cerrado">Cerrado</span>';
         if (completado) estado = `<span class="chip chip-exito">Aprobado${puntaje !== null ? ` · ${puntaje} %` : ''}</span>`;
         else if (disponible) estado = '<span class="chip chip-cian">Disponible</span>';
         const textoEstado = completado ? 'aprobado' : disponible ? 'disponible' : 'cerrado';
 
         return `
-            <button type="button" class="modulo ${lab ? 'lab' : ''}" ${disponible || completado ? `onclick="Router.openModule('${m.id}')"` : 'disabled'}
-                aria-label="${lab ? 'Laboratorio' : 'Lección'}: ${escaparHTML(m.titulo)}. ${textoEstado}">
-                <span class="modulo-icono">${disponible || completado ? (lab ? Icono.terminal() : Icono.libro()) : Icono.candado(20)}</span>
+            <button type="button" class="modulo ${lab ? 'lab' : ''} ${examen ? 'examen' : ''}" ${disponible || completado ? `onclick="Router.openModule('${m.id}')"` : 'disabled'}
+                aria-label="${tipoTexto}: ${escaparHTML(m.titulo)}. ${textoEstado}">
+                <span class="modulo-icono">${disponible || completado ? (lab ? Icono.terminal() : examen ? Icono.medalla() : Icono.libro()) : Icono.candado(20)}</span>
                 <span class="modulo-textos">
-                    <span class="modulo-tipo">${lab ? 'Laboratorio' : 'Lección y examen'}</span>
+                    <span class="modulo-tipo">${tipoTexto}${m.duracion ? ` · ${escaparHTML(m.duracion)}` : ''}</span>
                     <span class="modulo-titulo">${escaparHTML(m.titulo)}</span>
                     ${m.descripcion ? `<span class="modulo-desc">${escaparHTML(m.descripcion)}</span>` : ''}
                     <span class="modulo-estado">${estado}</span>
@@ -289,6 +291,10 @@ const UIRenderer = {
 
         if (mod.tipo === 'lab') {
             SAPEngine.abrir(mod);
+            return;
+        }
+        if (mod.tipo === 'exam') {
+            this.portadaExamen(mod);
             return;
         }
 
@@ -331,8 +337,37 @@ const UIRenderer = {
                 <footer class="barra-inf">
                     <button class="btn btn-secundario btn-alto" type="button" ${i === 0 ? 'disabled' : `onclick="UIRenderer.cambiarPagina('${itemId}', ${i - 1})"`}>Anterior</button>
                     ${ultima
-                        ? `<button class="btn btn-primario btn-alto" type="button" onclick="UIRenderer.startExam('${itemId}')">Presentar examen ${Icono.siguiente()}</button>`
+                        ? `<button class="btn btn-primario btn-alto" type="button" onclick="UIRenderer.startExam('${itemId}')">Hacer el mini quiz ${Icono.siguiente()}</button>`
                         : `<button class="btn btn-primario btn-alto" type="button" onclick="UIRenderer.cambiarPagina('${itemId}', ${i + 1})">Siguiente ${Icono.siguiente()}</button>`}
+                </footer>
+            </div>`, { nav: false });
+    },
+
+    /** Portada del examen del ciclo: reglas antes de empezar. */
+    portadaExamen(mod) {
+        const ciclo = ContentStore.cicloDe(mod.id);
+        const n = Math.min(mod.preguntasPorIntento || (mod.banco || []).length, (mod.banco || []).length);
+        const puntaje = AppState.getScore(mod.id);
+        const robots = Robots.visibles();
+        this.mostrar(`
+            <div class="vista">
+                ${this.barraSup({ antetitulo: ciclo ? `Ciclo ${ciclo.numero} · ${escaparHTML(ciclo.corto)}` : 'Examen', titulo: 'Examen del ciclo', atras: ciclo ? `Router.abrirCiclo('${ciclo.id}')` : 'Router.renderDashboard()' })}
+                <div class="vista-cuerpo">
+                    <section class="resultado">
+                        ${robots ? Robots.svg(Robots.principal(), 'explicando', 110) : ''}
+                        <h2 class="titulo-pagina">${escaparHTML(mod.titulo)}</h2>
+                        ${mod.descripcion ? `<p class="texto-suave">${escaparHTML(mod.descripcion)}</p>` : ''}
+                    </section>
+                    <section class="tarjeta" style="display:flex; flex-direction:column; gap:8px;">
+                        <span class="antetitulo">Reglas</span>
+                        <p><strong>${n} preguntas</strong> tomadas al azar de un banco de ${(mod.banco || []).length}. Cada intento es distinto.</p>
+                        <p>Algunas tienen <strong>varias respuestas correctas</strong>: la pregunta te dice cuántas elegir.</p>
+                        <p>Apruebas con <strong>80 %</strong>. Al final verás por qué cada respuesta es correcta.</p>
+                        ${puntaje !== null ? `<p class="texto-suave">Tu mejor puntaje: ${puntaje} %</p>` : ''}
+                    </section>
+                </div>
+                <footer class="barra-inf">
+                    <button class="btn btn-primario btn-alto" type="button" onclick="UIRenderer.startExam('${mod.id}')">Empezar el examen ${Icono.siguiente()}</button>
                 </footer>
             </div>`, { nav: false });
     },
@@ -400,13 +435,16 @@ const UIRenderer = {
         this.moduloActual = itemId;
         smartNotes.setContext(itemId, mod.titulo);
 
-        const preguntas = shuffleArray(mod.examen || []).map(p => {
+        let fuente = shuffleArray(mod.banco || mod.examen || []);
+        if (mod.preguntasPorIntento) fuente = fuente.slice(0, mod.preguntasPorIntento);
+        const preguntas = fuente.map(p => {
             const opciones = shuffleArray(p.opciones);
             const correctas = opciones.filter(o => o.correcta).length;
             return { ...p, opciones, multiple: correctas > 1, nCorrectas: correctas };
         });
         this.examen = {
             id: itemId,
+            tipo: mod.tipo,
             titulo: mod.titulo,
             ciclo: ContentStore.cicloDe(itemId),
             preguntas,
@@ -458,7 +496,7 @@ const UIRenderer = {
         this.mostrar(`
             <div class="vista">
                 ${this.barraSup({
-                    antetitulo: `Examen${ex.ciclo ? ` · Ciclo ${ex.ciclo.numero}` : ''}`,
+                    antetitulo: `${ex.tipo === 'exam' ? 'Examen del ciclo' : 'Mini quiz'}${ex.ciclo ? ` · Ciclo ${ex.ciclo.numero}` : ''}`,
                     titulo: `Pregunta ${i + 1} de ${total}`,
                     cerrar: 'UIRenderer.salirExamen()',
                     acciones: `<div class="reloj" role="timer" aria-label="Tiempo transcurrido">${Icono.reloj()}<span id="reloj-texto">${this.tiempoTranscurrido()}</span></div>`,
@@ -468,7 +506,7 @@ const UIRenderer = {
                     <span class="pregunta-tipo">${tipo}</span>
                     <h2 class="pregunta-texto" id="pregunta-texto">${p.pregunta}</h2>
                     <div class="opciones" role="group" aria-labelledby="pregunta-texto">${opciones}</div>
-                    ${i === 0 ? `<div class="nota-evaluacion">${Robots.visibles() ? Robots.svg(Robots.complemento(), 'explicando', 52) : ''}<span>En el examen no hay pistas. Necesitas 80 % para aprobar; las preguntas cambian de orden en cada intento.</span></div>` : ''}
+                    ${i === 0 ? `<div class="nota-evaluacion">${Robots.visibles() ? Robots.svg(Robots.complemento(), 'explicando', 52) : ''}<span>Aquí no hay pistas. Necesitas 80 % para aprobar; las preguntas y opciones cambian de orden en cada intento.</span></div>` : ''}
                 </div>
                 <footer class="barra-inf">
                     <button class="btn-icono" style="width:52px;height:52px;border-radius:14px" type="button" ${i === 0 ? 'disabled' : `onclick="UIRenderer.irPregunta(${i - 1})"`} aria-label="Pregunta anterior">${Icono.anterior(20)}</button>
@@ -530,7 +568,7 @@ const UIRenderer = {
         this.mostrar(`
             <div class="vista">
                 ${this.barraSup({
-                    antetitulo: `Examen${ex.ciclo ? ` · Ciclo ${ex.ciclo.numero}` : ''}`,
+                    antetitulo: `${ex.tipo === 'exam' ? 'Examen del ciclo' : 'Mini quiz'}${ex.ciclo ? ` · Ciclo ${ex.ciclo.numero}` : ''}`,
                     titulo: 'Resumen antes de entregar',
                     atras: `UIRenderer.irPregunta(${total - 1})`,
                     acciones: `<div class="reloj" role="timer" aria-label="Tiempo transcurrido">${Icono.reloj()}<span id="reloj-texto">${this.tiempoTranscurrido()}</span></div>`
@@ -603,7 +641,7 @@ const UIRenderer = {
 
         this.mostrar(`
             <div class="vista">
-                ${this.barraSup({ antetitulo: escaparHTML(ex.titulo), titulo: aprobado ? 'Examen aprobado' : 'Examen no aprobado', atras: ciclo ? `Router.abrirCiclo('${ciclo.id}')` : 'Router.renderDashboard()' })}
+                ${this.barraSup({ antetitulo: escaparHTML(ex.titulo), titulo: aprobado ? (ex.tipo === 'exam' ? 'Ciclo aprobado' : 'Aprobado') : 'No aprobado', atras: ciclo ? `Router.abrirCiclo('${ciclo.id}')` : 'Router.renderDashboard()' })}
                 <div class="vista-cuerpo">
                     <section class="resultado">
                         ${robots ? Robots.svg(aprobado ? Robots.principal() : Robots.complemento(), aprobado ? 'celebrando' : 'pensando', 120) : ''}
@@ -613,7 +651,7 @@ const UIRenderer = {
                         ${aprobado
                             ? `${siguiente ? `<button class="btn btn-primario btn-alto" type="button" onclick="Router.openModule('${siguiente.id}')">Continuar con lo siguiente ${Icono.siguiente()}</button>` : ''}
                                <button class="btn btn-secundario" type="button" onclick="Router.renderDashboard('${ciclo ? ciclo.id : ''}')">Ver el mapa</button>`
-                            : `<button class="btn btn-primario btn-alto" type="button" onclick="Router.openModule('${ex.id}')">Repasar la teoría</button>
+                            : `<button class="btn btn-primario btn-alto" type="button" onclick="${ex.tipo === 'exam' && ciclo ? `Router.abrirCiclo('${ciclo.id}')` : `Router.openModule('${ex.id}')`}">Repasar la teoría</button>
                                <button class="btn btn-secundario" type="button" onclick="UIRenderer.startExam('${ex.id}')">Intentar de nuevo</button>`}
                     </section>
                     <h2 class="titulo-seccion">Retroalimentación</h2>

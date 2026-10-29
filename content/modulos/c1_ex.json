@@ -1,0 +1,490 @@
+{
+ "id": "c1_ex",
+ "banco": [
+  {
+   "pregunta": "¿Cuántos caracteres tiene el código de una sociedad?",
+   "opciones": [
+    {
+     "texto": "4",
+     "correcta": true
+    },
+    {
+     "texto": "3",
+     "correcta": false
+    },
+    {
+     "texto": "2",
+     "correcta": false
+    },
+    {
+     "texto": "10",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Sociedad, centro y almacén usan 4 caracteres; el mandante, 3 dígitos."
+  },
+  {
+   "pregunta": "Una empresa abre una nueva sede de distribución con la misma razón social. ¿Qué se crea normalmente?",
+   "opciones": [
+    {
+     "texto": "Un centro nuevo",
+     "correcta": true
+    },
+    {
+     "texto": "Una sociedad nueva",
+     "correcta": false
+    },
+    {
+     "texto": "Un mandante nuevo",
+     "correcta": false
+    },
+    {
+     "texto": "Un tipo de material nuevo",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Misma empresa legal → misma sociedad; la sede nueva es un centro."
+  },
+  {
+   "pregunta": "¿Qué es cierto sobre el almacén (storage location)? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Se define dentro de un centro",
+     "correcta": true
+    },
+    {
+     "texto": "El stock se lleva por centro y almacén",
+     "correcta": true
+    },
+    {
+     "texto": "Puede pertenecer a varios centros a la vez",
+     "correcta": false
+    },
+    {
+     "texto": "Tiene contabilidad propia",
+     "correcta": false
+    }
+   ],
+   "explicacion": "El almacén vive dentro de un centro y es el nivel donde se llevan las cantidades."
+  },
+  {
+   "pregunta": "¿Qué transacción define los almacenes de un centro?",
+   "opciones": [
+    {
+     "texto": "OX09",
+     "correcta": true
+    },
+    {
+     "texto": "OX18",
+     "correcta": false
+    },
+    {
+     "texto": "OX02",
+     "correcta": false
+    },
+    {
+     "texto": "MM02",
+     "correcta": false
+    }
+   ],
+   "explicacion": "OX09 define almacenes; OX18 asigna centros a sociedades; OX02 define sociedades."
+  },
+  {
+   "pregunta": "¿Qué unidad organizativa define desde dónde salen los despachos?",
+   "opciones": [
+    {
+     "texto": "El punto de expedición",
+     "correcta": true
+    },
+    {
+     "texto": "El grupo de compras",
+     "correcta": false
+    },
+    {
+     "texto": "El canal de distribución",
+     "correcta": false
+    },
+    {
+     "texto": "La clase de valoración",
+     "correcta": false
+    }
+   ],
+   "explicacion": "El punto de expedición (shipping point) se asigna al centro y organiza los despachos."
+  },
+  {
+   "pregunta": "¿Cuál es la diferencia entre MM y WM/EWM en el manejo del stock?",
+   "opciones": [
+    {
+     "texto": "MM dice cuánto hay y cuánto vale; WM/EWM dice en qué ubicación está",
+     "correcta": true
+    },
+    {
+     "texto": "MM maneja ubicaciones; WM solo valores",
+     "correcta": false
+    },
+    {
+     "texto": "Son lo mismo con otro nombre",
+     "correcta": false
+    },
+    {
+     "texto": "WM/EWM maneja precios de venta",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Inventarios (MM) lleva cantidades y valores por almacén; WM/EWM lleva ubicaciones exactas."
+  },
+  {
+   "pregunta": "¿En qué nivel se recomienda valorar el inventario?",
+   "opciones": [
+    {
+     "texto": "El centro",
+     "correcta": true
+    },
+    {
+     "texto": "El almacén",
+     "correcta": false
+    },
+    {
+     "texto": "El mandante",
+     "correcta": false
+    },
+    {
+     "texto": "El grupo de compras",
+     "correcta": false
+    }
+   ],
+   "explicacion": "SAP recomienda valorar a nivel de centro; es obligatorio con planificación de producción o costeo."
+  },
+  {
+   "pregunta": "¿Cuál es el tipo de material para materia prima?",
+   "opciones": [
+    {
+     "texto": "ROH",
+     "correcta": true
+    },
+    {
+     "texto": "HAWA",
+     "correcta": false
+    },
+    {
+     "texto": "FERT",
+     "correcta": false
+    },
+    {
+     "texto": "DIEN",
+     "correcta": false
+    }
+   ],
+   "explicacion": "ROH es materia prima; HAWA mercadería; FERT producto terminado; DIEN servicios."
+  },
+  {
+   "pregunta": "¿Qué tipo de material corresponde a repuestos?",
+   "opciones": [
+    {
+     "texto": "ERSA",
+     "correcta": true
+    },
+    {
+     "texto": "VERP",
+     "correcta": false
+    },
+    {
+     "texto": "NLAG",
+     "correcta": false
+    },
+    {
+     "texto": "HALB",
+     "correcta": false
+    }
+   ],
+   "explicacion": "ERSA son repuestos; VERP embalaje; NLAG no almacenable; HALB semielaborado."
+  },
+  {
+   "pregunta": "¿Qué datos se guardan a nivel de centro? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Planificación de necesidades (MRP)",
+     "correcta": true
+    },
+    {
+     "texto": "Datos de compras",
+     "correcta": true
+    },
+    {
+     "texto": "Descripción del material",
+     "correcta": false
+    },
+    {
+     "texto": "Unidad de medida base",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MRP y compras son vistas de centro; descripción y unidad base son datos básicos de mandante."
+  },
+  {
+   "pregunta": "¿Qué transacción se usa para modificar un material?",
+   "opciones": [
+    {
+     "texto": "MM02",
+     "correcta": true
+    },
+    {
+     "texto": "MM01",
+     "correcta": false
+    },
+    {
+     "texto": "MM03",
+     "correcta": false
+    },
+    {
+     "texto": "MMBE",
+     "correcta": false
+    }
+   ],
+   "explicacion": "MM02 modifica; MM01 crea; MM03 visualiza; MMBE consulta stock."
+  },
+  {
+   "pregunta": "Con precio medio variable, hay 50 UN a 200 c/u y entran 50 UN a 240 c/u. ¿Nuevo precio?",
+   "opciones": [
+    {
+     "texto": "220",
+     "correcta": true
+    },
+    {
+     "texto": "240",
+     "correcta": false
+    },
+    {
+     "texto": "200",
+     "correcta": false
+    },
+    {
+     "texto": "230",
+     "correcta": false
+    }
+   ],
+   "explicacion": "(10.000 + 12.000) / 100 = 220."
+  },
+  {
+   "pregunta": "¿Qué ocurre con las variaciones de costo cuando se usa precio estándar?",
+   "opciones": [
+    {
+     "texto": "Van a cuentas de diferencia de precio",
+     "correcta": true
+    },
+    {
+     "texto": "Cambian el precio del material",
+     "correcta": false
+    },
+    {
+     "texto": "Se pierden y no se registran",
+     "correcta": false
+    },
+    {
+     "texto": "Se suman al precio de venta",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Con precio estándar el precio no cambia: las diferencias van a cuentas de diferencias."
+  },
+  {
+   "pregunta": "¿Qué conecta la clase de valoración?",
+   "opciones": [
+    {
+     "texto": "El material con las cuentas contables",
+     "correcta": true
+    },
+    {
+     "texto": "El material con el proveedor",
+     "correcta": false
+    },
+    {
+     "texto": "El centro con la sociedad",
+     "correcta": false
+    },
+    {
+     "texto": "El cliente con la organización de ventas",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La clase de valoración determina las cuentas de mayor de los movimientos de inventario."
+  },
+  {
+   "pregunta": "Si 1 CJ = 12 UN y un cliente pide 5 CJ, ¿cuántas unidades base salen?",
+   "opciones": [
+    {
+     "texto": "60 UN",
+     "correcta": true
+    },
+    {
+     "texto": "17 UN",
+     "correcta": false
+    },
+    {
+     "texto": "5 UN",
+     "correcta": false
+    },
+    {
+     "texto": "120 UN",
+     "correcta": false
+    }
+   ],
+   "explicacion": "5 × 12 = 60 unidades."
+  },
+  {
+   "pregunta": "¿Por qué no conviene cambiar la unidad base cuando el material ya tiene movimientos?",
+   "opciones": [
+    {
+     "texto": "Porque SAP no lo permite directamente con stock o documentos abiertos",
+     "correcta": true
+    },
+    {
+     "texto": "Porque borra el material",
+     "correcta": false
+    },
+    {
+     "texto": "Porque cambia la sociedad",
+     "correcta": false
+    },
+    {
+     "texto": "Porque desactiva el centro",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Con stock o documentos abiertos, el cambio de unidad base está bloqueado; por eso se define bien desde el inicio."
+  },
+  {
+   "pregunta": "¿Qué unidad usa compras para pedir al proveedor?",
+   "opciones": [
+    {
+     "texto": "La unidad de pedido",
+     "correcta": true
+    },
+    {
+     "texto": "La unidad de venta",
+     "correcta": false
+    },
+    {
+     "texto": "La unidad de salida",
+     "correcta": false
+    },
+    {
+     "texto": "La unidad de transporte",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La unidad de pedido (order unit) se usa en el pedido de compra."
+  },
+  {
+   "pregunta": "¿Qué es cierto sobre el socio comercial en S/4HANA? Elige 2.",
+   "opciones": [
+    {
+     "texto": "Un mismo tercero puede tener rol de cliente y de proveedor",
+     "correcta": true
+    },
+    {
+     "texto": "Se gestiona con la transacción BP",
+     "correcta": true
+    },
+    {
+     "texto": "Solo sirve para empleados",
+     "correcta": false
+    },
+    {
+     "texto": "Reemplaza al maestro de materiales",
+     "correcta": false
+    }
+   ],
+   "explicacion": "El BP unifica clientes y proveedores mediante roles."
+  },
+  {
+   "pregunta": "¿Qué rol se usa para un cliente en ventas?",
+   "opciones": [
+    {
+     "texto": "FLCU01",
+     "correcta": true
+    },
+    {
+     "texto": "FLVN01",
+     "correcta": false
+    },
+    {
+     "texto": "FLVN00",
+     "correcta": false
+    },
+    {
+     "texto": "MM01",
+     "correcta": false
+    }
+   ],
+   "explicacion": "FLCU01 es cliente para ventas; FLCU00 es cliente en contabilidad financiera."
+  },
+  {
+   "pregunta": "¿Qué indica la lista de fuentes?",
+   "opciones": [
+    {
+     "texto": "Los proveedores autorizados para un material en un centro",
+     "correcta": true
+    },
+    {
+     "texto": "Los clientes con crédito aprobado",
+     "correcta": false
+    },
+    {
+     "texto": "Las transacciones permitidas a un usuario",
+     "correcta": false
+    },
+    {
+     "texto": "Las ubicaciones libres de la bodega",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La lista de fuentes (source list) controla de qué proveedores se puede comprar."
+  },
+  {
+   "pregunta": "¿Dónde se guardan los cambios de configuración para llevarlos a producción?",
+   "opciones": [
+    {
+     "texto": "En una orden de transporte de customizing",
+     "correcta": true
+    },
+    {
+     "texto": "En un documento de material",
+     "correcta": false
+    },
+    {
+     "texto": "En un pedido de compra",
+     "correcta": false
+    },
+    {
+     "texto": "En el maestro de materiales",
+     "correcta": false
+    }
+   ],
+   "explicacion": "La configuración viaja en órdenes de transporte de DEV a QAS y PRD."
+  },
+  {
+   "pregunta": "¿Qué debes hacer antes de crear un material nuevo?",
+   "opciones": [
+    {
+     "texto": "Buscar si ya existe con MM03 y la ayuda F4",
+     "correcta": true
+    },
+    {
+     "texto": "Crear dos códigos por si acaso",
+     "correcta": false
+    },
+    {
+     "texto": "Pedir un mandante nuevo",
+     "correcta": false
+    },
+    {
+     "texto": "Borrar los materiales parecidos",
+     "correcta": false
+    }
+   ],
+   "explicacion": "Buscar primero evita duplicados que parten el stock y el historial."
+  }
+ ],
+ "preguntasPorIntento": 15
+}

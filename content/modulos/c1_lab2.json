@@ -1,0 +1,128 @@
+{
+ "id": "c1_lab2",
+ "pasos": [
+  {
+   "tipo": "comando",
+   "comando": "MM01",
+   "mision": "Abre la transacción para crear un material.",
+   "instruccion": "MM01",
+   "pista": "Crear material: MM01.",
+   "exito": "Crear material: pantalla inicial.",
+   "placeholder": ""
+  },
+  {
+   "tipo": "valor",
+   "comando": "CAFE-1000",
+   "mision": "La empresa usa numeración externa. Escribe el código del material nuevo.",
+   "instruccion": "Material",
+   "pista": "El código es CAFE-1000.",
+   "exito": "Número de material disponible.",
+   "placeholder": "",
+   "campo": "Material"
+  },
+  {
+   "tipo": "valor",
+   "comando": "M",
+   "mision": "Elige el ramo que usa la empresa por defecto: M (Ingeniería mecánica).",
+   "instruccion": "Ramo",
+   "pista": "El ramo es M.",
+   "exito": "Ramo M tomado.",
+   "placeholder": "",
+   "campo": "Ramo",
+   "porque": "Muchas empresas usan un solo ramo para todo; el ramo influye en qué campos aparecen."
+  },
+  {
+   "tipo": "valor",
+   "comando": "HAWA",
+   "mision": "Elige el tipo de material correcto para un producto que se compra y se vende sin transformar.",
+   "instruccion": "Tipo de material",
+   "pista": "Es mercadería: HAWA.",
+   "exito": "Tipo de material HAWA: Mercaderías.",
+   "placeholder": "",
+   "campo": "Tipo de material",
+   "porque": "HAWA propone precio medio variable y permite las vistas de compras y ventas."
+  },
+  {
+   "tipo": "valor",
+   "comando": "1010",
+   "mision": "Indica el centro donde se va a manejar el material.",
+   "instruccion": "Centro",
+   "pista": "El centro es 1010.",
+   "exito": "Niveles organizativos: centro 1010.",
+   "placeholder": "",
+   "campo": "Centro"
+  },
+  {
+   "tipo": "valor",
+   "comando": "0001",
+   "mision": "Indica el almacén donde se va a guardar.",
+   "instruccion": "Almacén",
+   "pista": "El almacén es 0001.",
+   "exito": "Almacén 0001 Bodega principal.",
+   "placeholder": "",
+   "campo": "Almacén"
+  },
+  {
+   "tipo": "valor",
+   "comando": "CAFE MOLIDO 1 KG",
+   "mision": "En Datos básicos 1, escribe la descripción: CAFE MOLIDO 1 KG.",
+   "instruccion": "Texto breve de material",
+   "pista": "La descripción es CAFE MOLIDO 1 KG.",
+   "exito": "Descripción tomada.",
+   "placeholder": "",
+   "campo": "Texto breve de material"
+  },
+  {
+   "tipo": "valor",
+   "comando": "UN",
+   "mision": "Define la unidad de medida base: la bolsa se maneja por unidad (UN).",
+   "instruccion": "Unidad de medida base",
+   "pista": "La unidad es UN.",
+   "exito": "Unidad de medida base UN.",
+   "placeholder": "",
+   "campo": "Unidad de medida base",
+   "porque": "Todo el stock se lleva en la unidad base. En SAP en español, la unidad \"pieza\" se muestra como UN."
+  },
+  {
+   "tipo": "valor",
+   "comando": "CAFE",
+   "mision": "Asigna el grupo de artículos CAFE.",
+   "instruccion": "Grupo de artículos",
+   "pista": "El grupo es CAFE.",
+   "exito": "Grupo de artículos CAFE.",
+   "placeholder": "",
+   "campo": "Grupo de artículos"
+  },
+  {
+   "tipo": "valor",
+   "comando": "3100",
+   "mision": "En la vista Contabilidad 1, asigna la clase de valoración de mercadería.",
+   "instruccion": "Clase de valoración",
+   "pista": "En el estándar, la mercadería usa 3100.",
+   "exito": "Clase de valoración 3100: Mercaderías.",
+   "placeholder": "",
+   "campo": "Clase de valoración"
+  },
+  {
+   "tipo": "valor",
+   "comando": "V",
+   "mision": "Elige el control de precio para mercadería.",
+   "instruccion": "Control de precio",
+   "pista": "Precio medio variable: V.",
+   "exito": "Control de precios V.",
+   "placeholder": "",
+   "campo": "Control de precio",
+   "porque": "Con precio medio variable, el precio se recalcula con cada entrada de mercancía."
+  },
+  {
+   "tipo": "valor",
+   "comando": "GUARDAR",
+   "mision": "Guarda el material.",
+   "instruccion": "Acción",
+   "pista": "Escribe GUARDAR.",
+   "exito": "Material CAFE-1000 creado.",
+   "placeholder": "",
+   "campo": "Acción"
+  }
+ ]
+}

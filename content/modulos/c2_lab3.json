@@ -1,0 +1,154 @@
+{
+ "id": "c2_lab3",
+ "pasos": [
+  {
+   "tipo": "comando",
+   "comando": "MI01",
+   "mision": "Abre la transacción para crear un documento de inventario físico.",
+   "instruccion": "MI01",
+   "pista": "Crear documento de inventario: MI01.",
+   "exito": "Crear documento de inventario: pantalla inicial.",
+   "placeholder": ""
+  },
+  {
+   "tipo": "valor",
+   "comando": "1010",
+   "mision": "Indica el centro.",
+   "instruccion": "Centro",
+   "pista": "El centro es 1010.",
+   "exito": "Centro 1010.",
+   "placeholder": "",
+   "campo": "Centro"
+  },
+  {
+   "tipo": "valor",
+   "comando": "0001",
+   "mision": "Indica el almacén que se va a contar.",
+   "instruccion": "Almacén",
+   "pista": "Se cuenta la bodega principal: 0001.",
+   "exito": "Almacén 0001.",
+   "placeholder": "",
+   "campo": "Almacén"
+  },
+  {
+   "tipo": "valor",
+   "comando": "X",
+   "mision": "Activa el bloqueo de contabilización para que nadie mueva el material durante el conteo. Escribe X.",
+   "instruccion": "Bloqueo contabilización",
+   "pista": "Escribe X.",
+   "exito": "Bloqueo de contabilización activado.",
+   "placeholder": "",
+   "campo": "Bloqueo contabilización",
+   "porque": "Si alguien despacha mientras se cuenta, el conteo deja de servir."
+  },
+  {
+   "tipo": "valor",
+   "comando": "CAFE-1000",
+   "mision": "Agrega el material a contar.",
+   "instruccion": "Material",
+   "pista": "El material es CAFE-1000.",
+   "exito": "Posición 1: CAFE-1000.",
+   "placeholder": "",
+   "campo": "Material"
+  },
+  {
+   "tipo": "valor",
+   "comando": "GUARDAR",
+   "mision": "Guarda el documento.",
+   "instruccion": "Acción",
+   "pista": "Escribe GUARDAR.",
+   "exito": "Documento de inventario 100000045 creado.",
+   "placeholder": "",
+   "campo": "Acción"
+  },
+  {
+   "tipo": "comando",
+   "comando": "MI04",
+   "mision": "El equipo terminó de contar. Abre la transacción para registrar el conteo.",
+   "instruccion": "MI04",
+   "pista": "Registrar conteo: MI04.",
+   "exito": "Entrar recuento: pantalla inicial.",
+   "placeholder": ""
+  },
+  {
+   "tipo": "valor",
+   "comando": "100000045",
+   "mision": "Indica el documento de inventario.",
+   "instruccion": "Documento de inventario",
+   "pista": "El documento es 100000045.",
+   "exito": "Documento 100000045, ejercicio actual.",
+   "placeholder": "",
+   "campo": "Documento de inventario"
+  },
+  {
+   "tipo": "valor",
+   "comando": "430",
+   "mision": "El conteo físico dio 430 bolsas. Regístralo.",
+   "instruccion": "Cantidad contada (UN)",
+   "pista": "Contaron 430.",
+   "exito": "Cantidad contada 430 UN.",
+   "placeholder": "",
+   "campo": "Cantidad contada (UN)"
+  },
+  {
+   "tipo": "valor",
+   "comando": "GUARDAR",
+   "mision": "Guarda el conteo.",
+   "instruccion": "Acción",
+   "pista": "Escribe GUARDAR.",
+   "exito": "Recuento registrado para el documento 100000045.",
+   "placeholder": "",
+   "campo": "Acción"
+  },
+  {
+   "tipo": "valor",
+   "comando": "2",
+   "mision": "SAP tenía 432 UN y contaron 430. ¿Cuántas unidades faltan?",
+   "instruccion": "Faltante (UN)",
+   "pista": "432 − 430.",
+   "exito": "Diferencia: −2 UN.",
+   "placeholder": "",
+   "campo": "Faltante (UN)",
+   "porque": "Antes de ajustar, revisa en MB51 si hubo movimientos sin registrar."
+  },
+  {
+   "tipo": "comando",
+   "comando": "MI07",
+   "mision": "Ya investigaste y la diferencia es real. Abre la transacción para contabilizar diferencias.",
+   "instruccion": "MI07",
+   "pista": "Contabilizar diferencias: MI07.",
+   "exito": "Contabilizar diferencias: pantalla inicial.",
+   "placeholder": ""
+  },
+  {
+   "tipo": "valor",
+   "comando": "100000045",
+   "mision": "Indica el documento de inventario.",
+   "instruccion": "Documento de inventario",
+   "pista": "El documento es 100000045.",
+   "exito": "Documento 100000045: diferencia −2 UN.",
+   "placeholder": "",
+   "campo": "Documento de inventario"
+  },
+  {
+   "tipo": "valor",
+   "comando": "702",
+   "mision": "¿Con qué clase de movimiento contabilizará SAP este faltante?",
+   "instruccion": "Clase de movimiento",
+   "pista": "Faltante de inventario: 702.",
+   "exito": "Clase de movimiento 702 propuesta.",
+   "placeholder": "",
+   "campo": "Clase de movimiento"
+  },
+  {
+   "tipo": "valor",
+   "comando": "CONTABILIZAR",
+   "mision": "Contabiliza la diferencia.",
+   "instruccion": "Acción",
+   "pista": "Escribe CONTABILIZAR.",
+   "exito": "Diferencias contabilizadas. Bloqueo levantado.",
+   "placeholder": "",
+   "campo": "Acción"
+  }
+ ]
+}

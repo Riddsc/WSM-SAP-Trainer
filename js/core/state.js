@@ -169,7 +169,9 @@ const AppState = {
 
     /** Un módulo está disponible si no tiene requisito o si el requisito ya se aprobó. */
     estaDisponible(mod) {
-        return !mod.requisito || this.isCompleted(mod.requisito);
+        if (!mod.requisito || this.isCompleted(mod.requisito)) return true;
+        // Quien ya había aprobado el módulo equivalente de la versión anterior no pierde su avance
+        return !!mod.requisitoLegado && this.isCompleted(mod.requisitoLegado);
     },
 
     /** El siguiente módulo por estudiar, en el orden del catálogo. */
