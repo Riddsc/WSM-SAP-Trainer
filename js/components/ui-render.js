@@ -367,7 +367,7 @@ const UIRenderer = {
                 ${p.glosario.map(t => `<span lang="es">${escaparHTML(t.es)} · <em lang="en">${escaparHTML(t.en)}</em></span>`).join('')}
             </div></div>`;
         }
-        if (p.puente) html += this.cajaPuente('Puente SENA', p.puente);
+        if (p.puente) html += this.cajaPuente('Conecta con lo que sabes', p.puente);
         if (p.error) {
             html += `<details class="error-comun"><summary><span class="icono-error">${Icono.alerta()}</span><span style="flex:1"><strong>Error común:</strong> ${escaparHTML(p.error.titulo || '')}</span>${Icono.bajar()}</summary><p>${p.error.texto || ''}</p></details>`;
         }
