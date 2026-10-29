@@ -69,30 +69,20 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon
 
-      - name: Firmar APK con la llave guardada en Secrets
-        env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      - name: Firmar APK con la llave del repositorio
+        # Siempre la misma llave (logistica.keystore): las actualizaciones se instalan encima sin desinstalar.
         run: |
-          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
-            echo "::error::Faltan los Secrets de firma (ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD). La app compiló bien, pero no se puede firmar sin ellos."
-            exit 1
-          fi
-          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/firma.keystore"
           BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
           UNSIGNED=android/app/build/outputs/apk/release/app-release-unsigned.apk
           "$BUILD_TOOLS/zipalign" -p -f 4 "$UNSIGNED" "$RUNNER_TEMP/alineado.apk"
           "$BUILD_TOOLS/apksigner" sign \
-            --ks "$RUNNER_TEMP/firma.keystore" \
-            --ks-key-alias "$KEY_ALIAS" \
-            --ks-pass env:KEYSTORE_PASSWORD \
-            --key-pass env:KEY_PASSWORD \
+            --ks logistica.keystore \
+            --ks-key-alias logistica_alias \
+            --ks-pass pass:logistica123 \
+            --key-pass pass:logistica123 \
             --out "LogisticaPro-${APP_VERSION_NAME}.apk" \
             "$RUNNER_TEMP/alineado.apk"
-          "$BUILD_TOOLS/apksigner" verify "LogisticaPro-${APP_VERSION_NAME}.apk"
-          rm -f "$RUNNER_TEMP/firma.keystore"
+          "$BUILD_TOOLS/apksigner" verify --print-certs "LogisticaPro-${APP_VERSION_NAME}.apk" | grep -i "SHA-256"
 
       - name: Subir APK
         uses: actions/upload-artifact@v4
