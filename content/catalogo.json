@@ -1,5 +1,214 @@
 {
-  "version": 1,
+  "version": 2,
+  "zonas": [
+    {
+      "id": "fundamentos",
+      "titulo": "Fundamentos · Oficina",
+      "etiqueta": "Ciclos 0–2",
+      "ciclos": [
+        "c0",
+        "c1",
+        "c2"
+      ],
+      "icono": null
+    },
+    {
+      "id": "wm",
+      "titulo": "WM clásico · Estanterías",
+      "etiqueta": "Ciclo 3",
+      "ciclos": [
+        "c3"
+      ],
+      "icono": "estanteria"
+    },
+    {
+      "id": "ewm",
+      "titulo": "EWM · Centro de distribución",
+      "etiqueta": "Ciclos 4–9",
+      "ciclos": [
+        "c4",
+        "c5",
+        "c6",
+        "c7",
+        "c8",
+        "c9"
+      ],
+      "icono": null
+    },
+    {
+      "id": "muelles",
+      "titulo": "Muelles · Transporte y carrera",
+      "etiqueta": "Ciclos 10–11",
+      "ciclos": [
+        "c10",
+        "c11"
+      ],
+      "icono": "camion"
+    }
+  ],
+  "ciclos": [
+    {
+      "id": "c0",
+      "numero": 0,
+      "ruta": "Fundamentos",
+      "nombre": "Del SENA a SAP",
+      "corto": "Del SENA a SAP",
+      "horas": 15,
+      "fase": 2,
+      "temas": "Cadena de suministro, qué es un ERP, S/4HANA, navegar SAP GUI y Fiori, inglés técnico logístico I",
+      "modulos": []
+    },
+    {
+      "id": "c1",
+      "numero": 1,
+      "ruta": "Fundamentos",
+      "nombre": "Estructura y materiales",
+      "corto": "Estructura",
+      "horas": 25,
+      "fase": 2,
+      "temas": "Mandante, sociedad, centro y almacén; maestro de materiales; unidades de medida",
+      "modulos": [
+        "s1_m1",
+        "s1_l1",
+        "s1_m2",
+        "s1_l2"
+      ]
+    },
+    {
+      "id": "c2",
+      "numero": 2,
+      "ruta": "Fundamentos",
+      "nombre": "Gestión de inventarios",
+      "corto": "Inventarios",
+      "horas": 25,
+      "fase": 2,
+      "temas": "Tipos de movimiento, entradas y salidas de mercancía, traslados, consulta de stock, compras y entregas básicas",
+      "modulos": []
+    },
+    {
+      "id": "c3",
+      "numero": 3,
+      "ruta": "WM clásico",
+      "nombre": "Bodega con LE-WM",
+      "corto": "Bodega con LE-WM",
+      "horas": 30,
+      "fase": 3,
+      "temas": "Número de almacén, tipos de almacenamiento, ubicaciones, cuantos, órdenes y necesidades de transporte, estrategias, inventario WM",
+      "modulos": []
+    },
+    {
+      "id": "c4",
+      "numero": 4,
+      "ruta": "EWM",
+      "nombre": "Estructura y datos maestros",
+      "corto": "Datos maestros",
+      "horas": 25,
+      "fase": 4,
+      "temas": "Embebido vs. descentralizado, básico vs. avanzado, estructura de bodega, producto de almacén, monitor, radiofrecuencia",
+      "modulos": []
+    },
+    {
+      "id": "c5",
+      "numero": 5,
+      "ruta": "EWM",
+      "nombre": "Entradas (inbound)",
+      "corto": "Entradas",
+      "horas": 30,
+      "fase": 4,
+      "temas": "Entrega entrante, descarga, recepción, tareas de almacén, control orientado al proceso y al layout, estrategias de ubicación, devoluciones",
+      "modulos": [
+        "s2_m1",
+        "s2_l1",
+        "s2_m2",
+        "s2_l2"
+      ]
+    },
+    {
+      "id": "c6",
+      "numero": 6,
+      "ruta": "EWM",
+      "nombre": "Salidas (outbound)",
+      "corto": "Salidas",
+      "horas": 30,
+      "fase": 4,
+      "temas": "Entrega de salida, olas, reglas de creación de órdenes de bodega, estrategias de retiro, picking, embalaje, carga, excepciones",
+      "modulos": [
+        "s3_m1",
+        "s3_l1",
+        "s3_m2",
+        "s3_l2"
+      ]
+    },
+    {
+      "id": "c7",
+      "numero": 7,
+      "ruta": "EWM",
+      "nombre": "Interno e inventario",
+      "corto": "Interno",
+      "horas": 25,
+      "fase": 4,
+      "temas": "Tipos de proceso de almacén, reabastecimiento, movimientos ad hoc, cambios de stock, inventario físico, lotes y números de serie",
+      "modulos": []
+    },
+    {
+      "id": "c8",
+      "numero": 8,
+      "ruta": "EWM",
+      "nombre": "EWM avanzado",
+      "corto": "Avanzado",
+      "horas": 35,
+      "fase": 5,
+      "temas": "Recursos y colas, task interleaving, gestión de personal, servicios de valor agregado, cross-docking, patio, slotting, producción, calidad, automatización (MFS)",
+      "modulos": [
+        "s4_m1",
+        "s4_l1",
+        "s4_m2",
+        "s4_l2",
+        "s5_m1",
+        "s5_l1",
+        "s5_m2",
+        "s5_l2",
+        "s6_m2",
+        "s6_l2"
+      ]
+    },
+    {
+      "id": "c9",
+      "numero": 9,
+      "ruta": "EWM",
+      "nombre": "Migración y proyectos",
+      "corto": "Migración",
+      "horas": 15,
+      "fase": 5,
+      "temas": "De WM a EWM, Stock Room Management, cuándo usar básico o avanzado, metodología SAP Activate, rol del usuario clave y del consultor",
+      "modulos": []
+    },
+    {
+      "id": "c10",
+      "numero": 10,
+      "ruta": "Transporte",
+      "nombre": "SAP TM",
+      "corto": "SAP TM",
+      "horas": 35,
+      "fase": 6,
+      "temas": "Fundamentos del transporte, Incoterms, red de transporte, requerimientos y órdenes de flete, planificación, subcontratación, costos de flete, integración con EWM",
+      "modulos": [
+        "s6_m1",
+        "s6_l1"
+      ]
+    },
+    {
+      "id": "c11",
+      "numero": 11,
+      "ruta": "Carrera",
+      "nombre": "Certificación y carrera",
+      "corto": "Carrera",
+      "horas": 15,
+      "fase": 6,
+      "temas": "Simulacros C_S4EWM y C_S4TM, proyecto integrador, hoja de vida y entrevistas en inglés, ruta profesional",
+      "modulos": []
+    }
+  ],
   "modulos": [
     {
       "id": "s1_m1",

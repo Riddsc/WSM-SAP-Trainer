@@ -1,10 +1,11 @@
 {
   "name": "logistica-pro",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "description": "Logística Pro: maestría práctica en SAP para logística de bodega (WM y EWM) y transporte (TM)",
   "scripts": {
-    "validar": "node scripts/validar-contenido.js"
+    "validar": "node scripts/validar-contenido.js",
+    "fuentes": "node scripts/copiar-fuentes.js"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
@@ -17,6 +18,9 @@
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^8.0.0"
+    "@capacitor/cli": "^8.0.0",
+    "@fontsource/atkinson-hyperlegible": "^5.0.0",
+    "@fontsource/barlow-condensed": "^5.0.0",
+    "@fontsource/jetbrains-mono": "^5.0.0"
   }
 }

@@ -1,8 +1,11 @@
 /**
- * Logística Pro - Simulador de terminal SAP.
- * Cada laboratorio es una sesión con sus propios temporizadores. Al cerrar
- * la terminal se cancelan todos, así nada sigue corriendo por detrás ni
- * afecta otra pantalla u otro laboratorio.
+ * Logística Pro - Laboratorio: simulador con pantallas tipo SAP.
+ *
+ * Cada paso espera una transacción (en el campo de comando) o un valor
+ * (en el formulario). Hay dos modos:
+ *   - Práctica: Mechanizer da pistas progresivas; sirve para aprender.
+ *   - Evaluación: sin pistas y con 3 intentos por paso; aprobarlo marca
+ *     el laboratorio como completado.
  */
 const MAX_STRIKES = 3;
 
@@ -10,226 +13,334 @@ const SAPEngine = {
     modulo: null,
     paso: 0,
     errores: 0,
-    sesion: 0,          // cambia en cada apertura; invalida temporizadores viejos
-    temporizadores: [],
-    escribiendo: null,
+    modo: 'practica',
+    pistaNivel: 0,
+    tcode: null,
+    campos: [],
+    estado: null,
+    terminado: false,
 
-    init() {
-        const input = document.getElementById('terminal-input');
-        const cerrar = document.getElementById('terminal-close-btn');
-        if (input) {
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.execute();
-                }
-            });
+    async abrir(modulo, modo = 'practica') {
+        if (!modulo.pasos || modulo.pasos.length === 0) {
+            UIRenderer.renderError('Este laboratorio no tiene pasos.', 'Avísale al autor de la app.');
+            return;
         }
-        const ejecutar = document.getElementById('terminal-exec-btn');
-        if (ejecutar) ejecutar.addEventListener('click', () => this.execute());
-        if (cerrar) cerrar.addEventListener('click', () => this.closeTerminal());
+        Router.irA('lab');
+        UIRenderer.moduloActual = modulo.id;
+        smartNotes.setContext(modulo.id, modulo.titulo);
+        await this.cargarTransacciones();
+        this.modulo = modulo;
+        this.modo = modo;
+        this.reiniciarDatos();
+        this.render(true);
+    },
+
+    async cargarTransacciones() {
+        if (UIRenderer.transacciones) return;
+        try {
+            const r = await fetch('content/transacciones-verificadas.json');
+            UIRenderer.transacciones = (await r.json()).transacciones;
+        } catch (e) {
+            UIRenderer.transacciones = [];
+        }
+    },
+
+    reiniciarDatos() {
+        this.paso = 0;
+        this.errores = 0;
+        this.pistaNivel = 0;
+        this.tcode = null;
+        this.campos = [];
+        this.estado = null;
+        this.terminado = false;
     },
 
     estaAbierta() {
-        const overlay = document.getElementById('sap-terminal-overlay');
-        return !!overlay && !overlay.classList.contains('terminal-hidden');
+        return Router.currentView === 'lab' && !!this.modulo;
     },
 
-    /** Programa una acción que solo ocurre si la sesión sigue siendo la misma. */
-    despues(ms, accion) {
-        const sesion = this.sesion;
-        const id = setTimeout(() => {
-            if (sesion === this.sesion) accion();
-        }, ms);
-        this.temporizadores.push(id);
+    /** ¿El paso espera una transacción (va en el campo de comando)? */
+    esTransaccion(cmd) {
+        const c = String(cmd).toUpperCase().trim();
+        const lista = UIRenderer.transacciones || [];
+        if (lista.some(t => t.codigo.toUpperCase() === c)) return true;
+        return c.startsWith('/') || /^[A-Z]{2,4}\d{1,3}[A-Z]?$/.test(c);
     },
 
-    cancelarTodo() {
-        this.temporizadores.forEach(clearTimeout);
-        this.temporizadores = [];
-        if (this.escribiendo) clearInterval(this.escribiendo);
-        this.escribiendo = null;
+    descripcionTransaccion(cmd) {
+        const t = (UIRenderer.transacciones || []).find(x => x.codigo.toUpperCase() === String(cmd).toUpperCase());
+        return t ? t.descripcion : 'Transacción';
     },
 
-    async open(id) {
-        AudioEngine.play('click');
-        let modulo;
-        try {
-            modulo = await ContentStore.cargar(id);
-        } catch (e) {
-            alert('No se pudo cargar el laboratorio. Intenta de nuevo.');
+    tituloCorto() {
+        return this.modulo.titulo.replace(/^[\d.]+\s*/, '').replace(/^Lab(oratorio)?( Multi-Paso)?:\s*/i, '');
+    },
+
+    limpiarMensaje(texto) {
+        return String(texto || '').replace(/^>\s*/, '').replace(/\n+/g, ' ').trim();
+    },
+
+    // ------------------------------------------
+    // Dibujo de la pantalla
+    // ------------------------------------------
+    render(animarCamion = false) {
+        const m = this.modulo;
+        const ciclo = ContentStore.cicloDe(m.id);
+        const total = m.pasos.length;
+        const paso = m.pasos[this.paso];
+        const pideComando = this.esTransaccion(paso.comando);
+        const practica = this.modo === 'practica';
+
+        const puntos = m.pasos.map((_, i) => `<span class="${i < this.paso ? 'hecho' : i === this.paso ? 'actual' : ''}"></span>`).join('');
+
+        const campos = this.campos.map(c => `
+            <span class="sap-etq">${escaparHTML(c.etq)}</span>
+            <span class="sap-valor" title="${escaparHTML(c.valor)}">${escaparHTML(c.valor)}</span>`).join('');
+        const campoActivo = pideComando ? '' : `
+            <label for="lab-campo">${escaparHTML(paso.instruccion)}</label>
+            <input id="lab-campo" autocomplete="off" spellcheck="false" autocapitalize="characters" enterkeyhint="send" placeholder="${escaparHTML(paso.placeholder || 'Valor')}">`;
+        const formVacio = !campos && pideComando ? '<span class="sap-vacio">Escribe la transacción en el campo de comando y confírmala.</span>' : '';
+
+        const estado = this.estado
+            ? `<div class="sap-estado ${this.estado.ok ? 'ok' : 'mal'}" role="status">${this.estado.ok ? Icono.check(16) : Icono.alerta(16)}<span></span></div>`
+            : '<div class="sap-estado" role="status"><span class="texto-suave" style="color:#4A6268">Listo.</span></div>';
+
+        let ayuda;
+        if (practica) {
+            const textos = [
+                '¿Te atascaste? Pide una pista y te oriento sin darte la respuesta.',
+                `Pista 1 de 2: relee la misión. ${this.orientacion(paso)}`,
+                `Pista 2 de 2: ${paso.pista || paso.comando}`
+            ];
+            const nivel = Math.min(this.pistaNivel, 2);
+            const boton = nivel < 2
+                ? `<button type="button" class="btn btn-secundario btn-chico" onclick="SAPEngine.pedirPista()">${nivel === 0 ? 'Pedir pista' : 'Otra pista'}</button>` : '';
+            ayuda = Robots.visibles()
+                ? `<section class="robot-dice mech">${Robots.svg('mech', nivel === 0 ? 'explicando' : 'pensando', 74)}<div class="globo"><span class="globo-quien">Mechanizer · ${nivel === 0 ? 'Práctica' : 'Pista'}</span><span id="lab-pista"></span>${boton}</div></section>`
+                : `<section class="tarjeta" style="display:flex; flex-direction:column; gap:8px; padding:12px"><span class="antetitulo">Práctica</span><span id="lab-pista"></span>${boton}</section>`;
+            this._textoPista = textos[nivel];
+        } else {
+            const quedan = MAX_STRIKES - this.errores;
+            ayuda = `<div class="nota-evaluacion">${Robots.visibles() ? Robots.svg('mech', this.errores ? 'alertando' : 'explicando', 52) : ''}<span>Modo evaluación: sin pistas. Te quedan <strong>${quedan}</strong> intento(s) en este paso.</span></div>`;
+            this._textoPista = '';
+        }
+
+        UIRenderer.mostrar(`
+            <div class="vista">
+                ${UIRenderer.barraSup({
+                    antetitulo: `Laboratorio${ciclo ? ` · Ciclo ${ciclo.numero}` : ''}`,
+                    titulo: escaparHTML(this.tituloCorto()),
+                    cerrar: 'SAPEngine.salir()',
+                    debajo: `
+                        <div class="modo" role="radiogroup" aria-label="Modo del laboratorio">
+                            <button type="button" role="radio" aria-checked="${practica}" onclick="SAPEngine.cambiarModo('practica')">Práctica · con pistas</button>
+                            <button type="button" role="radio" aria-checked="${!practica}" onclick="SAPEngine.cambiarModo('evaluacion')">Evaluación · aprueba</button>
+                        </div>`
+                })}
+                <div class="vista-cuerpo">
+                    <section class="tarjeta escenario">
+                        ${animarCamion ? Icono.muelle() : Icono.muelle().replace('class="camion-llega"', '')}
+                        <div class="escenario-textos">
+                            <span class="escenario-etiqueta">Caso de negocio</span>
+                            <span class="escenario-texto">${escaparHTML(m.descripcion || '')}</span>
+                        </div>
+                    </section>
+
+                    <section class="mision" aria-live="polite">
+                        <div class="mision-cab">
+                            <span class="mision-etiqueta">MISIÓN · PASO ${this.paso + 1} DE ${total}</span>
+                            <div class="puntos" aria-hidden="true">${puntos}</div>
+                        </div>
+                        <p class="mision-texto">${pideComando ? 'Abre la transacción para: ' : 'Llena el campo: '}${escaparHTML(paso.instruccion)}</p>
+                    </section>
+
+                    <section class="sap" id="lab-sap" aria-label="Simulador de SAP">
+                        <div class="sap-cmd">
+                            <label for="lab-cmd">Comando</label>
+                            <input id="lab-cmd" autocomplete="off" spellcheck="false" autocapitalize="characters" enterkeyhint="go" ${pideComando ? '' : 'disabled'} placeholder="${pideComando ? 'Transacción' : ''}">
+                            <button type="button" aria-label="Confirmar comando" ${pideComando ? 'onclick="SAPEngine.ejecutar()"' : 'disabled'}>${Icono.check(18)}</button>
+                        </div>
+                        <div class="sap-titulo">
+                            <strong>${this.tcode ? escaparHTML(this.tcode.descripcion) : 'Pantalla inicial'}</strong>
+                            <span class="codigo">${this.tcode ? escaparHTML(this.tcode.codigo) : 'S/4HANA · práctica'}</span>
+                        </div>
+                        <div class="sap-form">${campos}${campoActivo}${formVacio}</div>
+                        ${estado}
+                    </section>
+
+                    ${ayuda}
+                </div>
+                <footer class="barra-inf">
+                    <button class="btn-icono" style="width:52px;height:52px;border-radius:14px" type="button" onclick="smartNotes.openNotes()" aria-label="Abrir mis apuntes">${Icono.apuntes()}</button>
+                    <button class="btn btn-primario btn-alto" type="button" onclick="SAPEngine.ejecutar()">Ejecutar <span class="tecla">F8</span></button>
+                </footer>
+            </div>`, { nav: false });
+
+        // Textos que vienen del contenido: se insertan como texto, nunca como HTML
+        const pista = document.getElementById('lab-pista');
+        if (pista) pista.textContent = this._textoPista;
+        const mensaje = document.querySelector('.sap-estado span:last-child');
+        if (mensaje && this.estado) mensaje.textContent = this.estado.texto;
+
+        const activo = document.getElementById(pideComando ? 'lab-cmd' : 'lab-campo');
+        if (activo) {
+            activo.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === 'F8') {
+                    e.preventDefault();
+                    this.ejecutar();
+                }
+            });
+            setTimeout(() => activo.focus({ preventScroll: true }), 150);
+        }
+    },
+
+    // ------------------------------------------
+    // Acciones
+    // ------------------------------------------
+    ejecutar() {
+        if (!this.estaAbierta() || this.terminado) return;
+        const paso = this.modulo.pasos[this.paso];
+        const pideComando = this.esTransaccion(paso.comando);
+        const input = document.getElementById(pideComando ? 'lab-cmd' : 'lab-campo');
+        if (!input) return;
+        const valor = input.value.toUpperCase().trim();
+        if (valor === '') {
+            input.focus();
             return;
         }
-        if (!modulo.pasos || modulo.pasos.length === 0) return;
-
-        this.cancelarTodo();
-        this.sesion++;
-        this.modulo = modulo;
-        this.paso = 0;
-        this.errores = 0;
-
-        const historial = document.getElementById('terminal-history');
-        if (historial) {
-            historial.innerHTML = `
-                <div class="log-system">SAP S/4HANA · Simulador de práctica de Logística Pro</div>
-                <div class="log-system">--- SESIÓN: ${escaparHTML(modulo.titulo.toUpperCase())} ---</div>
-                <div class="log-hint">CASO DE NEGOCIO: ${escaparHTML(modulo.descripcion)}</div>
-                <div class="log-system">--------------------------------------------------</div>
-            `;
-        }
-        document.getElementById('sap-terminal-overlay').classList.remove('terminal-hidden');
-        this.renderStep();
-    },
-
-    closeTerminal() {
-        this.cancelarTodo();
-        this.sesion++;
-        document.getElementById('sap-terminal-overlay').classList.add('terminal-hidden');
-        const input = document.getElementById('terminal-input');
-        if (input) {
-            input.value = '';
-            input.blur();
-        }
-    },
-
-    renderStep() {
-        const paso = this.modulo.pasos[this.paso];
-        const instruccion = document.getElementById('terminal-current-instruction');
-        const input = document.getElementById('terminal-input');
-        if (instruccion) {
-            instruccion.innerText = `PASO ${this.paso + 1}/${this.modulo.pasos.length}: ${paso.instruccion}`;
-        }
-        if (input) {
-            input.placeholder = paso.placeholder || 'T-CODE O VALOR';
-            input.disabled = false;
-            this.despues(300, () => input.focus());
-        }
-    },
-
-    /** Agrega una línea a la terminal. El texto se escapa siempre. */
-    printLog(mensaje, tipo) {
-        const historial = document.getElementById('terminal-history');
-        if (!historial) return;
-        const linea = document.createElement('div');
-        linea.className = `log-${tipo}`;
-        String(mensaje).split('\n').forEach((parte, i) => {
-            if (i > 0) linea.appendChild(document.createElement('br'));
-            linea.appendChild(document.createTextNode(parte));
-        });
-        historial.appendChild(linea);
-        this.bajarScroll();
-    },
-
-    bajarScroll() {
-        const cuerpo = document.getElementById('terminal-body');
-        if (cuerpo) cuerpo.scrollTop = cuerpo.scrollHeight;
-    },
-
-    execute() {
-        if (!this.modulo || !this.estaAbierta()) return;
-        const input = document.getElementById('terminal-input');
-        if (!input || input.disabled) return;
-
-        const paso = this.modulo.pasos[this.paso];
-        const valor = input.value.toUpperCase().trim();
-        if (valor === '') return;
-
-        this.printLog(`EWM_PRD:/> ${valor}`, 'user');
-        input.value = '';
         AudioEngine.play('click');
-
-        const esperado = String(paso.comando).toUpperCase();
-        if (valor === esperado || valor === `/N${esperado}`) {
-            this.acierto(paso, input);
-        } else {
-            this.fallo(paso, valor, input);
-        }
+        const esperado = String(paso.comando).toUpperCase().trim();
+        if (valor === esperado || valor === `/N${esperado}`) this.acierto(paso, esperado, pideComando);
+        else this.fallo(valor);
     },
 
-    acierto(paso, input) {
+    acierto(paso, esperado, pideComando) {
         AudioEngine.play('success');
         NativeBridge.vibrar('LIGHT');
+        if (pideComando) {
+            this.tcode = { codigo: esperado, descripcion: this.descripcionTransaccion(esperado) };
+            this.campos = [];
+        } else {
+            this.campos.push({ etq: paso.instruccion, valor: esperado });
+        }
+        this.estado = { ok: true, texto: this.limpiarMensaje(paso.exito) || 'Paso completado.' };
+        this.paso++;
         this.errores = 0;
-        input.disabled = true;
-
-        // Efecto de máquina de escribir
-        const texto = paso.exito || 'Paso completado.';
-        const linea = document.createElement('div');
-        linea.className = 'log-success';
-        document.getElementById('terminal-history').appendChild(linea);
-        let i = 0;
-        const sesion = this.sesion;
-        this.escribiendo = setInterval(() => {
-            if (sesion !== this.sesion) return;
-            if (i < texto.length) {
-                const letra = texto.charAt(i);
-                if (letra === '\n') linea.appendChild(document.createElement('br'));
-                else linea.appendChild(document.createTextNode(letra));
-                if (i % 4 === 0) AudioEngine.play('key');
-                this.bajarScroll();
-                i++;
-                return;
-            }
-            clearInterval(this.escribiendo);
-            this.escribiendo = null;
-            this.paso++;
-            if (this.paso < this.modulo.pasos.length) {
-                this.despues(1200, () => this.renderStep());
-            } else {
-                this.terminarLaboratorio();
-            }
-        }, 20);
+        this.pistaNivel = 0;
+        if (this.paso >= this.modulo.pasos.length) this.terminar();
+        else this.render();
     },
 
-    terminarLaboratorio() {
-        const id = this.modulo.id;
-        this.printLog('\n✅ LABORATORIO COMPLETADO CON ÉXITO.', 'success');
-        NativeBridge.vibrarAviso('SUCCESS');
-        AppState.markComplete(id);
-        this.despues(2500, () => {
-            this.closeTerminal();
-            // Solo vuelve al inicio si el estudiante sigue en ese laboratorio
-            if (Router.currentView === 'lesson' && UIRenderer.moduloActual === id) Router.renderDashboard();
-        });
-    },
-
-    fallo(paso, valor, input) {
+    fallo(valor) {
         AudioEngine.play('error');
         NativeBridge.vibrarAviso('ERROR');
         this.errores++;
+        this.estado = { ok: false, texto: `"${valor}" no es correcto para este paso.` };
 
-        if (this.errores >= MAX_STRIKES) {
-            this.printLog(`> ERROR: ${this.errores} intentos fallidos.\n> La sesión se cerrará. Repasa la teoría y vuelve a intentarlo.`, 'error');
-            input.disabled = true;
-            this.despues(3500, () => {
-                this.closeTerminal();
-                alert('Se cerró el laboratorio por demasiados errores. Repasa la teoría y vuelve a intentarlo desde el inicio.');
-            });
+        if (this.modo === 'evaluacion' && this.errores >= MAX_STRIKES) {
+            this.resultado(false);
             return;
         }
+        if (this.modo === 'practica') this.pistaNivel = Math.max(this.pistaNivel, Math.min(this.errores, 2));
+        this.render();
+        const sap = document.getElementById('lab-sap');
+        if (sap) sap.classList.add('lab-error');
+    },
 
-        const restantes = MAX_STRIKES - this.errores;
-        this.printLog(`> El valor '${valor}' no es correcto. Te quedan ${restantes} intento(s).`, 'error');
-        // Pistas progresivas: primero una orientación, luego la pista completa
-        this.despues(500, () => {
-            if (this.errores === 1) {
-                this.printLog(`PISTA: relee la instrucción. ${this.orientacion(paso)}`, 'hint');
-            } else {
-                this.printLog(`PISTA: ${paso.pista}`, 'hint');
-            }
-        });
+    pedirPista() {
+        this.pistaNivel = Math.min(this.pistaNivel + 1, 2);
+        AudioEngine.play('click');
+        this.render();
+    },
+
+    cambiarModo(modo) {
+        if (modo === this.modo) return;
+        if (this.paso > 0 && !confirm('Cambiar de modo reinicia el laboratorio desde el primer paso. ¿Continuar?')) return;
+        this.modo = modo;
+        this.reiniciarDatos();
+        this.render();
+    },
+
+    reintentar(modo) {
+        this.modo = modo;
+        this.reiniciarDatos();
+        this.render(true);
+    },
+
+    salir() {
+        if (this.paso > 0 && !this.terminado && !confirm('¿Salir del laboratorio? Se perderá el avance de esta sesión.')) return;
+        this.cerrar();
+    },
+
+    cerrar() {
+        const ciclo = this.modulo ? ContentStore.cicloDe(this.modulo.id) : null;
+        this.modulo = null;
+        if (ciclo) Router.abrirCiclo(ciclo.id);
+        else Router.renderDashboard();
+    },
+
+    // Compatibilidad con el botón "atrás" de Android
+    closeTerminal() { this.salir(); },
+
+    terminar() {
+        this.terminado = true;
+        if (this.modo === 'evaluacion') {
+            AppState.markComplete(this.modulo.id);
+            NativeBridge.vibrarAviso('SUCCESS');
+        }
+        this.resultado(true);
+    },
+
+    resultado(exito) {
+        this.terminado = true;
+        const m = this.modulo;
+        const ciclo = ContentStore.cicloDe(m.id);
+        const evaluacion = this.modo === 'evaluacion';
+        const siguiente = AppState.siguienteModulo();
+        const robots = Robots.visibles();
+        let robot, titulo, texto, botones;
+
+        if (exito && evaluacion) {
+            robot = robots ? Robots.svg('mech', 'celebrando', 130) : '';
+            titulo = 'Laboratorio aprobado';
+            texto = `¡Bien hecho, ${UIRenderer.primerNombre()}! Completaste los ${m.pasos.length} pasos sin pistas.`;
+            botones = `${siguiente ? `<button class="btn btn-primario btn-alto" type="button" onclick="Router.openModule('${siguiente.id}')">Continuar con lo siguiente ${Icono.siguiente()}</button>` : ''}
+                <button class="btn btn-secundario" type="button" onclick="SAPEngine.modulo=null; Router.renderDashboard('${ciclo ? ciclo.id : ''}')">Ver el mapa</button>`;
+        } else if (exito) {
+            robot = robots ? Robots.svg('ridds', 'celebrando', 130) : '';
+            titulo = 'Práctica completada';
+            texto = 'Ya conoces el proceso. Para aprobar el laboratorio, hazlo ahora en modo evaluación, sin pistas.';
+            botones = `<button class="btn btn-primario btn-alto" type="button" onclick="SAPEngine.reintentar('evaluacion')">Hacer la evaluación ${Icono.siguiente()}</button>
+                <button class="btn btn-secundario" type="button" onclick="SAPEngine.reintentar('practica')">Practicar otra vez</button>`;
+        } else {
+            AudioEngine.play('error');
+            robot = robots ? Robots.svg('ridds', 'pensando', 130) : '';
+            titulo = 'Se acabaron los intentos';
+            texto = `Fallaste ${MAX_STRIKES} veces en el paso ${this.paso + 1}. Practica con pistas y vuelve a intentarlo.`;
+            botones = `<button class="btn btn-primario btn-alto" type="button" onclick="SAPEngine.reintentar('practica')">Practicar con pistas</button>
+                <button class="btn btn-secundario" type="button" onclick="SAPEngine.reintentar('evaluacion')">Reintentar la evaluación</button>`;
+        }
+
+        UIRenderer.mostrar(`
+            <div class="vista">
+                ${UIRenderer.barraSup({ antetitulo: `Laboratorio${ciclo ? ` · Ciclo ${ciclo.numero}` : ''}`, titulo: escaparHTML(this.tituloCorto()), cerrar: 'SAPEngine.cerrar()' })}
+                <div class="vista-cuerpo">
+                    <section class="resultado">
+                        ${robot}
+                        <h2 class="titulo-pagina">${titulo}</h2>
+                        <p class="texto-suave">${escaparHTML(texto)}</p>
+                        ${botones}
+                    </section>
+                </div>
+            </div>`);
     },
 
     /** Primera pista: orienta sin dar la respuesta. */
     orientacion(paso) {
         const cmd = String(paso.comando);
-        if (cmd.startsWith('/')) return 'Se espera una transacción con espacio de nombres (empieza por /).';
+        if (cmd.startsWith('/')) return 'Se espera una transacción que empieza por "/".';
         if (/^\d+$/.test(cmd)) return `Se espera un número de ${cmd.length} dígitos.`;
-        if (/^[A-Z]{2,4}\d{1,3}[A-Z]?$/i.test(cmd)) return 'Se espera un código de transacción (letras y números).';
+        if (this.esTransaccion(cmd)) return `Se espera un código de transacción de ${cmd.length} caracteres (letras y números).`;
         return `La respuesta tiene ${cmd.length} caracteres.`;
     }
 };
-
-document.addEventListener('DOMContentLoaded', () => {
-    SAPEngine.init();
-});

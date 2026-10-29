@@ -15,8 +15,22 @@ const ContentStore = {
         if (!respuesta.ok) throw new Error(`No se pudo cargar el catálogo (${respuesta.status})`);
         const datos = await respuesta.json();
         this.catalogo = datos.modulos || [];
+        this.ciclos = datos.ciclos || [];
+        this.zonas = datos.zonas || [];
         this.listo = true;
         return this.catalogo;
+    },
+
+    ciclos: [],
+    zonas: [],
+
+    ciclo(id) {
+        return this.ciclos.find(c => c.id === id) || null;
+    },
+
+    /** Ciclo al que pertenece un módulo. */
+    cicloDe(moduloId) {
+        return this.ciclos.find(c => (c.modulos || []).includes(moduloId)) || null;
     },
 
     /** Datos básicos del módulo (título, tipo, semestre...). */

@@ -17,6 +17,8 @@ const ESTADO_INICIAL = () => ({
         nivelVibracion: 'MEDIUM',
         tema: 'dark',
         mascota: 'mecharidds',
+        robots: true,
+        letra: 'normal',
         recordatorio: ''
     }
 });
@@ -160,6 +162,33 @@ const AppState = {
         if (!total) return 0;
         const aprobados = ContentStore.catalogo.filter(m => this.isCompleted(m.id)).length;
         return Math.round((aprobados / total) * 100);
+    },
+
+    /** Un módulo está disponible si no tiene requisito o si el requisito ya se aprobó. */
+    estaDisponible(mod) {
+        return !mod.requisito || this.isCompleted(mod.requisito);
+    },
+
+    /** El siguiente módulo por estudiar, en el orden del catálogo. */
+    siguienteModulo() {
+        if (typeof ContentStore === 'undefined') return null;
+        return ContentStore.catalogo.find(m => !this.isCompleted(m.id) && this.estaDisponible(m)) || null;
+    },
+
+    /**
+     * Estado de un ciclo en el mapa:
+     * 'construccion' (aún sin contenido), 'hecho', 'actual' (tiene el siguiente
+     * módulo), 'abierto' (tiene algo disponible) o 'cerrado'.
+     */
+    estadoCiclo(ciclo) {
+        const ids = ciclo.modulos || [];
+        if (ids.length === 0) return 'construccion';
+        const mods = ids.map(id => ContentStore.info(id)).filter(Boolean);
+        if (mods.every(m => this.isCompleted(m.id))) return 'hecho';
+        const siguiente = this.siguienteModulo();
+        if (siguiente && ids.includes(siguiente.id)) return 'actual';
+        if (mods.some(m => this.isCompleted(m.id) || this.estaDisponible(m))) return 'abierto';
+        return 'cerrado';
     },
 
     // --- Apuntes ---

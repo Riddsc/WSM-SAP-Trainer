@@ -122,7 +122,32 @@ if (comandosDudosos.length > 0) {
     advertencias.push(`${comandosDudosos.length} comandos de laboratorio no son transacciones SAP verificadas:\n      ${comandosDudosos.join('\n      ')}`);
 }
 
-console.log(`Módulos revisados: ${catalogo.modulos.length} · Preguntas: ${preguntasTotales}`);
+// --- Ciclos y zonas del mapa ---
+if (!Array.isArray(catalogo.ciclos) || catalogo.ciclos.length === 0) {
+    errores.push('El catálogo no tiene la lista de ciclos');
+} else {
+    const enCiclo = new Map();
+    const idsCiclo = new Set();
+    catalogo.ciclos.forEach(c => {
+        ['id', 'numero', 'ruta', 'nombre', 'corto'].forEach(campo => {
+            if (c[campo] === undefined || c[campo] === '') errores.push(`Ciclo ${c.id || '?'}: falta el campo "${campo}"`);
+        });
+        idsCiclo.add(c.id);
+        (c.modulos || []).forEach(id => {
+            if (!ids.has(id)) errores.push(`Ciclo ${c.id}: el módulo "${id}" no existe`);
+            if (enCiclo.has(id)) errores.push(`El módulo "${id}" está en dos ciclos (${enCiclo.get(id)} y ${c.id})`);
+            enCiclo.set(id, c.id);
+        });
+    });
+    ids.forEach(id => {
+        if (!enCiclo.has(id)) errores.push(`El módulo "${id}" no está en ningún ciclo`);
+    });
+    (catalogo.zonas || []).forEach(z => (z.ciclos || []).forEach(id => {
+        if (!idsCiclo.has(id)) errores.push(`Zona ${z.id}: el ciclo "${id}" no existe`);
+    }));
+}
+
+console.log(`Módulos revisados: ${catalogo.modulos.length} · Ciclos: ${(catalogo.ciclos || []).length} · Preguntas: ${preguntasTotales}`);
 if (advertencias.length) {
     console.log(`\nADVERTENCIAS (${advertencias.length}):`);
     advertencias.forEach(a => console.log(`  ⚠ ${a}`));

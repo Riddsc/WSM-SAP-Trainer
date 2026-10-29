@@ -6,3 +6,4 @@ assets/
 *.p12
 secrets*.txt
 .DS_Store
+fonts/

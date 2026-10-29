@@ -1,102 +1,73 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
-    <!-- Fondo Corporativo Oscuro -->
-    <rect width="1024" height="1024" fill="#0A0F1C" />
-    
-    <!-- División Diagonal y Red de Circuitos -->
-    <polygon points="1024,0 1024,1024 0,1024" fill="#111827" />
-    <line x1="0" y1="1024" x2="1024" y2="0" stroke="#06B6D4" stroke-width="6" opacity="0.4" />
-
-    <!-- 1. LADO IZQUIERDO: MECHARIDDS (Foco Científico) -->
-    <g transform="translate(60, 160)">
-        <!-- Orejas con Candongas Negras -->
-        <circle cx="150" cy="270" r="18" fill="none" stroke="#111" stroke-width="8" />
-        <circle cx="150" cy="270" r="12" fill="none" stroke="#000" stroke-width="4" />
-        <circle cx="410" cy="270" r="18" fill="none" stroke="#111" stroke-width="8" />
-        
-        <!-- Antena -->
-        <rect x="270" y="40" width="16" height="60" fill="#adb5bd" />
-        <circle cx="278" cy="30" r="15" fill="#06B6D4" />
-
-        <!-- Cabeza Robotizada -->
-        <rect x="160" y="100" width="240" height="230" rx="45" fill="#e2e8f0" stroke="#475569" stroke-width="6" />
-        <rect x="180" y="120" width="200" height="110" rx="15" fill="#cbd5e1" />
-
-        <!-- Gafitas Científicas de Montura Gruesa con lentes Cyan -->
-        <rect x="190" y="165" width="80" height="60" rx="12" fill="none" stroke="#334155" stroke-width="12" />
-        <rect x="194" y="169" width="72" height="52" rx="8" fill="#e0f7fa" opacity="0.8" />
-        <circle cx="230" cy="195" r="10" fill="#06B6D4" />
-
-        <rect x="290" y="165" width="80" height="60" rx="12" fill="none" stroke="#334155" stroke-width="12" />
-        <rect x="294" y="169" width="72" height="52" rx="8" fill="#e0f7fa" opacity="0.8" />
-        <circle cx="330" cy="195" r="10" fill="#06B6D4" />
-        
-        <line x1="270" y1="195" x2="290" y2="195" stroke="#334155" stroke-width="12" stroke-linecap="round" />
-
-        <!-- Ojos y Boca -->
-        <circle cx="230" cy="195" r="4" fill="#000" />
-        <circle cx="330" cy="195" r="4" fill="#000" />
-        <path d="M 240 275 Q 280 295 320 275" fill="none" stroke="#334155" stroke-width="6" stroke-linecap="round" />
-
-        <!-- Cuerpo: Bata de Laboratorio y Corbata -->
-        <path d="M 160 330 L 400 330 L 450 560 L 110 560 Z" fill="#f8f9fa" stroke="#cbd5e1" stroke-width="4" />
-        <path d="M 230 330 L 280 330 L 290 410 L 220 410 Z" fill="#06B6D4" />
-        <path d="M 265 330 L 280 330 L 295 440 L 250 440 Z" fill="#0A0F1C" />
-    </g>
-
-    <!-- 2. LADO DERECHO: MECHANIZER (Estilo Girlie) -->
-    <g transform="translate(480, 160)">
-        <!-- Diadema y Moño Rosa en la Cabeza -->
-        <path d="M 210 90 Q 280 40 350 90" fill="none" stroke="#f472b6" stroke-width="18" stroke-linecap="round" />
-        <!-- Moño Superior Grande -->
-        <path d="M 250 50 C 190 0, 210 110, 280 80 C 350 110, 370 0, 310 50 Z" fill="#ec4899" />
-        <circle cx="280" cy="65" r="15" fill="#f472b6" />
-
-        <!-- Cabeza Suave y Rostro -->
-        <rect x="160" y="100" width="240" height="230" rx="80" fill="#fff5f5" stroke="#f472b6" stroke-width="6" />
-        
-        <!-- Ojos con Pestañas y Rubor -->
-        <circle cx="220" cy="205" r="6" fill="#000" />
-        <path d="M 205 195 Q 220 180 235 195" fill="none" stroke="#000" stroke-width="4" />
-        <circle cx="220" cy="205" r="2" fill="#fff" />
-        
-        <circle cx="340" cy="205" r="6" fill="#000" />
-        <path d="M 325 195 Q 340 180 355 195" fill="none" stroke="#000" stroke-width="4" />
-        <circle cx="340" cy="205" r="2" fill="#fff" />
-
-        <!-- Mejillas Rosas -->
-        <circle cx="205" cy="245" r="14" fill="#fbcfe8" opacity="0.6" />
-        <circle cx="355" cy="245" r="14" fill="#fbcfe8" opacity="0.6" />
-
-        <!-- Gafitas Cat-Eye Magenta -->
-        <polygon points="175,185 270,185 250,225 190,225" fill="none" stroke="#d81b60" stroke-width="8" />
-        <polygon points="385,185 290,185 310,225 370,225" fill="none" stroke="#d81b60" stroke-width="8" />
-        <line x1="270" y1="185" x2="290" y2="185" stroke="#d81b60" stroke-width="8" />
-
-        <!-- Boca -->
-        <path d="M 255 270 Q 280 290 305 270" fill="none" stroke="#ec4899" stroke-width="6" stroke-linecap="round" />
-
-        <!-- Bata de Laboratorio Científica con detalles rosa -->
-        <path d="M 175 330 L 385 330 L 435 560 L 125 560 Z" fill="#ffffff" stroke="#fbcfe8" stroke-width="4" />
-        <path d="M 260 330 L 300 330 L 310 400 L 250 400 Z" fill="#ec4899" />
-        <path d="M 175 330 L 240 460 L 220 460 L 160 330 Z" fill="#fbcfe8" />
-        <path d="M 385 330 L 320 460 L 340 460 L 400 330 Z" fill="#fbcfe8" />
-    </g>
-
-    <!-- Detalles del Entorno: Circuitos y Brillos -->
-    <circle cx="100" cy="100" r="15" fill="#06B6D4" opacity="0.3" />
-    <circle cx="924" cy="100" r="20" fill="#ec4899" opacity="0.3" />
-    <circle cx="512" cy="740" r="8" fill="#fff" />
-
-    <!-- 3. BRANDING: Logo y Texto Inferior en Cyan brillante -->
-    <g transform="translate(0, 780)">
-        <rect x="112" y="0" width="800" height="150" rx="30" fill="#111827" stroke="#1F2937" stroke-width="4" />
-        <!-- Texto LOGÍSTICA PRO -->
-        <text x="512" y="70" font-family="&#39;Impact&#39;, &#39;Arial Black&#39;, sans-serif" font-size="64" font-weight="900" fill="#06B6D4" text-anchor="middle" letter-spacing="4">
-            LOGÍSTICA PRO
-        </text>
-        <!-- Subtexto SAP EWM -->
-        <text x="512" y="115" font-family="&#39;Courier New&#39;, monospace, sans-serif" font-size="28" font-weight="bold" fill="#38BDF8" text-anchor="middle" letter-spacing="8">
-            S / 4 H A N A   E W M
-        </text>
-    </g>
+<rect width="1024" height="1024" fill="#0A1F26"/>
+<g stroke="#3DD6E8" stroke-opacity="0.08" stroke-width="2"><path d="M0 0V1024M0 0H1024"/><path d="M64 0V1024M0 64H1024"/><path d="M128 0V1024M0 128H1024"/><path d="M192 0V1024M0 192H1024"/><path d="M256 0V1024M0 256H1024"/><path d="M320 0V1024M0 320H1024"/><path d="M384 0V1024M0 384H1024"/><path d="M448 0V1024M0 448H1024"/><path d="M512 0V1024M0 512H1024"/><path d="M576 0V1024M0 576H1024"/><path d="M640 0V1024M0 640H1024"/><path d="M704 0V1024M0 704H1024"/><path d="M768 0V1024M0 768H1024"/><path d="M832 0V1024M0 832H1024"/><path d="M896 0V1024M0 896H1024"/><path d="M960 0V1024M0 960H1024"/><path d="M1024 0V1024M0 1024H1024"/></g>
+<circle cx="512" cy="500" r="330" fill="#0F2C35" stroke="#24505C" stroke-width="6"/>
+<g stroke="#F5A524" stroke-width="26" opacity="0.9"><path d="M-100 1024L20 904" /><path d="M-36 1024L84 904" /><path d="M28 1024L148 904" /><path d="M92 1024L212 904" /><path d="M156 1024L276 904" /><path d="M220 1024L340 904" /><path d="M284 1024L404 904" /><path d="M348 1024L468 904" /><path d="M412 1024L532 904" /><path d="M476 1024L596 904" /><path d="M540 1024L660 904" /><path d="M604 1024L724 904" /><path d="M668 1024L788 904" /><path d="M732 1024L852 904" /><path d="M796 1024L916 904" /><path d="M860 1024L980 904" /><path d="M924 1024L1044 904" /><path d="M988 1024L1108 904" /><path d="M1052 1024L1172 904" /><path d="M1116 1024L1236 904" /></g>
+<rect x="0" y="880" width="1024" height="10" fill="#F5A524"/>
+<path d="M262 712H762" stroke="#F5A524" stroke-width="8" stroke-dasharray="28 18" stroke-linecap="round"/>
+<svg x="195" y="330" width="330" height="363" viewBox="0 0 200 220" overflow="visible">
+<line x1="100" y1="32" x2="100" y2="14" stroke="#2B3F45" stroke-width="5" stroke-linecap="round"/>
+<circle cx="100" cy="11" r="8" fill="#3DD6E8" stroke="#0E5561" stroke-width="2"/>
+<rect x="30" y="64" width="14" height="30" rx="5" fill="#9FB3B8" stroke="#2B3F45" stroke-width="3"/>
+<rect x="156" y="64" width="14" height="30" rx="5" fill="#9FB3B8" stroke="#2B3F45" stroke-width="3"/>
+<circle cx="37" cy="105" r="9" fill="none" stroke="#121A1C" stroke-width="5"/>
+<circle cx="163" cy="105" r="9" fill="none" stroke="#121A1C" stroke-width="5"/>
+<rect x="88" y="124" width="24" height="16" fill="#9FB3B8"/>
+<path d="M58 136 L142 136 L162 216 L38 216 Z" fill="#F7FAFA" stroke="#B9C7CA" stroke-width="3" stroke-linejoin="round"/>
+<path d="M86 136 L114 136 L100 168 Z" fill="#E3EAEC"/>
+<path d="M80 136 L100 172 L92 216" fill="none" stroke="#B9C7CA" stroke-width="3" stroke-linejoin="round"/>
+<path d="M120 136 L100 172 L108 216" fill="none" stroke="#B9C7CA" stroke-width="3" stroke-linejoin="round"/>
+<path d="M95 140 L105 140 L107 166 L100 176 L93 166 Z" fill="#3DD6E8" stroke="#0E5561" stroke-width="2" stroke-linejoin="round"/>
+<rect x="118" y="180" width="22" height="16" rx="3" fill="none" stroke="#B9C7CA" stroke-width="3"/>
+<rect x="124" y="171" width="5" height="15" rx="2" fill="#F5A524"/>
+<rect x="40" y="30" width="120" height="100" rx="28" fill="#DCE4E6" stroke="#2B3F45" stroke-width="4"/>
+<circle cx="54" cy="44" r="3" fill="#9FB3B8"/>
+<circle cx="146" cy="44" r="3" fill="#9FB3B8"/>
+<rect x="56" y="62" width="40" height="32" rx="9" fill="#D3F5FA" stroke="#22343A" stroke-width="6"/>
+<rect x="104" y="62" width="40" height="32" rx="9" fill="#D3F5FA" stroke="#22343A" stroke-width="6"/>
+<line x1="96" y1="76" x2="104" y2="76" stroke="#22343A" stroke-width="6"/>
+<path d="M60 146 L46 190" fill="none" stroke="#2B3F45" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M60 146 L46 190" fill="none" stroke="#E3EAEC" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="45" cy="194" r="8" fill="#E3EAEC" stroke="#2B3F45" stroke-width="3"/>
+<path d="M140 146 L168 122" fill="none" stroke="#2B3F45" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M140 146 L168 122" fill="none" stroke="#E3EAEC" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="172" y1="118" x2="192" y2="82" stroke="#2B3F45" stroke-width="4" stroke-linecap="round"/>
+<circle cx="193" cy="80" r="5" fill="#F5A524" stroke="#7A4A00" stroke-width="2"/>
+<circle cx="171" cy="119" r="8" fill="#E3EAEC" stroke="#2B3F45" stroke-width="3"/>
+<circle cx="76" cy="79" r="5.5" fill="#0F2A31"/><circle cx="124" cy="79" r="5.5" fill="#0F2A31"/>
+<circle cx="78" cy="77" r="1.8" fill="#FFFFFF"/><circle cx="126" cy="77" r="1.8" fill="#FFFFFF"/>
+<ellipse cx="100" cy="112" rx="9" ry="6" fill="#0F2A31"/></svg>
+<g transform="translate(1024 0) scale(-1 1)"><svg x="195" y="330" width="330" height="363" viewBox="0 0 200 220" overflow="visible">
+<rect x="30" y="66" width="14" height="30" rx="6" fill="#F7A1C4" stroke="#B3266A" stroke-width="2"/>
+<rect x="156" y="66" width="14" height="30" rx="6" fill="#F7A1C4" stroke="#B3266A" stroke-width="2"/>
+<rect x="88" y="124" width="24" height="16" fill="#F7D9E4"/>
+<path d="M58 136 L142 136 L162 216 L38 216 Z" fill="#FFFFFF" stroke="#F2B6CB" stroke-width="3" stroke-linejoin="round"/>
+<path d="M86 136 L114 136 L100 166 Z" fill="#F06BA0"/>
+<path d="M58 136 L86 136 L100 168 L84 192 Z" fill="#FBD3E2" stroke="#F2B6CB" stroke-width="2" stroke-linejoin="round"/>
+<path d="M142 136 L114 136 L100 168 L116 192 Z" fill="#FBD3E2" stroke="#F2B6CB" stroke-width="2" stroke-linejoin="round"/>
+<path d="M100 168 L100 216" fill="none" stroke="#F2B6CB" stroke-width="3"/>
+<rect x="60" y="182" width="22" height="16" rx="3" fill="none" stroke="#F2B6CB" stroke-width="3"/>
+<rect x="66" y="173" width="5" height="15" rx="2" fill="#E8558E"/>
+<circle cx="125" cy="186" r="9" fill="#FFFFFF" stroke="#E8558E" stroke-width="2.5"/>
+<path d="M122 181 L122 186 L118 192 L132 192 L128 186 L128 181" fill="none" stroke="#E8558E" stroke-width="2" stroke-linejoin="round"/>
+<rect x="40" y="34" width="120" height="96" rx="44" fill="#FFF1F4" stroke="#E0628F" stroke-width="4"/>
+<path d="M50 56 Q100 20 150 56" fill="none" stroke="#F06BA0" stroke-width="7" stroke-linecap="round"/>
+<path d="M100 30 C80 8 64 22 74 38 C82 46 94 38 100 32 C106 38 118 46 126 38 C136 22 120 8 100 30 Z" fill="#E8558E" stroke="#B3266A" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="100" cy="31" r="6" fill="#F7A1C4" stroke="#B3266A" stroke-width="2"/>
+<polygon points="50,60 98,66 93,93 61,93" fill="#FDE7F0" stroke="#C2185B" stroke-width="5" stroke-linejoin="round"/>
+<polygon points="150,60 102,66 107,93 139,93" fill="#FDE7F0" stroke="#C2185B" stroke-width="5" stroke-linejoin="round"/>
+<line x1="98" y1="68" x2="102" y2="68" stroke="#C2185B" stroke-width="5"/>
+<line x1="50" y1="60" x2="43" y2="53" stroke="#C2185B" stroke-width="3" stroke-linecap="round"/>
+<line x1="150" y1="60" x2="157" y2="53" stroke="#C2185B" stroke-width="3" stroke-linecap="round"/>
+<circle cx="61" cy="107" r="8" fill="#F9B8CF" opacity="0.85"/>
+<circle cx="139" cy="107" r="8" fill="#F9B8CF" opacity="0.85"/>
+<path d="M60 146 L46 190" fill="none" stroke="#C2185B" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M60 146 L46 190" fill="none" stroke="#F7D9E4" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><circle cx="45" cy="194" r="8" fill="#F7D9E4" stroke="#C2185B" stroke-width="3"/>
+<path d="M140 146 L168 122" fill="none" stroke="#C2185B" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M140 146 L168 122" fill="none" stroke="#F7D9E4" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="172" y1="118" x2="192" y2="82" stroke="#2B3F45" stroke-width="4" stroke-linecap="round"/>
+<circle cx="193" cy="80" r="5" fill="#F5A524" stroke="#7A4A00" stroke-width="2"/>
+<circle cx="171" cy="119" r="8" fill="#F7D9E4" stroke="#C2185B" stroke-width="3"/>
+<circle cx="76" cy="79" r="5.5" fill="#0F2A31"/><circle cx="124" cy="79" r="5.5" fill="#0F2A31"/>
+<circle cx="78" cy="77" r="1.8" fill="#FFFFFF"/><circle cx="126" cy="77" r="1.8" fill="#FFFFFF"/>
+<ellipse cx="100" cy="112" rx="9" ry="6" fill="#0F2A31"/></svg></g>
 </svg>

@@ -6,6 +6,7 @@ const Router = {
 
     async init() {
         this.conectarMenu('nav-academy', 'dashboard', () => UIRenderer.renderDashboard());
+        this.conectarMenu('nav-review', 'review', () => UIRenderer.renderRepaso());
         this.conectarMenu('nav-glossary', 'glossary', () => UIRenderer.renderGlossary());
         this.conectarMenu('nav-profile', 'profile', () => UIRenderer.renderProfile());
 
@@ -22,8 +23,14 @@ const Router = {
             UIRenderer.renderError('No se pudo cargar el contenido de la maestría.', 'Cierra y vuelve a abrir la app. Si el problema sigue, reinstálala.');
             return;
         }
-        UIRenderer.actualizarBarraProgreso();
         this.renderDashboard();
+
+        setTimeout(() => {
+            const nombre = AppState.perfil.nombre;
+            UIRenderer.aviso(nombre
+                ? `¡Hola de nuevo, ${nombre.split(/\s+/)[0]}! La bodega está lista.`
+                : 'Bienvenido. Escribe tu nombre en Perfil para personalizar tu constancia.', { segundos: 4 });
+        }, 700);
     },
 
     conectarMenu(idBoton, vista, render) {
@@ -43,26 +50,32 @@ const Router = {
 
     /**
      * Lo que hace el botón "atrás": primero cierra lo que esté abierto
-     * encima (terminal, apuntes); luego vuelve a la pantalla anterior;
-     * en el inicio, sale de la app.
+     * encima (apuntes); luego vuelve a la pantalla anterior; en el mapa,
+     * sale de la app.
      */
     atras() {
-        if (SAPEngine.estaAbierta()) {
-            SAPEngine.closeTerminal();
-            return;
-        }
         if (smartNotes.estaAbierto()) {
             smartNotes.closeNotes();
             return;
         }
         switch (this.currentView) {
+            case 'lab':
+                SAPEngine.salir();
+                break;
+            case 'exam':
+                UIRenderer.salirExamen();
+                break;
+            case 'lesson':
+            case 'examResult': {
+                const ciclo = ContentStore.cicloDe(UIRenderer.moduloActual);
+                if (ciclo) this.abrirCiclo(ciclo.id);
+                else this.renderDashboard();
+                break;
+            }
             case 'report':
             case 'certificate':
                 this.irA('profile', 'nav-profile');
                 UIRenderer.renderProfile();
-                break;
-            case 'exam':
-                if (confirm('¿Salir del examen? Perderás las respuestas marcadas.')) this.renderDashboard();
                 break;
             case 'dashboard': {
                 const appPlugin = NativeBridge.plugin('App');
@@ -74,10 +87,16 @@ const Router = {
         }
     },
 
-    renderDashboard() {
+    renderDashboard(encenderCiclo) {
         this.irA('dashboard', 'nav-academy');
         smartNotes.setContext('general', 'Apuntes generales');
-        UIRenderer.renderDashboard();
+        UIRenderer.renderDashboard(encenderCiclo || null);
+    },
+
+    abrirCiclo(id) {
+        this.irA('cycle', 'nav-academy');
+        smartNotes.setContext('general', 'Apuntes generales');
+        UIRenderer.renderCiclo(id);
     },
 
     openModule(id) {
@@ -86,9 +105,15 @@ const Router = {
     },
 
     setActiveNav(navId) {
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+            btn.removeAttribute('aria-current');
+        });
         const activo = document.getElementById(navId);
-        if (activo) activo.classList.add('active');
+        if (activo) {
+            activo.classList.add('active');
+            activo.setAttribute('aria-current', 'page');
+        }
     }
 };
 

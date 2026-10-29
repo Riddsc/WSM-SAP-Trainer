@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      APP_VERSION_NAME: "2.0.${{ github.run_number }}"
+      APP_VERSION_NAME: "2.1.${{ github.run_number }}"
       APP_VERSION_CODE: "${{ github.run_number }}"
 
     steps:
@@ -50,6 +50,7 @@ jobs:
           rm -rf www && mkdir -p www
           cp index.html icon.svg www/
           cp -r css js content www/
+          node scripts/copiar-fuentes.js www/fonts
           echo "window.APP_VERSION = '${APP_VERSION_NAME}';" > www/js/version.js
 
       - name: Generar el proyecto Android
