@@ -70,16 +70,16 @@ jobs:
           ./gradlew assembleRelease --no-daemon
 
       - name: Firmar APK con la llave del repositorio
-        # Siempre la misma llave (logistica.keystore): las actualizaciones se instalan encima sin desinstalar.
+        # Siempre la misma llave (firma/logistica-pro.keystore): las actualizaciones se instalan encima sin desinstalar.
         run: |
           BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
           UNSIGNED=android/app/build/outputs/apk/release/app-release-unsigned.apk
           "$BUILD_TOOLS/zipalign" -p -f 4 "$UNSIGNED" "$RUNNER_TEMP/alineado.apk"
           "$BUILD_TOOLS/apksigner" sign \
-            --ks logistica.keystore \
-            --ks-key-alias logistica_alias \
-            --ks-pass pass:logistica123 \
-            --key-pass pass:logistica123 \
+            --ks firma/logistica-pro.keystore \
+            --ks-key-alias logisticapro \
+            --ks-pass pass:LogisticaPro2026 \
+            --key-pass pass:LogisticaPro2026 \
             --out "LogisticaPro-${APP_VERSION_NAME}.apk" \
             "$RUNNER_TEMP/alineado.apk"
           "$BUILD_TOOLS/apksigner" verify --print-certs "LogisticaPro-${APP_VERSION_NAME}.apk" | grep -i "SHA-256"
