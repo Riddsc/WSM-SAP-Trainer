@@ -3,16 +3,49 @@
  * Mechanizer (científica de operaciones). Ambos con bata de científicos.
  *
  * Robots.svg(quien, animo, tamaño) devuelve el dibujo listo para insertar.
+ * El estudiante elige el robot principal y el color de acento de cada uno.
  *   quien: 'ridds' | 'mech'
  *   animo: 'explicando' | 'celebrando' | 'pensando' | 'alertando'
  */
 const Robots = {
     NOMBRES: { ridds: 'MechaRidds', mech: 'Mechanizer' },
 
+    /** Colores de acento que cada estudiante puede elegir para cada robot. */
+    COLORES: {
+        verde:    { nombre: 'Verde',    relleno: '#34D399', borde: '#0F6B4A' },
+        amarillo: { nombre: 'Amarillo', relleno: '#FACC15', borde: '#8A6A00' },
+        cian:     { nombre: 'Cian',     relleno: '#3DD6E8', borde: '#0E5561' },
+        naranja:  { nombre: 'Naranja',  relleno: '#FB923C', borde: '#9A3412' },
+        morado:   { nombre: 'Morado',   relleno: '#A78BFA', borde: '#5B3FB0' },
+        coral:    { nombre: 'Coral',    relleno: '#FB7185', borde: '#9F1239' },
+        azul:     { nombre: 'Azul',     relleno: '#60A5FA', borde: '#1E4E8C' }
+    },
+    COLOR_INICIAL: { ridds: 'verde', mech: 'amarillo' },
+
+    /** Robot que el estudiante eligió como acompañante principal. */
+    principal() {
+        return AppState.ajustes.principal === 'mech' ? 'mech' : 'ridds';
+    },
+
+    /** El otro robot: también aparece, pero como complemento. */
+    complemento() {
+        return this.principal() === 'mech' ? 'ridds' : 'mech';
+    },
+
+    nombre(quien) {
+        return this.NOMBRES[quien === 'mech' ? 'mech' : 'ridds'];
+    },
+
+    color(quien) {
+        const q = quien === 'mech' ? 'mech' : 'ridds';
+        const elegido = AppState.ajustes[q === 'mech' ? 'colorMech' : 'colorRidds'];
+        return this.COLORES[elegido] || this.COLORES[this.COLOR_INICIAL[q]];
+    },
+
     base: {
         ridds: `
 <line x1="100" y1="32" x2="100" y2="14" stroke="#2B3F45" stroke-width="5" stroke-linecap="round"/>
-<circle cx="100" cy="11" r="8" fill="#3DD6E8" stroke="#0E5561" stroke-width="2"/>
+<circle cx="100" cy="11" r="8" fill="{A}" stroke="{B}" stroke-width="2"/>
 <rect x="30" y="64" width="14" height="30" rx="5" fill="#9FB3B8" stroke="#2B3F45" stroke-width="3"/>
 <rect x="156" y="64" width="14" height="30" rx="5" fill="#9FB3B8" stroke="#2B3F45" stroke-width="3"/>
 <circle cx="37" cy="105" r="9" fill="none" stroke="#121A1C" stroke-width="5"/>
@@ -22,7 +55,7 @@ const Robots = {
 <path d="M86 136 L114 136 L100 168 Z" fill="#E3EAEC"/>
 <path d="M80 136 L100 172 L92 216" fill="none" stroke="#B9C7CA" stroke-width="3" stroke-linejoin="round"/>
 <path d="M120 136 L100 172 L108 216" fill="none" stroke="#B9C7CA" stroke-width="3" stroke-linejoin="round"/>
-<path d="M95 140 L105 140 L107 166 L100 176 L93 166 Z" fill="#3DD6E8" stroke="#0E5561" stroke-width="2" stroke-linejoin="round"/>
+<path d="M95 140 L105 140 L107 166 L100 176 L93 166 Z" fill="{A}" stroke="{B}" stroke-width="2" stroke-linejoin="round"/>
 <rect x="118" y="180" width="22" height="16" rx="3" fill="none" stroke="#B9C7CA" stroke-width="3"/>
 <rect x="124" y="171" width="5" height="15" rx="2" fill="#F5A524"/>
 <rect x="40" y="30" width="120" height="100" rx="28" fill="#DCE4E6" stroke="#2B3F45" stroke-width="4"/>
@@ -41,13 +74,14 @@ const Robots = {
 <path d="M142 136 L114 136 L100 168 L116 192 Z" fill="#FBD3E2" stroke="#F2B6CB" stroke-width="2" stroke-linejoin="round"/>
 <path d="M100 168 L100 216" fill="none" stroke="#F2B6CB" stroke-width="3"/>
 <rect x="60" y="182" width="22" height="16" rx="3" fill="none" stroke="#F2B6CB" stroke-width="3"/>
-<rect x="66" y="173" width="5" height="15" rx="2" fill="#E8558E"/>
-<circle cx="125" cy="186" r="9" fill="#FFFFFF" stroke="#E8558E" stroke-width="2.5"/>
-<path d="M122 181 L122 186 L118 192 L132 192 L128 186 L128 181" fill="none" stroke="#E8558E" stroke-width="2" stroke-linejoin="round"/>
+<rect x="66" y="173" width="5" height="15" rx="2" fill="{A}" stroke="{B}" stroke-width="1"/>
+<circle cx="125" cy="186" r="9" fill="#FFFFFF" stroke="{B}" stroke-width="2.5"/>
+<path d="M118 190 L132 190 L130 192 L120 192 Z" fill="{A}"/>
+<path d="M122 181 L122 186 L118 192 L132 192 L128 186 L128 181" fill="none" stroke="{B}" stroke-width="2" stroke-linejoin="round"/>
 <rect x="40" y="34" width="120" height="96" rx="44" fill="#FFF1F4" stroke="#E0628F" stroke-width="4"/>
 <path d="M50 56 Q100 20 150 56" fill="none" stroke="#F06BA0" stroke-width="7" stroke-linecap="round"/>
 <path d="M100 30 C80 8 64 22 74 38 C82 46 94 38 100 32 C106 38 118 46 126 38 C136 22 120 8 100 30 Z" fill="#E8558E" stroke="#B3266A" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="100" cy="31" r="6" fill="#F7A1C4" stroke="#B3266A" stroke-width="2"/>
+<circle cx="100" cy="31" r="6.5" fill="{A}" stroke="{B}" stroke-width="2"/>
 <polygon points="50,60 98,66 93,93 61,93" fill="#FDE7F0" stroke="#C2185B" stroke-width="5" stroke-linejoin="round"/>
 <polygon points="150,60 102,66 107,93 139,93" fill="#FDE7F0" stroke="#C2185B" stroke-width="5" stroke-linejoin="round"/>
 <line x1="98" y1="68" x2="102" y2="68" stroke="#C2185B" stroke-width="5"/>
@@ -127,7 +161,9 @@ ${this.mano(171, 119, c)}
         const accesible = decorativo
             ? 'aria-hidden="true" focusable="false"'
             : `role="img" aria-label="${this.NOMBRES[q]} ${animo}"`;
-        return `<svg class="robot robot-${q}" viewBox="0 0 200 220" width="${tam}" height="${Math.round(tam * 1.1)}" ${accesible} style="overflow:visible">${this.base[q]}${this.animo(animo, colores)}</svg>`;
+        const acento = this.color(q);
+        const base = this.base[q].replace(/\{A\}/g, acento.relleno).replace(/\{B\}/g, acento.borde);
+        return `<svg class="robot robot-${q}" viewBox="0 0 200 220" width="${tam}" height="${Math.round(tam * 1.1)}" ${accesible} style="overflow:visible">${base}${this.animo(animo, colores)}</svg>`;
     },
 
     /** ¿El estudiante quiere ver los robots? */

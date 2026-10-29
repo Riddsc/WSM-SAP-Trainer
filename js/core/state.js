@@ -18,6 +18,9 @@ const ESTADO_INICIAL = () => ({
         tema: 'dark',
         mascota: 'mecharidds',
         robots: true,
+        principal: 'ridds',
+        colorRidds: 'verde',
+        colorMech: 'amarillo',
         letra: 'normal',
         recordatorio: ''
     }

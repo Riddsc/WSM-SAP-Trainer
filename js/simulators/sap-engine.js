@@ -3,7 +3,7 @@
  *
  * Cada paso espera una transacción (en el campo de comando) o un valor
  * (en el formulario). Hay dos modos:
- *   - Práctica: Mechanizer da pistas progresivas; sirve para aprender.
+ *   - Práctica: el robot principal da pistas progresivas; sirve para aprender.
  *   - Evaluación: sin pistas y con 3 intentos por paso; aprobarlo marca
  *     el laboratorio como completado.
  */
@@ -116,12 +116,12 @@ const SAPEngine = {
             const boton = nivel < 2
                 ? `<button type="button" class="btn btn-secundario btn-chico" onclick="SAPEngine.pedirPista()">${nivel === 0 ? 'Pedir pista' : 'Otra pista'}</button>` : '';
             ayuda = Robots.visibles()
-                ? `<section class="robot-dice mech">${Robots.svg('mech', nivel === 0 ? 'explicando' : 'pensando', 74)}<div class="globo"><span class="globo-quien">Mechanizer · ${nivel === 0 ? 'Práctica' : 'Pista'}</span><span id="lab-pista"></span>${boton}</div></section>`
+                ? `<section class="robot-dice ${Robots.principal()}">${Robots.svg(Robots.principal(), nivel === 0 ? 'explicando' : 'pensando', 74)}<div class="globo"><span class="globo-quien">${Robots.nombre(Robots.principal())} · ${nivel === 0 ? 'Práctica' : 'Pista'}</span><span id="lab-pista"></span>${boton}</div></section>`
                 : `<section class="tarjeta" style="display:flex; flex-direction:column; gap:8px; padding:12px"><span class="antetitulo">Práctica</span><span id="lab-pista"></span>${boton}</section>`;
             this._textoPista = textos[nivel];
         } else {
             const quedan = MAX_STRIKES - this.errores;
-            ayuda = `<div class="nota-evaluacion">${Robots.visibles() ? Robots.svg('mech', this.errores ? 'alertando' : 'explicando', 52) : ''}<span>Modo evaluación: sin pistas. Te quedan <strong>${quedan}</strong> intento(s) en este paso.</span></div>`;
+            ayuda = `<div class="nota-evaluacion">${Robots.visibles() ? Robots.svg(Robots.complemento(), this.errores ? 'alertando' : 'explicando', 52) : ''}<span>Modo evaluación: sin pistas. Te quedan <strong>${quedan}</strong> intento(s) en este paso.</span></div>`;
             this._textoPista = '';
         }
 
@@ -301,20 +301,20 @@ const SAPEngine = {
         let robot, titulo, texto, botones;
 
         if (exito && evaluacion) {
-            robot = robots ? Robots.svg('mech', 'celebrando', 130) : '';
+            robot = robots ? Robots.svg(Robots.principal(), 'celebrando', 130) : '';
             titulo = 'Laboratorio aprobado';
             texto = `¡Bien hecho, ${UIRenderer.primerNombre()}! Completaste los ${m.pasos.length} pasos sin pistas.`;
             botones = `${siguiente ? `<button class="btn btn-primario btn-alto" type="button" onclick="Router.openModule('${siguiente.id}')">Continuar con lo siguiente ${Icono.siguiente()}</button>` : ''}
                 <button class="btn btn-secundario" type="button" onclick="SAPEngine.modulo=null; Router.renderDashboard('${ciclo ? ciclo.id : ''}')">Ver el mapa</button>`;
         } else if (exito) {
-            robot = robots ? Robots.svg('ridds', 'celebrando', 130) : '';
+            robot = robots ? Robots.svg(Robots.complemento(), 'celebrando', 130) : '';
             titulo = 'Práctica completada';
             texto = 'Ya conoces el proceso. Para aprobar el laboratorio, hazlo ahora en modo evaluación, sin pistas.';
             botones = `<button class="btn btn-primario btn-alto" type="button" onclick="SAPEngine.reintentar('evaluacion')">Hacer la evaluación ${Icono.siguiente()}</button>
                 <button class="btn btn-secundario" type="button" onclick="SAPEngine.reintentar('practica')">Practicar otra vez</button>`;
         } else {
             AudioEngine.play('error');
-            robot = robots ? Robots.svg('ridds', 'pensando', 130) : '';
+            robot = robots ? Robots.svg(Robots.complemento(), 'pensando', 130) : '';
             titulo = 'Se acabaron los intentos';
             texto = `Fallaste ${MAX_STRIKES} veces en el paso ${this.paso + 1}. Practica con pistas y vuelve a intentarlo.`;
             botones = `<button class="btn btn-primario btn-alto" type="button" onclick="SAPEngine.reintentar('practica')">Practicar con pistas</button>

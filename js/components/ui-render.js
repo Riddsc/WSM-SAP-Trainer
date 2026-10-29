@@ -46,7 +46,7 @@ const UIRenderer = {
     },
 
     /** Aviso corto con un robot (si el estudiante los tiene visibles). */
-    aviso(mensaje, { quien = 'ridds', animo = 'explicando', segundos = 4 } = {}) {
+    aviso(mensaje, { quien = Robots.principal(), animo = 'explicando', segundos = 4 } = {}) {
         const caja = document.getElementById('aviso');
         if (!caja) return;
         const conRobot = Robots.visibles();
@@ -58,7 +58,7 @@ const UIRenderer = {
         this.avisoTimeout = setTimeout(() => caja.classList.remove('visible'), segundos * 1000);
     },
 
-    /** Compatibilidad: mensajes generales de MechaRidds. */
+    /** Compatibilidad: mensajes generales del robot principal. */
     mascota(mensaje, segundos) {
         this.aviso(mensaje, { segundos });
     },
@@ -69,7 +69,7 @@ const UIRenderer = {
         this.mostrar(`
             <div class="vista"><div class="vista-cuerpo">
                 <div class="vacio">
-                    ${Robots.svg('ridds', 'alertando', 110)}
+                    ${Robots.svg(Robots.principal(), 'alertando', 110)}
                     <h2 class="titulo-seccion"></h2>
                     <p></p>
                     <button class="btn btn-primario" type="button" onclick="Router.renderDashboard()">Volver al mapa</button>
@@ -165,7 +165,7 @@ const UIRenderer = {
                 <div class="vista-cuerpo">
                     <section class="tarjeta tarjeta-saludo">
                         <div class="saludo-textos">${saludo}</div>
-                        ${robots ? `<div class="saludo-robot">${Robots.svg(siguiente ? 'ridds' : 'mech', siguiente ? 'explicando' : 'celebrando', 88)}</div>` : ''}
+                        ${robots ? `<div class="saludo-robot">${Robots.svg(Robots.principal(), siguiente ? 'explicando' : 'celebrando', 88)}</div>` : ''}
                     </section>
                     <div class="cab-plano">
                         <h2 class="titulo-seccion">Plano de la maestría</h2>
@@ -223,7 +223,7 @@ const UIRenderer = {
                     <p>Este ciclo se escribe completo en la <strong>Fase ${c.fase}</strong> de la maestría, con lecciones, laboratorios y examen.</p>
                     <p class="texto-suave" style="font-size:0.9rem;"><strong>Temas:</strong> ${escaparHTML(c.temas || '')}</p>
                 </div>
-                ${Robots.visibles() ? `<div class="robot-dice">${Robots.svg('ridds', 'pensando', 78)}<div class="globo"><span class="globo-quien">MechaRidds</span>Mientras tanto, sigue con el ciclo marcado como "Aquí" en el mapa.</div></div>` : ''}`;
+                ${Robots.visibles() ? `<div class="robot-dice">${Robots.svg(Robots.complemento(), 'pensando', 78)}<div class="globo"><span class="globo-quien">${Robots.nombre(Robots.complemento())}</span>Mientras tanto, sigue con el ciclo marcado como "Aquí" en el mapa.</div></div>` : ''}`;
         } else {
             cuerpo = `
                 <div class="lista-modulos">
@@ -312,7 +312,7 @@ const UIRenderer = {
         const contenido = typeof pagina === 'string'
             ? `<div class="contenido-leccion">${pagina}</div>`
             : this.paginaNueva(pagina || {});
-        const consejo = i === 0 && typeof pagina === 'string' && pagina.includes('<details') ? this.cajaPuente('MechaRidds', 'Lee primero la idea principal. Cuando quieras el detalle técnico, toca "Ver explicación a fondo".') : '';
+        const consejo = i === 0 && typeof pagina === 'string' && pagina.includes('<details') ? this.cajaPuente(Robots.nombre(Robots.principal()), 'Lee primero la idea principal. Cuando quieras el detalle técnico, toca "Ver explicación a fondo".') : '';
 
         this.mostrar(`
             <div class="vista">
@@ -341,7 +341,7 @@ const UIRenderer = {
         const robot = Robots.visibles();
         return `
             <section class="puente ${robot ? '' : 'sin-robot'}">
-                ${robot ? Robots.svg('ridds', 'explicando', 64) : ''}
+                ${robot ? Robots.svg(Robots.principal(), 'explicando', 64) : ''}
                 <div class="puente-textos"><span class="puente-titulo">${escaparHTML(titulo)}</span><p>${escaparHTML(texto)}</p></div>
             </section>`;
     },
@@ -468,7 +468,7 @@ const UIRenderer = {
                     <span class="pregunta-tipo">${tipo}</span>
                     <h2 class="pregunta-texto" id="pregunta-texto">${p.pregunta}</h2>
                     <div class="opciones" role="group" aria-labelledby="pregunta-texto">${opciones}</div>
-                    ${i === 0 ? `<div class="nota-evaluacion">${Robots.visibles() ? Robots.svg('mech', 'explicando', 52) : ''}<span>En el examen no hay pistas. Necesitas 80 % para aprobar; las preguntas cambian de orden en cada intento.</span></div>` : ''}
+                    ${i === 0 ? `<div class="nota-evaluacion">${Robots.visibles() ? Robots.svg(Robots.complemento(), 'explicando', 52) : ''}<span>En el examen no hay pistas. Necesitas 80 % para aprobar; las preguntas cambian de orden en cada intento.</span></div>` : ''}
                 </div>
                 <footer class="barra-inf">
                     <button class="btn-icono" style="width:52px;height:52px;border-radius:14px" type="button" ${i === 0 ? 'disabled' : `onclick="UIRenderer.irPregunta(${i - 1})"`} aria-label="Pregunta anterior">${Icono.anterior(20)}</button>
@@ -606,7 +606,7 @@ const UIRenderer = {
                 ${this.barraSup({ antetitulo: escaparHTML(ex.titulo), titulo: aprobado ? 'Examen aprobado' : 'Examen no aprobado', atras: ciclo ? `Router.abrirCiclo('${ciclo.id}')` : 'Router.renderDashboard()' })}
                 <div class="vista-cuerpo">
                     <section class="resultado">
-                        ${robots ? Robots.svg(aprobado ? 'mech' : 'ridds', aprobado ? 'celebrando' : 'pensando', 120) : ''}
+                        ${robots ? Robots.svg(aprobado ? Robots.principal() : Robots.complemento(), aprobado ? 'celebrando' : 'pensando', 120) : ''}
                         <span class="resultado-puntaje ${aprobado ? 'bien' : 'mal'}">${puntaje} %</span>
                         <p><strong>${buenas} de ${total}</strong> correctas · tiempo ${duracion}</p>
                         <p class="texto-suave">${aprobado ? `¡Excelente trabajo, ${escaparHTML(nombre)}! Se desbloqueó lo siguiente.` : `Se necesita 80 %. Repasa la teoría con calma y vuelve a intentarlo, ${escaparHTML(nombre)}.`}</p>
@@ -698,7 +698,7 @@ const UIRenderer = {
                     <span class="apunte-titulo">${escaparHTML(a.titulo)}</span>
                     <span class="apunte-extracto">${escaparHTML(a.texto)}</span>
                 </button>`).join('')
-            : `<div class="vacio">${Robots.visibles() ? Robots.svg('ridds', 'pensando', 90) : ''}<p>Aún no tienes apuntes. En cada lección y laboratorio hay un botón para escribirlos.</p></div>`;
+            : `<div class="vacio">${Robots.visibles() ? Robots.svg(Robots.complemento(), 'pensando', 90) : ''}<p>Aún no tienes apuntes. En cada lección y laboratorio hay un botón para escribirlos.</p></div>`;
 
         this.mostrar(`
             <div class="vista">
@@ -779,8 +779,9 @@ const UIRenderer = {
                         <h2 class="settings-card-title">Apariencia</h2>
                         ${interruptor('t-claro', 'Modo claro', 'Fondo claro para estudiar de día', claro, 'visualUI.toggleTheme(); UIRenderer.renderProfile()')}
                         ${interruptor('t-letra', 'Letra grande', 'Agranda el texto de toda la app', a.letra === 'grande', 'visualUI.toggleLetra()')}
-                        ${interruptor('t-robots', 'Robots guía', 'MechaRidds y Mechanizer en lecciones, laboratorios y avisos', a.robots !== false, 'visualUI.toggleRobots(false)')}
                     </section>
+
+                    ${this.seccionRobots()}
 
                     <section class="settings-card">
                         <h2 class="settings-card-title">Sonido y vibración</h2>
@@ -829,6 +830,61 @@ const UIRenderer = {
             </div>`);
     },
 
+    /** Ajustes de los robots: mostrarlos, quién acompaña y colores. */
+    seccionRobots() {
+        const a = AppState.ajustes;
+        const visibles = a.robots !== false;
+        const principal = Robots.principal();
+        const tarjeta = (q, rol) => `
+            <button type="button" role="radio" class="robot-opcion" aria-checked="${principal === q}" onclick="UIRenderer.elegirPrincipal('${q}')">
+                ${Robots.svg(q, principal === q ? 'celebrando' : 'explicando', 64)}
+                <span class="robot-opcion-nombre">${Robots.nombre(q)}</span>
+                <span class="robot-opcion-rol">${principal === q ? 'Principal' : 'Complemento'}</span>
+                <span class="sr-only">${rol}</span>
+            </button>`;
+        const colores = (q, clave) => `
+            <div class="colores-fila">
+                <span class="settings-label" id="col-${q}">Color de ${Robots.nombre(q)}</span>
+                <div class="colores" role="radiogroup" aria-labelledby="col-${q}">
+                    ${Object.entries(Robots.COLORES).map(([id, c]) => `
+                        <button type="button" role="radio" class="color-opcion" aria-checked="${Robots.color(q) === c}" aria-label="${c.nombre}" title="${c.nombre}"
+                            style="--c:${c.relleno}; --cb:${c.borde}" onclick="UIRenderer.elegirColor('${clave}', '${id}')"></button>`).join('')}
+                </div>
+            </div>`;
+        return `
+            <section class="settings-card">
+                <h2 class="settings-card-title">Robots guía</h2>
+                <div class="settings-row">
+                    <div><span class="settings-label" id="t-robots-lbl">Mostrar robots</span><span class="settings-sublabel">En lecciones, laboratorios, exámenes y avisos</span></div>
+                    <label class="switch"><input type="checkbox" id="t-robots" ${visibles ? 'checked' : ''} onchange="visualUI.toggleRobots(false); UIRenderer.renderProfile()" aria-labelledby="t-robots-lbl"><span class="slider-toggle"></span></label>
+                </div>
+                <span class="settings-label" id="robot-principal-lbl">Acompañante principal</span>
+                <p>El principal te guía en lecciones y laboratorios; el otro también aparece, como complemento.</p>
+                <div class="robots-eleccion" role="radiogroup" aria-labelledby="robot-principal-lbl">
+                    ${tarjeta('ridds', 'científico profesor')}
+                    ${tarjeta('mech', 'científica de operaciones')}
+                </div>
+                ${colores('ridds', 'colorRidds')}
+                ${colores('mech', 'colorMech')}
+            </section>`;
+    },
+
+    elegirPrincipal(q) {
+        AppState.setAjuste('principal', q === 'mech' ? 'mech' : 'ridds');
+        AudioEngine.play('click');
+        this.renderProfile();
+        this.aviso(`¡Hola! Desde ahora te acompaño como principal.`, { quien: Robots.principal(), animo: 'celebrando', segundos: 3 });
+    },
+
+    elegirColor(clave, id) {
+        if (!Robots.COLORES[id]) return;
+        AppState.setAjuste(clave, id);
+        AudioEngine.play('click');
+        const y = this.contenedor().scrollTop;
+        this.renderProfile();
+        this.contenedor().scrollTop = y;
+    },
+
     saveProfileName() {
         const nombre = (document.getElementById('user-name-input')?.value || '').trim();
         const rol = (document.getElementById('user-role-input')?.value || '').trim();
@@ -839,7 +895,7 @@ const UIRenderer = {
         AppState.setPerfil(nombre, rol);
         AudioEngine.play('success');
         this.renderProfile();
-        this.aviso(`¡Perfil guardado, ${nombre.split(/\s+/)[0]}!`, { quien: 'mech', animo: 'celebrando' });
+        this.aviso(`¡Perfil guardado, ${nombre.split(/\s+/)[0]}!`, { quien: Robots.complemento(), animo: 'celebrando' });
     },
 
     saveHardwareSettings() {
@@ -870,7 +926,7 @@ const UIRenderer = {
         if (resultado.ok) {
             AppState.setAjuste('recordatorio', hora);
             this.renderProfile();
-            this.aviso(`Recordatorio activado para las ${hora}.`, { quien: 'mech' });
+            this.aviso(`Recordatorio activado para las ${hora}.`, { quien: Robots.complemento() });
         }
     },
 
@@ -943,7 +999,7 @@ const UIRenderer = {
         const tipo = d.pct >= 100 ? 'CONSTANCIA DE FINALIZACIÓN' : 'CONSTANCIA DE AVANCE';
         return `
             <div class="cert-container">
-                <div class="cert-robots">${Robots.svg('ridds', 'celebrando', 64)}${Robots.svg('mech', 'celebrando', 64)}</div>
+                <div class="cert-robots">${Robots.svg(Robots.principal(), 'celebrando', 64)}${Robots.svg(Robots.complemento(), 'celebrando', 64)}</div>
                 <h1>${tipo}</h1>
                 <p class="cert-org">Logística Pro · Maestría práctica en SAP para logística</p>
                 <p class="cert-text">Se deja constancia de que</p>
@@ -1146,7 +1202,7 @@ class VisualManager {
         const visibles = !Robots.visibles();
         AppState.setAjuste('robots', visibles);
         if (redibujar && Router.currentView === 'dashboard') UIRenderer.renderDashboard();
-        if (visibles) UIRenderer.aviso('¡Volvimos! Te acompañamos en lecciones y laboratorios.', { quien: 'mech', animo: 'celebrando', segundos: 3 });
+        if (visibles) UIRenderer.aviso('¡Volvimos! Te acompañamos en lecciones y laboratorios.', { quien: Robots.principal(), animo: 'celebrando', segundos: 3 });
         else UIRenderer.aviso('Robots ocultos. Puedes volver a mostrarlos cuando quieras.', { segundos: 3 });
     }
 

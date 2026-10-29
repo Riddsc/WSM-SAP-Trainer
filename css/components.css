@@ -299,6 +299,7 @@ body.sin-nav .bottom-nav { display: none; }
     font-size: 0.95rem; line-height: 1.4;
 }
 .robot-dice.mech .globo { border-color: var(--rosa-borde); }
+.robot-dice.ridds .globo { border-color: var(--cian); }
 .globo-quien { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--cian); }
 .robot-dice.mech .globo-quien { color: var(--rosa); }
 .robot-dice .btn-chico { align-self: flex-start; }
@@ -622,6 +623,28 @@ input[type="range"] { accent-color: var(--cian); min-height: 44px; }
 .kpi span { font-size: 0.75rem; color: var(--texto-suave); text-align: center; }
 .reminder-status { font-size: 0.9rem; color: var(--exito); }
 .app-version { text-align: center; font-size: 0.8rem; color: var(--texto-suave); padding: 8px 8px 0; line-height: 1.5; }
+
+/* --- Elección de robots y colores --- */
+.robots-eleccion { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.robot-opcion {
+    border: 1.5px solid var(--linea); background: var(--fondo); border-radius: var(--r-lg); padding: 10px 8px 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--texto);
+}
+.robot-opcion[aria-checked="true"] { border: 2px solid var(--cian); background: var(--cian-suave); padding: 9.5px 7.5px 11.5px; }
+.robot-opcion-nombre { font-weight: 700; }
+.robot-opcion-rol { font-size: 0.75rem; color: var(--texto-suave); }
+.robot-opcion[aria-checked="true"] .robot-opcion-rol { color: var(--cian); font-weight: 700; }
+.colores-fila { display: flex; flex-direction: column; gap: 8px; }
+.colores { display: flex; flex-wrap: wrap; gap: 5px; }
+.color-opcion {
+    width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--superficie);
+    background: var(--c); box-shadow: 0 0 0 2px var(--cb); position: relative;
+}
+.color-opcion[aria-checked="true"] { box-shadow: 0 0 0 3px var(--texto); }
+.color-opcion[aria-checked="true"]::after {
+    content: ''; position: absolute; left: 50%; top: 45%; width: 8px; height: 14px;
+    border-right: 3px solid #0A1F26; border-bottom: 3px solid #0A1F26; transform: translate(-50%, -50%) rotate(45deg);
+}
 
 /* --- Reporte y constancia --- */
 .report-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
