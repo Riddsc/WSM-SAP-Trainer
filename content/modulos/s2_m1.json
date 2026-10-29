@@ -1,0 +1,350 @@
+{
+ "id": "s2_m1",
+ "paginas": [
+  "<h3>Capítulo 1: El Paradigma Inbound Moderno</h3>\n            <p>En SAP EWM se requiere visibilidad anticipada. No se recibe contra una PO, se recibe contra un ASN.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Cuello de Botella MIGO)</summary>\n                <div class=\"details-content\">\n                    <p>En el SAP clásico (IM), un camión llega, el guardia pide la Orden de Compra (PO) y el almacén hace la MIGO 101. En volúmenes enterprise, esto es inviable: no sabes cuántos palets vienen ni qué tamaño tienen hasta que abren el camión. SAP EWM <strong>prohíbe</strong> la recepción directa por PO. Obliga a que el proveedor o el ERP envíe un aviso previo (Inbound Delivery) para pre-calcular el espacio en los racks antes de que el camión cruce la puerta.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 2: El Aviso de Expedición (ASN)</h3>\n            <p>La Inbound Delivery (VL31N) le dice al almacén qué viene, a qué hora y en qué palets. Es un compromiso logístico.</p>\n            <details>\n                <summary>Ver explicación a fondo (Advanced Shipping Notice)</summary>\n                <div class=\"details-content\">\n                    <p>El proveedor transmite el ASN vía EDI (IDoc DELVRY03). Esta Inbound Delivery aterriza en la transacción ERP <strong>VL31N / VL32N</strong> y se replica inmediatamente a EWM (transacción <strong>/SCWM/PRDI</strong>). EWM la usa para programar los montacargas, calcular las olas de Putaway y asignar una puerta de descarga (Door Assignment).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 3: Handling Unit Management (HUM)</h3>\n            <p>El código SSCC de 18 dígitos identifica a un palet único. Al escanearlo, SAP da por recibidas las unidades internas.</p>\n            <details>\n                <summary>Ver explicación a fondo (Trazabilidad SSCC)</summary>\n                <div class=\"details-content\">\n                    <p>Una <strong>Handling Unit (HU)</strong> es la combinación física del empaque (ej. EuroPalet de madera) y su contenido (ej. 50 laptops). Su matrícula global es el <em>Serial Shipping Container Code (SSCC)</em>. Con EWM HUM activo, el operario no digita \"Recibí 50 laptops\"; simplemente dispara su láser al SSCC del palet y el sistema hace el Post Goods Receipt (PGR) del contenido exacto en un milisegundo.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 4: Yard Management (Gestión de Patios)</h3>\n            <p>Gestiona el flujo vehicular desde el Check-in. Asigna puertas (Doors) o espacios de parqueo internos.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Almacén Externo)</summary>\n                <div class=\"details-content\">\n                    <p>El Yard es un almacén EWM al aire libre. Los camiones se modelan como \"Transportation Units\" (TUs). El flujo es: 1) <strong>Check-in</strong> en garita, 2) Movimiento a un Parking Space, 3) Llamado a la Inbound Door, 4) Descarga, 5) <strong>Check-out</strong>. Si omites el Check-out, el sistema asume que el camión sigue bloqueando la puerta, impidiendo la asignación del siguiente vehículo.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 5: MIGO vs VL32N / PRDI</h3>\n            <p>MIGO es para Inventory Management clásico. En EWM, el Post Goods Receipt (PGR) se hace sobre la Inbound Delivery.</p>\n            <details>\n                <summary>Ver explicación a fondo (Bloqueo de Transacciones)</summary>\n                <div class=\"details-content\">\n                    <p>Si intentas usar la MIGO_GR para un Almacén gestionado por EWM, SAP lanzará un Hard Error. Toda recepción debe hacerse desde EWM en la transacción <strong>/SCWM/PRDI</strong>. Al pulsar el botón \"PGR\", EWM envía un mensaje asíncrono (qRFC) al ERP para que actualice la contabilidad y disminuya el saldo pendiente de la Orden de Compra.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 6: La Zona Temporal (GR Zone)</h3>\n            <p>La Zona 9010/902 es transitoria. Logísticamente está en 'tránsito interno' hasta que se mueva al rack.</p>\n            <details>\n                <summary>Ver explicación a fondo (Storage Type Transitorio)</summary>\n                <div class=\"details-content\">\n                    <p>Cuando haces PGR, el inventario corporativo aumenta financieramente, pero físicamente los palets están sentados en el piso de descarga (GR Zone 9010). Este <em>Storage Type</em> no tiene capacidad volumétrica. Si los palets se quedan ahí más de 4 horas, se generan alertas rojas en el monitor (/SCWM/MON), ya que bloquean el flujo de los siguientes camiones.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 7: Integración con Calidad (QM)</h3>\n            <p>El stock entra como 'Quality Inspection Stock'. Nadie puede venderlo hasta que se libere con la QA11.</p>\n            <details>\n                <summary>Ver explicación a fondo (Inspection Lots)</summary>\n                <div class=\"details-content\">\n                    <p>Si el Material Master tiene la vista QM activa (Inspection Type 01), EWM detona automáticamente un Lote de Inspección (Inspection Lot) al momento del PGR. El sistema crea una Warehouse Task para mover el palet a la zona de cuarentena (Q-Zone). Ventas verá el stock, pero no podrá despacharlo hasta que el inspector de calidad registre el \"Usage Decision\" (UD) de liberación en SAP ERP.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 8: Expected Goods Receipt (EGR)</h3>\n            <p>Si el ERP se cae, EWM puede seguir recibiendo camiones basándose en los EGR pre-descargados.</p>\n            <details>\n                <summary>Ver explicación a fondo (Operación Offline / Desacoplada)</summary>\n                <div class=\"details-content\">\n                    <p>Una de las mayores ventajas de que EWM esté descentralizado (o como Add-on S/4HANA embebido) es la resiliencia. EWM descarga periódicamente un documento llamado <strong>EGR</strong> (Entradas de mercancías esperadas basadas en las POs abiertas del ERP). Si el ERP entra en mantenimiento o cae la red, EWM permite recibir camiones y crear Inbound Deliveries locales basadas en ese EGR, enviando la actualización contable cuando el ERP reviva.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 9: Reversiones (Movement Type 102)</h3>\n            <p>Para anular una recepción (101). EWM lo bloquea si el palet ya fue movido de la GR Zone al rack.</p>\n            <details>\n                <summary>Ver explicación a fondo (Reverse Goods Receipt)</summary>\n                <div class=\"details-content\">\n                    <p>El error humano existe. Un operario confirma PGR por 1,000 unidades, pero el camión traía 100. En SAP IM, vas a MIGO y anulas con 102. En EWM es complejo: solo puedes ejecutar la anulación (Reverse GR) <strong>SI Y SOLO SÍ</strong> la Warehouse Task de Putaway no ha sido confirmada. Si el palet ya está guardado en el pasillo 14 a 10 metros de altura, debes hacer un Putaway inverso para devolverlo a la zona 9010 antes de poder anular financieramente.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 10: Tolerancias de Entrega</h3>\n            <p>Si la PO permite 5% extra, y el camión trae 6% extra, el sistema arroja Hard Error (M7 022).</p>\n            <details>\n                <summary>Ver explicación a fondo (Overdelivery & Underdelivery)</summary>\n                <div class=\"details-content\">\n                    <p>La clave para evitar cuellos de botella en la garita está en las tolerancias (mantenidas en la Purchasing Info Record o el Material Master). Si el proveedor envía de más, EWM verifica la tolerancia. Si se excede, el PGR falla y el camión queda atascado en el muelle. Las mejores prácticas recomiendan gestionar estos excesos mediante \"Unplanned Returns\" o re-negociación dinámica con el comprador antes del escaneo final.</p>\n                </div>\n            </details>"
+ ],
+ "resumen": "En operaciones enterprise, nunca se recibe con MIGO directo contra una PO. Se utiliza VL31N para crear el Aviso de Expedición (ASN) y mapear el camión en el Yard Management antes de tocar el muelle.",
+ "examen": [
+  {
+   "pregunta": "¿Documento recomendado para recepción con EWM?",
+   "opciones": [
+    {
+     "texto": "Inbound Delivery (ASN)",
+     "correcta": true
+    },
+    {
+     "texto": "Purchase Order",
+     "correcta": false
+    },
+    {
+     "texto": "Material Document",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Transacción para crear Inbound Delivery?",
+   "opciones": [
+    {
+     "texto": "VL31N",
+     "correcta": true
+    },
+    {
+     "texto": "MIGO",
+     "correcta": false
+    },
+    {
+     "texto": "VA01",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Código de barras global de un palet:",
+   "opciones": [
+    {
+     "texto": "SSCC",
+     "correcta": true
+    },
+    {
+     "texto": "EAN13",
+     "correcta": false
+    },
+    {
+     "texto": "UPC",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué es HUM?",
+   "opciones": [
+    {
+     "texto": "Handling Unit Management",
+     "correcta": true
+    },
+    {
+     "texto": "Human Usage",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Estado inicial del camión en Yard Management:",
+   "opciones": [
+    {
+     "texto": "Check-in",
+     "correcta": true
+    },
+    {
+     "texto": "Docked",
+     "correcta": false
+    },
+    {
+     "texto": "Loading",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Movement Type estándar para recepción de compras:",
+   "opciones": [
+    {
+     "texto": "101",
+     "correcta": true
+    },
+    {
+     "texto": "102",
+     "correcta": false
+    },
+    {
+     "texto": "561",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Al hacer PGR exitoso:",
+   "opciones": [
+    {
+     "texto": "Se carga inventario y abona cuenta GR/IR.",
+     "correcta": true
+    },
+    {
+     "texto": "Se paga al proveedor.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Área transitoria de descarga (piso):",
+   "opciones": [
+    {
+     "texto": "GR Zone (902)",
+     "correcta": true
+    },
+    {
+     "texto": "High Rack",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Stock type si requiere inspección?",
+   "opciones": [
+    {
+     "texto": "Quality Inspection Stock",
+     "correcta": true
+    },
+    {
+     "texto": "Unrestricted",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Se puede despachar stock en Quality Inspection?",
+   "opciones": [
+    {
+     "texto": "No, hasta la Decisión de Empleo.",
+     "correcta": true
+    },
+    {
+     "texto": "Sí.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Transacción para liberar stock de calidad?",
+   "opciones": [
+    {
+     "texto": "QA11",
+     "correcta": true
+    },
+    {
+     "texto": "MIGO",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿EGR sirve para?",
+   "opciones": [
+    {
+     "texto": "Recibir camiones si ERP se cae.",
+     "correcta": true
+    },
+    {
+     "texto": "Imprimir facturas.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Movement Type para anular MIGO 101:",
+   "opciones": [
+    {
+     "texto": "102",
+     "correcta": true
+    },
+    {
+     "texto": "311",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Por qué falla la reversión 102 en EWM?",
+   "opciones": [
+    {
+     "texto": "El palet ya se movió al rack alto.",
+     "correcta": true
+    },
+    {
+     "texto": "Es de noche.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si recibe 105 tons de 100 pactadas sin error, es por:",
+   "opciones": [
+    {
+     "texto": "Overdelivery Tolerance.",
+     "correcta": true
+    },
+    {
+     "texto": "Bug SAP.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Error si excede tolerancia:",
+   "opciones": [
+    {
+     "texto": "M7 022",
+     "correcta": true
+    },
+    {
+     "texto": "404",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si andenes están ocupados, el camión va a:",
+   "opciones": [
+    {
+     "texto": "Parking Space.",
+     "correcta": true
+    },
+    {
+     "texto": "La calle.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "La Inbound Delivery ERP se convierte en EWM a:",
+   "opciones": [
+    {
+     "texto": "Inbound Delivery EWM.",
+     "correcta": true
+    },
+    {
+     "texto": "Transfer Order.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Una Inbound Delivery agrupa POs si:",
+   "opciones": [
+    {
+     "texto": "Mismo proveedor y Centro.",
+     "correcta": true
+    },
+    {
+     "texto": "Mismo peso.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Cajas dentro de palets se llaman:",
+   "opciones": [
+    {
+     "texto": "Nested HUs",
+     "correcta": true
+    },
+    {
+     "texto": "Slotting",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Movement Type para traslado entre SLocs del mismo Plant?",
+   "opciones": [
+    {
+     "texto": "311",
+     "correcta": true
+    },
+    {
+     "texto": "101",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Documento de MIGO:",
+   "opciones": [
+    {
+     "texto": "Material Document.",
+     "correcta": true
+    },
+    {
+     "texto": "WT.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿MIGO si PO no está aprobada (release)?",
+   "opciones": [
+    {
+     "texto": "Bloqueado.",
+     "correcta": true
+    },
+    {
+     "texto": "Permitido.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Monitor de colas atascadas:",
+   "opciones": [
+    {
+     "texto": "SMQ1/SMQ2",
+     "correcta": true
+    },
+    {
+     "texto": "MIGO",
+     "correcta": false
+    }
+   ]
+  }
+ ]
+}

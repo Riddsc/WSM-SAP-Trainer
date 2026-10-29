@@ -1,74 +1,62 @@
 /**
- * Logística Pro - Motor de Audio Nativo (Web Audio API)
- * Cumple con los estándares de Arquitectura Capacitor: Funciona 100% offline sin archivos externos.
+ * Logística Pro - Sonidos sintéticos (Web Audio API).
+ * Funciona sin internet y sin archivos de audio. Respeta el interruptor
+ * de sonido y el volumen elegidos en el perfil.
  */
-
 const AudioEngine = {
     audioCtx: null,
 
     init() {
         if (!this.audioCtx) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.audioCtx = new AudioContext();
+            const Contexto = window.AudioContext || window.webkitAudioContext;
+            if (!Contexto) return false;
+            this.audioCtx = new Contexto();
         }
-        if (this.audioCtx.state === 'suspended') {
-            this.audioCtx.resume();
-        }
+        if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+        return true;
     },
 
-    play(type) {
+    /** Volumen elegido por el usuario, de 0 a 1. */
+    volumen() {
+        if (typeof AppState === 'undefined') return 1;
+        const a = AppState.ajustes;
+        if (!a.sonido) return 0;
+        return Math.max(0, Math.min(100, Number(a.volumen))) / 100;
+    },
+
+    play(tipo) {
+        const vol = this.volumen();
+        if (vol <= 0) return;
         try {
-            this.init();
+            if (!this.init()) return;
             const ctx = this.audioCtx;
-            const now = ctx.currentTime;
+            const ahora = ctx.currentTime;
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
-
             osc.connect(gain);
             gain.connect(ctx.destination);
 
-            if (type === 'click') {
-                // Sonido sutil de toque UI
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(500, now);
-                osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
-                gain.gain.setValueAtTime(0.15, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-                osc.start(now);
-                osc.stop(now + 0.08);
-            } 
-            else if (type === 'success') {
-                // Acorde brillante de éxito / quiz correcto
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, now); // C5
-                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.linearRampToValueAtTime(0.001, now + 0.4);
-                osc.start(now);
-                osc.stop(now + 0.4);
-            } 
-            else if (type === 'error') {
-                // Alarma sorda de error / fallo
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(140, now);
-                osc.frequency.exponentialRampToValueAtTime(90, now + 0.25);
-                gain.gain.setValueAtTime(0.25, now);
-                gain.gain.linearRampToValueAtTime(0.001, now + 0.25);
-                osc.start(now);
-                osc.stop(now + 0.25);
-            }
-            else if (type === 'key') {
-                // Clic mecánico tipo teclado de terminal SAP
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(800, now);
-                gain.gain.setValueAtTime(0.03, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
-                osc.start(now);
-                osc.stop(now + 0.03);
-            }
+            // Cada sonido define su forma, notas, volumen base y duración
+            const sonidos = {
+                click:   { forma: 'sine',     notas: [[500, 0], [200, 0.08, true]], base: 0.15, dur: 0.08 },
+                success: { forma: 'triangle', notas: [[523.25, 0], [659.25, 0.1], [783.99, 0.2]], base: 0.2, dur: 0.4 },
+                error:   { forma: 'sawtooth', notas: [[140, 0], [90, 0.25, true]], base: 0.25, dur: 0.25 },
+                key:     { forma: 'square',   notas: [[800, 0]], base: 0.03, dur: 0.03 }
+            };
+            const s = sonidos[tipo];
+            if (!s) return;
+
+            osc.type = s.forma;
+            s.notas.forEach(([frecuencia, momento, rampa]) => {
+                if (rampa) osc.frequency.exponentialRampToValueAtTime(frecuencia, ahora + momento);
+                else osc.frequency.setValueAtTime(frecuencia, ahora + momento);
+            });
+            gain.gain.setValueAtTime(s.base * vol, ahora);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ahora + s.dur);
+            osc.start(ahora);
+            osc.stop(ahora + s.dur);
         } catch (e) {
-            console.warn('Audio contextual bloqueado por políticas del navegador hasta interacción del usuario.', e);
+            // El navegador bloquea el audio hasta que el usuario toca la pantalla
         }
     }
 };

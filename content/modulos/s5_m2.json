@@ -1,0 +1,443 @@
+{
+ "id": "s5_m2",
+ "paginas": [
+  "<h3>Capítulo 1: El Paradigma de Calidad Integrada</h3>\n            <p>El almacén no solo guarda cajas; custodia millones de dólares sujetos a normativas de la FDA, ISO 9001 o regulaciones de aeronáutica. Si el almacén despacha un palet de medicina vencida o contaminada, las consecuencias legales quiebran empresas.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Muro de QA)</summary>\n                <div class=\"details-content\">\n                    <p>La integración QM-EWM es el muro de contención (Quality Firewall). En almacenes sin integración, los operarios pueden hacer picking por error de un lote dudoso. En EWM, el stock en estado <strong>'Q' (Quality Inspection)</strong> es ciego matemáticamente para el algoritmo de Outbound: es imposible asignarlo a una ola de salidas de clientes. Calidad manda sobre la operación comercial.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 2: Inspection Object Types (IOTs)</h3>\n            <p>Son los \"enchufes\" arquitectónicos que conectan un evento logístico de EWM con el motor de Calidad (QM).</p>\n            <details>\n                <summary>Ver explicación a fondo (El Mapa IOT)</summary>\n                <div class=\"details-content\">\n                    <p>En el Customizing de EWM, activas diferentes IOTs según en qué etapa del flujo logístico quieres inspeccionar:<br>\n                    <strong>IOT 1:</strong> Inspección Pre-Entrada (Aviso de Despacho del Proveedor).<br>\n                    <strong>IOT 3:</strong> Inspección de Salida (Revisión antes de cargar el camión al cliente).<br>\n                    <strong>IOT 4:</strong> Inspección de Entrada (La más crítica, ocurre en el PGR).<br>\n                    <strong>IOT 5:</strong> Inspecciones Internas o cíclicas (Inspecciones periódicas de lotes que llevan meses guardados).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 3: Inspección de Entrada (IOT 4) y Q-Zone</h3>\n            <p>El camión descarga. Automáticamente, el sistema secuestra el inventario y lo aísla lógicamente.</p>\n            <details>\n                <summary>Ver explicación a fondo (Ruteo Dinámico de Calidad)</summary>\n                <div class=\"details-content\">\n                    <p>Al contabilizar el Post Goods Receipt (PGR), el IOT 4 se gatilla. SAP verifica si el Material Master exige inspección. Si es así, crea un <strong>Inspection Lot (Lote de Inspección)</strong> en el ERP y una Warehouse Task en EWM para mover el palet desde el muelle hacia la <strong>Q-Zone (Zona de Cuarentena)</strong> o Laboratorio de QA. El palet jamás tocará los racks de venta hasta aprobar el examen.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 4: Inspection Rules (Reglas de Inspección - /SCWM/QRSETUP)</h3>\n            <p>El cerebro condicional. Define a quién, cuánto y cómo inspeccionar sin tener que codificar a mano.</p>\n            <details>\n                <summary>Ver explicación a fondo (Matriz de Riesgos)</summary>\n                <div class=\"details-content\">\n                    <p>La transacción maestra de calidad en EWM es <code>/SCWM/QRSETUP</code>. Aquí configuras matrices de riesgo: \"Si el material es QUÍMICO y el proveedor es NUEVO, inspecciona el 100% de los palets. Si el proveedor tiene certificado ISO y lleva 5 años de buen récord (Skip-Lot), inspecciona solo 1 palet de cada 20 de forma aleatoria\". Todo de forma algorítmica.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 5: Muestreo Físico (Sample Size & Sampling Procedures)</h3>\n            <p>El inspector de calidad no puede abrir las 10,000 botellas que llegaron; necesita una muestra representativa (Sample).</p>\n            <details>\n                <summary>Ver explicación a fondo (Work Center de QA)</summary>\n                <div class=\"details-content\">\n                    <p>Según la regla <em>Sampling Procedure</em> basada en tablas de estadística militar (ej. AQL), SAP determina que debe extraer 15 botellas de muestra. EWM genera una Warehouse Task especial (Sample Extraction WT). El operario extrae las 15 botellas, las escanea, y las lleva al <strong>Work Center de QA</strong>. El resto del palet (9,985 botellas) queda inmovilizado en la zona de reserva esperando el resultado de la muestra.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 6: Registro de Resultados (Results Recording - QA32/QE01)</h3>\n            <p>El laboratorista ingresa las mediciones físicas o químicas a la base de datos de SAP QM.</p>\n            <details>\n                <summary>Ver explicación a fondo (Master Inspection Characteristics - MICs)</summary>\n                <div class=\"details-content\">\n                    <p>El lote de inspección contiene <strong>MICs (Características Maestras de Inspección)</strong>. Ejemplos: MIC 1 = Temperatura (Permitido: 2°C a 8°C). MIC 2 = Color (Permitido: Blanco). Si el laboratorista teclea 15°C, SAP QM rechaza automáticamente esa característica (Out of Spec). Esta información vive en el ERP, pero impacta la logística inmovilizada en EWM.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 7: La Decisión de Empleo (Usage Decision - UD)</h3>\n            <p>El momento de la verdad. ¿El material se aprueba para la venta, o se destruye?</p>\n            <details>\n                <summary>Ver explicación a fondo (Follow-Up Actions)</summary>\n                <div class=\"details-content\">\n                    <p>El Gerente de Calidad firma digitalmente el UD (Usage Decision) en la transacción QA11. Existen decisiones estándar: <strong>A (Aprobado)</strong> o <strong>R (Rechazado)</strong>. Al guardar el UD, SAP dispara un <strong>Follow-Up Action (Acción Subsiguiente)</strong>. Esta acción se comunica vía qRFC de vuelta a EWM, desencadenando toda una tormenta de Warehouse Tasks automatizadas según el resultado.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 8: Logística Post-Aprobación (Unrestricted Stock)</h3>\n            <p>El Gerente de Calidad aprobó el lote. El stock se libera comercialmente.</p>\n            <details>\n                <summary>Ver explicación a fondo (Cambio de Tipo de Stock - Posting Change)</summary>\n                <div class=\"details-content\">\n                    <p>Si el UD es \"Aprobado\", el Follow-Up Action en EWM ejecuta un <strong>Posting Change (Cambio Contable)</strong> en milisegundos. El inventario pasa del tipo de stock <code>'Q' (Quality)</code> al tipo de stock <code>'F' o 'Blank' (Unrestricted/Libre Utilización)</code>. Inmediatamente después, genera una Warehouse Task para mover los palets desde la zona de cuarentena hacia el rack de venta (High Rack Putaway).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 9: Logística de Rechazo, Reproceso (Rework) y Scrap (Chatarra)</h3>\n            <p>El lote falló las pruebas. El peligro de contaminación es inminente. Debe aislarse o destruirse.</p>\n            <details>\n                <summary>Ver explicación a fondo (Ruteo de Excepciones)</summary>\n                <div class=\"details-content\">\n                    <p>Si el UD es \"Rechazado\", el Follow-Up Action cambia el stock a tipo <code>'S' (Blocked/Scrap)</code>. EWM crea tareas forzosas hacia la <strong>Zona de Destrucción (Scrap Zone)</strong> o, si el artículo es recuperable (ej. le falta una etiqueta), hacia la <strong>Zona de Reproceso (Rework Work Center)</strong>. Financieramente, esto detona una pérdida contable o un cargo/débito en reclamo hacia el proveedor en SAP MM.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 10: Ensayos Destructivos (Destructive Testing)</h3>\n            <p>Para probar que un chaleco antibalas funciona, tienes que dispararle y destruirlo. El inventario desaparece.</p>\n            <details>\n                <summary>Ver explicación a fondo (Inventario Consumido por QA)</summary>\n                <div class=\"details-content\">\n                    <p>En pruebas destructivas o de microbiología, la muestra extraída jamás regresa al almacén principal. El Follow-Up Action del módulo QM ejecuta automáticamente un <strong>Goods Issue to Sample (Salida por Muestreo)</strong>. En EWM, las 15 unidades que se llevaron al laboratorio se borran del inventario físico y se cargan al Centro de Costos del departamento de calidad en SAP FI.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 11: Inspecciones Cíclicas e Internas (IOT 5 / Relocation)</h3>\n            <p>Medicinas que llevan guardadas 12 meses deben re-evaluarse antes de salir al mercado para asegurar su potencia.</p>\n            <details>\n                <summary>Ver explicación a fondo (Batch Expiration Monitoring)</summary>\n                <div class=\"details-content\">\n                    <p>Un Job nocturno monitorea las fechas de caducidad (SLED). Si un lote de vacunas entra en su \"Ventana Crítica de Inspección Repetitiva\" (Recurring Inspection), el ERP genera un nuevo Lote de Inspección (IOT 5). EWM cambia sorpresivamente el stock de los racks de 'Unrestricted' a 'Quality', congelándolo, y envía WTs para que los operarios bajen los palets y los lleven al laboratorio para un test de estabilidad.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 12: Devoluciones de Clientes (Customer Returns) y Calidad</h3>\n            <p>Un cliente devuelve 5 laptops porque \"no encienden\". No puedes meterlas al inventario de venta directamente.</p>\n            <details>\n                <summary>Ver explicación a fondo (ARM - Advanced Returns Management)</summary>\n                <div class=\"details-content\">\n                    <p>El proceso <strong>Advanced Returns Management (ARM)</strong> usa el IOT 4 o IOT 3. Al recibir la caja de devolución en el muelle (Advanced Return Delivery), el sistema la envía forzosamente al <strong>Returns Work Center</strong>. Un técnico evalúa si la laptop realmente está dañada, si fue golpeada por el transportista, o si funciona perfecto (A-Stock). Su Decisión de Empleo determina si se devuelve el dinero al cliente o se tira a la basura.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 13: Certificados de Calidad (Quality Certificates)</h3>\n            <p>Documentos PDF firmados (ej. Certificado de Análisis - CoA) que el proveedor debe enviar con el camión, o el almacén no recibe.</p>\n            <details>\n                <summary>Ver explicación a fondo (Bloqueo de Inbound por Falta de Documentos)</summary>\n                <div class=\"details-content\">\n                    <p>En la industria farmacéutica, si llega la materia prima pero el transportista olvidó el <em>Certificate of Analysis (CoA)</em> del lote, SAP EWM bloquea por sistema la contabilización del Post Goods Receipt (PGR) a través del status \"Certificate Missing\". El camión se queda en el patio de maniobras (Yard Management) hasta que el proveedor envíe el PDF y el empleado de garita lo adjunte en SAP.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 14: Lotes de Inspección en EWM vs ERP (Engine QM Embebido vs Descentralizado)</h3>\n            <p>S/4HANA trajo una revolución: incrustar el motor de QM dentro del propio EWM para ganar microsegundos de respuesta.</p>\n            <details>\n                <summary>Ver explicación a fondo (QIE - Quality Inspection Engine)</summary>\n                <div class=\"details-content\">\n                    <p>Antes, EWM dependía enteramente de los mensajes RFC lentos del ERP para saber qué hacer. Ahora, S/4HANA EWM utiliza el <strong>QIE (Quality Inspection Engine)</strong> local. Esto permite generar documentos de inspección paralelos en EWM en tiempo real, permitiendo a los operarios del Work Center ingresar defectos desde su pistola de radiofrecuencia (/RFUI) sin tener acceso a las pantallas complejas de SAP ERP.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 15: Monitor EWM para Calidad y Tablas Core SQL QM</h3>\n            <p>Como consultor, si un palet está bloqueado en calidad y no sabes por qué, aquí encuentras las respuestas.</p>\n            <details>\n                <summary>Ver explicación a fondo (Troubleshooting QM-EWM)</summary>\n                <div class=\"details-content\">\n                    <p>En el Monitor (<code>/SCWM/MON</code>), nodo <em>Quality Inspection</em>, visualizas los Inspection Documents vinculados al stock. <strong>Tablas Core:</strong> <code>QALS</code> (Cabecera de Lote de Inspección ERP), <code>QAMV</code> (Características de inspección), <code>QAMR</code> (Resultados de inspección), y en EWM <code>/SCWM/QUAN</code> (Tabla maestra de Quants/Stock donde visualizas el flag de tipo 'Q' o 'S' de las HUs inmovilizadas).</p>\n                </div>\n            </details>"
+ ],
+ "resumen": "Regla de Oro: El módulo de Calidad manda sobre Logística. Si el Lote de Inspección (Inspection Lot) dictamina un 'Usage Decision' de Rechazo, EWM bloquea automáticamente la mercancía y la enruta hacia Scrap (Destrucción) o Rework (Reproceso). Las reglas de calidad se rigen por la transacción maestra /SCWM/QRSETUP (Inspection Rules) y los IOTs.",
+ "examen": [
+  {
+   "pregunta": "¿Cuál es el propósito fundamental de integrar SAP EWM con SAP QM en un almacén de clase mundial?",
+   "opciones": [
+    {
+     "texto": "Crear un 'Quality Firewall' (muro de calidad) inmovilizando sistémicamente inventarios dudosos o sin evaluar para evitar que sean recolectados y enviados a clientes.",
+     "correcta": true
+    },
+    {
+     "texto": "Mejorar los gráficos y colores del sistema SAP Fiori.",
+     "correcta": false
+    },
+    {
+     "texto": "Permitir que el departamento de finanzas cobre los fletes más rápido.",
+     "correcta": false
+    },
+    {
+     "texto": "Eliminar la necesidad de contratar gerentes en el almacén.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En la arquitectura técnica de integración EWM-QM, ¿qué significan las siglas IOT?",
+   "opciones": [
+    {
+     "texto": "Inspection Object Types (Los eventos de proceso, como entrada o salida, que detonan una inspección de calidad).",
+     "correcta": true
+    },
+    {
+     "texto": "Internet of Things.",
+     "correcta": false
+    },
+    {
+     "texto": "Internal Operation Taxes.",
+     "correcta": false
+    },
+    {
+     "texto": "Inter-Office Transfers.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué IOT (Inspection Object Type) se dispara de forma crítica y estándar justo en el momento en que se contabiliza el Post Goods Receipt (PGR) de un camión entrante?",
+   "opciones": [
+    {
+     "texto": "IOT 4 (Inspección de Entrada / Inbound Inspection).",
+     "correcta": true
+    },
+    {
+     "texto": "IOT 1 (Inspección Pre-Entrada).",
+     "correcta": false
+    },
+    {
+     "texto": "IOT 3 (Inspección de Salida).",
+     "correcta": false
+    },
+    {
+     "texto": "IOT 5 (Inspección Interna).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué IOT se encarga de las inspecciones cíclicas o internas para lotes de productos que ya llevan almacenados 12 meses en la bodega y necesitan re-evaluación por vencimiento?",
+   "opciones": [
+    {
+     "texto": "IOT 5 (Inspección Interna o Relocation Inspection).",
+     "correcta": true
+    },
+    {
+     "texto": "IOT 4.",
+     "correcta": false
+    },
+    {
+     "texto": "IOT 1.",
+     "correcta": false
+    },
+    {
+     "texto": "IOT 9.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál es la transacción maestra centralizada en SAP EWM donde el consultor parametriza las Reglas de Inspección (ej. inspeccionar el 100%, o solo muestras, dependiendo del proveedor o material)?",
+   "opciones": [
+    {
+     "texto": "/SCWM/QRSETUP (Inspection Rules).",
+     "correcta": true
+    },
+    {
+     "texto": "MM01 (Material Master).",
+     "correcta": false
+    },
+    {
+     "texto": "SU01 (User Maintenance).",
+     "correcta": false
+    },
+    {
+     "texto": "SE38 (ABAP Editor).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Cuando EWM recibe mercancía sujeta a calidad bajo IOT 4, ¿bajo qué Tipo de Stock (Stock Type) ingresa financieramente y lógicamente el inventario para inmovilizarlo?",
+   "opciones": [
+    {
+     "texto": "Tipo de Stock 'Q' (Quality Inspection Stock).",
+     "correcta": true
+    },
+    {
+     "texto": "Tipo de Stock 'Blank' o 'F' (Unrestricted / Libre Utilización).",
+     "correcta": false
+    },
+    {
+     "texto": "Tipo de Stock 'B' (Blocked by Finance).",
+     "correcta": false
+    },
+    {
+     "texto": "Tipo de Stock 'T' (Transit).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si un lote de 1,000 unidades llega y el sistema calcula, según las reglas de muestreo (AQL), que solo se necesitan 15 unidades de muestra. ¿Qué genera EWM?",
+   "opciones": [
+    {
+     "texto": "Una Warehouse Task de extracción de muestra (Sample WT) para llevar 15 unidades al laboratorio, inmovilizando las 985 unidades restantes en el rack de reserva bajo estado 'Q'.",
+     "correcta": true
+    },
+    {
+     "texto": "Envía las 1,000 unidades directo al laboratorio colapsando el edificio.",
+     "correcta": false
+    },
+    {
+     "texto": "Destruye las 985 unidades restantes por seguridad.",
+     "correcta": false
+    },
+    {
+     "texto": "Rechaza el camión obligando a que envíe solo 15 unidades.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué son las MICs (Master Inspection Characteristics) dentro de un Lote de Inspección de SAP QM?",
+   "opciones": [
+    {
+     "texto": "Las variables técnicas a medir en el laboratorio (ej. pH, color, temperatura) que definen el límite de tolerancia (Pass/Fail) del análisis.",
+     "correcta": true
+    },
+    {
+     "texto": "Las cámaras de seguridad físicas del almacén.",
+     "correcta": false
+    },
+    {
+     "texto": "Un tipo especial de código de barras militar.",
+     "correcta": false
+    },
+    {
+     "texto": "La tarifa por hora que cobra el inspector.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué significan las siglas 'UD' en el flujo de gestión de calidad integrada en SAP S/4HANA?",
+   "opciones": [
+    {
+     "texto": "Usage Decision (Decisión de Empleo - el dictamen final firmado por el Gerente de Calidad que aprueba o rechaza un lote).",
+     "correcta": true
+    },
+    {
+     "texto": "User Database (Base de datos de usuarios).",
+     "correcta": false
+    },
+    {
+     "texto": "Universal Delivery (Entrega universal).",
+     "correcta": false
+    },
+    {
+     "texto": "Urgent Dispatch (Despacho urgente).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si el Gerente de QA en el ERP realiza un 'Usage Decision' con resultado APROBADO, ¿qué mecanismo técnico utiliza SAP para informar y mover la mercancía en EWM de forma automatizada?",
+   "opciones": [
+    {
+     "texto": "A través de una 'Follow-Up Action' que ejecuta un Cambio Contable (Posting Change) en EWM, cambiando el stock de 'Q' a 'Libre', y generando las WTs de Putaway final.",
+     "correcta": true
+    },
+    {
+     "texto": "Llama por teléfono al supervisor de almacén para que mueva las cajas a mano.",
+     "correcta": false
+    },
+    {
+     "texto": "Genera una nueva Orden de Compra para premiar al proveedor.",
+     "correcta": false
+    },
+    {
+     "texto": "Borra el Material Master entero.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si el UD dictamina un RECHAZO definitivo por contaminación, ¿qué Follow-Up Action desencadena EWM típicamente sobre el inventario físico en la Q-Zone?",
+   "opciones": [
+    {
+     "texto": "Ejecuta el cambio de estado a tipo 'S' (Scrap/Blocked) y genera una Warehouse Task forzosa moviendo los palets desde la zona de calidad hacia la Zona de Destrucción (Scrap Zone).",
+     "correcta": true
+    },
+    {
+     "texto": "Lo vende al doble del precio en una liquidación.",
+     "correcta": false
+    },
+    {
+     "texto": "Lo empaqueta como regalo para los empleados.",
+     "correcta": false
+    },
+    {
+     "texto": "Lo vuelve a enviar al rack de venta libre, pero ocultándolo.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En un proceso de QA donde se aplican 'Ensayos Destructivos' (ej. someter una pieza a presión extrema hasta que estalla), ¿qué ocurre con el inventario lógico de esa muestra en SAP?",
+   "opciones": [
+    {
+     "texto": "El Follow-Up Action ejecuta un consumo o salida de mercancía por muestreo (Goods Issue to Sample), descargando el inventario de EWM con cargo al Centro de Costos de Calidad.",
+     "correcta": true
+    },
+    {
+     "texto": "SAP clona el inventario mágicamente para no perder dinero.",
+     "correcta": false
+    },
+    {
+     "texto": "Se devuelve el polvo de la pieza rota al proveedor para que la repare.",
+     "correcta": false
+    },
+    {
+     "texto": "El sistema genera un Short Dump porque no soporta roturas.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué característica de control avanzada permite a SAP EWM bloquear en garita a un camión entrante si le falta un documento PDF normativo crucial?",
+   "opciones": [
+    {
+     "texto": "La validación del Certificate of Analysis (CoA) en el Inbound Delivery; sin él, el status de calidad falla y se bloquea el PGR.",
+     "correcta": true
+    },
+    {
+     "texto": "El escáner térmico del guardia de seguridad.",
+     "correcta": false
+    },
+    {
+     "texto": "El pago anticipado de los impuestos de aduana.",
+     "correcta": false
+    },
+    {
+     "texto": "El certificado de antecedentes penales del chofer.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Un cliente devuelve un producto de alta tecnología porque llegó abollado. Usando Advanced Returns Management (ARM), ¿hacia dónde enruta EWM forzosamente el paquete al recibirlo en muelle?",
+   "opciones": [
+    {
+     "texto": "Hacia un Work Center especializado de Devoluciones (Returns Work Center) para que un técnico dictamine la gravedad del daño mediante una inspección IOT.",
+     "correcta": true
+    },
+    {
+     "texto": "Directamente al rack de ventas Unrestricted como nuevo.",
+     "correcta": false
+    },
+    {
+     "texto": "Directamente al basurero corporativo sin preguntar.",
+     "correcta": false
+    },
+    {
+     "texto": "Al escritorio de recepción administrativa (Front Desk).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cómo se denomina el motor local interno de SAP S/4HANA EWM que permite gestionar documentos de calidad y registrar defectos directamente desde las pantallas de radiofrecuencia (RF) del almacén sin depender exclusivamente del ERP?",
+   "opciones": [
+    {
+     "texto": "QIE (Quality Inspection Engine).",
+     "correcta": true
+    },
+    {
+     "texto": "V8 JavaScript Engine.",
+     "correcta": false
+    },
+    {
+     "texto": "Unreal Engine 5.",
+     "correcta": false
+    },
+    {
+     "texto": "SAP BTP Integration Suite.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Dentro del EWM Warehouse Monitor (/SCWM/MON), ¿en qué tabla SQL principal podrías buscar si existe un flag de stock tipo 'Q' o 'S' inmovilizando una unidad de manipulación (HU)?",
+   "opciones": [
+    {
+     "texto": "En la tabla /SCWM/QUAN (La tabla maestra de Quants/Inventario).",
+     "correcta": true
+    },
+    {
+     "texto": "En la tabla T001W (Maestro de Centros).",
+     "correcta": false
+    },
+    {
+     "texto": "En la tabla BIKER (No existe en logística).",
+     "correcta": false
+    },
+    {
+     "texto": "En la tabla VBAK (Cabecera de ventas).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En un escenario descentralizado (ERP separado de EWM), si la red corporativa sufre una desconexión total (Network Outage) por 2 horas, ¿qué sucede con las Decisiones de Empleo (UD) realizadas por el gerente en ERP QA11?",
+   "opciones": [
+    {
+     "texto": "Se encolan de forma asíncrona mediante mensajes qRFC y, tan pronto regresa la red, EWM las procesa en orden y dispara las WTs de los Follow-Up Actions.",
+     "correcta": true
+    },
+    {
+     "texto": "Se borran permanentemente y el gerente debe rehacerlas.",
+     "correcta": false
+    },
+    {
+     "texto": "EWM asume automáticamente que todo está aprobado para no frenar ventas.",
+     "correcta": false
+    },
+    {
+     "texto": "El ERP genera un Rollback masivo de toda la producción del año.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué ventaja estadística militar e industrial integra SAP QM para evitar inspeccionar cada tuerca individualmente en envíos masivos?",
+   "opciones": [
+    {
+     "texto": "Procedimientos de Muestreo Basados en Normas Internacionales (como AQL - Acceptable Quality Limits y reglas Skip-Lot para proveedores confiables).",
+     "correcta": true
+    },
+    {
+     "texto": "El Teorema de Pitágoras.",
+     "correcta": false
+    },
+    {
+     "texto": "Secuencias de Fibonacci invertidas.",
+     "correcta": false
+    },
+    {
+     "texto": "Mediciones astrológicas corporativas.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si un almacén de alimentos usa 'Rework' (Reproceso), ¿qué flujo físico rige EWM para el lote fallido?",
+   "opciones": [
+    {
+     "texto": "EWM mueve el lote a una zona física de Rework, PP lanza una Orden de Reproceso (CO01) para re-etiquetar, y al terminar, la mercancía se re-evalúa en QM antes de ir al rack final.",
+     "correcta": true
+    },
+    {
+     "texto": "Se vende a mitad de precio en la puerta del almacén sin registro alguno.",
+     "correcta": false
+    },
+    {
+     "texto": "Se esconde el palet detrás de los montacargas rotos.",
+     "correcta": false
+    },
+    {
+     "texto": "Se borra la tabla MARA para que Finanzas no note la pérdida.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Por qué el consultor logístico arquitecto (Senior Architect) nunca debe permitir que se evada el IOT 4 (Inbound Inspection) en productos regulados como farmacéuticos?",
+   "opciones": [
+    {
+     "texto": "Porque anula el 'Quality Firewall', permitiendo que lotes peligrosos se mezclen con el stock comercial y generando riesgo legal multimillonario y peligro de salud pública.",
+     "correcta": true
+    },
+    {
+     "texto": "Porque SAP cobraría una multa por falta de uso del módulo.",
+     "correcta": false
+    },
+    {
+     "texto": "Porque los montacargas se aburrirían por falta de tareas de cuarentena.",
+     "correcta": false
+    },
+    {
+     "texto": "Porque los laboratorios de calidad se quedarían sin presupuesto anual.",
+     "correcta": false
+    }
+   ]
+  }
+ ]
+}

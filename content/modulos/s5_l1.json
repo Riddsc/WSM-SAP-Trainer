@@ -1,0 +1,54 @@
+{
+ "id": "s5_l1",
+ "pasos": [
+  {
+   "instruccion": "Liberar Orden de Producción (ERP)",
+   "comando": "CO02-RELEASE",
+   "pista": "CO02-RELEASE",
+   "exito": "> Orden de Fabricación 90050 LIBERADA. PMR generado asíncronamente en EWM.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Abrir Consola de Staging (EWM)",
+   "comando": "/SCWM/STAGE",
+   "pista": "/SCWM/STAGE",
+   "exito": "> Monitor de Abastecimiento de Producción cargado. PSA: LINEA-01.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Seleccionar PMR Pendiente",
+   "comando": "SELECT-PMR",
+   "pista": "SELECT-PMR",
+   "exito": "> PMR #1000550 (Req: 16 Pistones, 2 Culatas, 1 Bloque V8) Seleccionado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Ejecutar Motor de Tareas",
+   "comando": "CREATE-WT",
+   "pista": "CREATE-WT",
+   "exito": "> Capacity Check OK. 3 WTs creadas hacia montacargas (Pick Parts).",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Simulador de Montacargas RF",
+   "comando": "/SCWM/RFUI",
+   "pista": "/SCWM/RFUI",
+   "exito": "> Terminal iniciada. Menú 'Putaway a Producción'.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Confirmar Entrega en Línea",
+   "comando": "CONFIRM-STAGING",
+   "pista": "CONFIRM-STAGING",
+   "exito": "> Materiales entregados físicamente en BIN-LINEA-01. EWM Stock en PSA = OK.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Ejecutar Consumo de Máquina",
+   "comando": "PP-MFBF-BACKFLUSH",
+   "pista": "PP-MFBF-BACKFLUSH",
+   "exito": "> Producción Terminada. BACKFLUSH EJECUTADO (Mov 261). Inventario deducido correctamente.",
+   "placeholder": ""
+  }
+ ]
+}

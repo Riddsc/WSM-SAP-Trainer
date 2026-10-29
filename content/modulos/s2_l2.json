@@ -1,0 +1,54 @@
+{
+ "id": "s2_l2",
+ "pasos": [
+  {
+   "instruccion": "Acceso Configuración",
+   "comando": "SPRO",
+   "pista": "SPRO",
+   "exito": "> SAP Reference IMG.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Transacción STSS",
+   "comando": "STSS",
+   "pista": "STSS",
+   "exito": "> Matriz abierta.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Control Indicator",
+   "comando": "PESA",
+   "pista": "PESA",
+   "exito": "> Filtrando PESA.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Prioridad 1 (Piso)",
+   "comando": "BULK",
+   "pista": "BULK",
+   "exito": "> Prioridad BULK.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Prioridad 2 (Rack)",
+   "comando": "HGH",
+   "pista": "HGH",
+   "exito": "> Prioridad HGH.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Commit",
+   "comando": "SAVE",
+   "pista": "SAVE",
+   "exito": "> Update SQL.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Activar TR",
+   "comando": "ACTIVATE",
+   "pista": "ACTIVATE",
+   "exito": "> Activo.",
+   "placeholder": ""
+  }
+ ]
+}

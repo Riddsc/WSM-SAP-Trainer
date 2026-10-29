@@ -1,0 +1,161 @@
+{
+ "id": "s1_m1",
+ "paginas": [
+  "<h3>Capítulo 1: El Paisaje de Sistemas (System Landscape)</h3>\n            <p>Entornos DEV (Desarrollo), QAS (Calidad/Pruebas UAT) y PRD (Producción).</p>\n            <details>\n                <summary>Ver explicación a fondo (Arquitectura Tiers)</summary>\n                <div class=\"details-content\">\n                    <p>En implementaciones enterprise, nunca se toca Producción directamente. Todo diseño de almacén inicia en el mandante \"Golden\" de <strong>DEV</strong>. Una vez configurado, viaja a <strong>QAS</strong> donde los <em>Key Users</em> prueban con pistolas de radiofrecuencia reales. Solo si aprueban (UAT - User Acceptance Testing), el cambio pasa a <strong>PRD</strong>, evitando paralizar la operación por errores de sistema.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 2: El Motor de Transportes (CTS)</h3>\n            <p>Customizing Requests (Configuración) vs Workbench Requests (Desarrollo ABAP).</p>\n            <details>\n                <summary>Ver explicación a fondo (Gestión de Cambios)</summary>\n                <div class=\"details-content\">\n                    <p>SAP encapsula los cambios en \"Órdenes de Transporte\" (TRs). Las <strong>Customizing Requests</strong> guardan ajustes funcionales (ej. crear una nueva zona de almacén en SPRO). Las <strong>Workbench Requests</strong> son exclusivas de los programadores (ej. inyectar código ABAP en una BAdI o modificar una tabla del diccionario de datos SE11).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 3: El Mandante (Client)</h3>\n            <p>Nivel supremo. Datos Cross-Client como Maestro de Proveedores y Materiales Base.</p>\n            <details>\n                <summary>Ver explicación a fondo (Aislamiento de Datos)</summary>\n                <div class=\"details-content\">\n                    <p>El Mandante (Tabla T000) es el nivel de base de datos más alto. Si creas un número de material (MARA) aquí, existirá para todas las filiales de la empresa a nivel mundial. Es vital para empresas multinacionales que desean estandarizar su catálogo (ej. Coca-Cola usando el mismo código de material para el envase en México y Colombia).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 4: La Sociedad (Company Code - FI)</h3>\n            <p>Entidad jurídica. Presenta Balance y P&L. Toda baja de stock impacta sus cuentas (G/L).</p>\n            <details>\n                <summary>Ver explicación a fondo (Integración Financiera)</summary>\n                <div class=\"details-content\">\n                    <p>La Sociedad (T001) es la entidad que rinde cuentas al gobierno (paga impuestos). Todo movimiento logístico en EWM está auditado financieramente: si un operario de montacargas daña un palet y hace un ajuste de inventario, el sistema lee la Sociedad y dispara automáticamente un asiento contable de \"Gasto por Pérdida\" al libro mayor (General Ledger).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 5: El Área de Control (Controlling - CO)</h3>\n            <p>Reportes internos y centros de costos. Agrupa Sociedades con mismo plan de cuentas.</p>\n            <details>\n                <summary>Ver explicación a fondo (Contabilidad Administrativa)</summary>\n                <div class=\"details-content\">\n                    <p>Mientras la Sociedad mira hacia afuera (impuestos/auditores), el Controlling mira hacia adentro (rentabilidad). Si la bodega gasta $10,000 en diésel para montacargas, ese gasto se asigna al <strong>Centro de Costo (Cost Center)</strong> del almacén bajo esta área, permitiendo calcular el verdadero costo logístico por palet movido.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 6: El Centro (Plant)</h3>\n            <p>Corazón logístico. Ejecuta MRP. Asignado a una sola Sociedad.</p>\n            <details>\n                <summary>Ver explicación a fondo (Motor de Planeación)</summary>\n                <div class=\"details-content\">\n                    <p>El Centro (T001W) es la fábrica o centro de distribución principal. Aquí corre el algoritmo de <strong>Material Requirements Planning (MRP)</strong>. El Plant evalúa si el stock es suficiente para cubrir los pedidos de ventas y, si falta, genera automáticamente las solicitudes de compra. Un Plant solo puede pertenecer a una Sociedad Financiera (OX18).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 7: El Área de Valoración (Valuation Area)</h3>\n            <p>Norma S/4HANA: Se valora el stock a nivel de Centro (Plant) para diferenciar costos de fletes.</p>\n            <details>\n                <summary>Ver explicación a fondo (Costeo Local)</summary>\n                <div class=\"details-content\">\n                    <p>Aunque SAP permite valorar el inventario a nivel Sociedad, la best practice en S/4HANA es a nivel de Centro. ¿Por qué? Un televisor en el Centro de Bogotá (cerca de la aduana aérea) cuesta $500, pero el mismo televisor en el Centro de Leticia cuesta $530 debido al flete fluvial. Valorar por Centro permite a finanzas reflejar estos costos logísticos reales.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 8: El Almacén (Storage Location - IM)</h3>\n            <p>Subdivide el Centro. Nivel IM. Cuenta unidades y valor, pero es espacialmente ciego (no ve estantes).</p>\n            <details>\n                <summary>Ver explicación a fondo (Inventory Management Clásico)</summary>\n                <div class=\"details-content\">\n                    <p>El Storage Location (SLoc - T001L) agrupa físicamente el inventario (ej. SLoc 0001 Producto Terminado, SLoc 0002 Cuarentena). Sabe que hay 1,000 laptops y que valen $1M, pero es \"ciego\" en 3D: no sabe en qué pasillo, nivel o estante están. Para ganar visión espacial, este SLoc debe vincularse al módulo EWM.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 9: El Número de Almacén (Warehouse Number - EWM)</h3>\n            <p>Activa la gestión 3D. Trabaja con Handling Units (HU), pesos, volúmenes y coordina escáneres RF.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Cerebro EWM)</summary>\n                <div class=\"details-content\">\n                    <p>Aquí nace la magia. El Número de Almacén divide el SLoc en Storage Types (Zonas), Storage Sections (Pasillos) y Storage Bins (Huecos exactos con coordenadas X,Y,Z). Gobierna los algoritmos de Putaway, Picking y envía las tareas (Warehouse Orders) directo a las pistolas de radiofrecuencia (RFUI) de los montacarguistas.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 10: Supply Chain Unit (SCU)</h3>\n            <p>Da atributos geográficos (zona horaria, lat/long) al almacén EWM.</p>\n            <details>\n                <summary>Ver explicación a fondo (Husos Horarios en SAP)</summary>\n                <div class=\"details-content\">\n                    <p>En un mandante global, tienes un almacén en Tokio y otro en Nueva York. Si usas la hora del servidor central en Alemania, los operarios registrarían horas incorrectas. La SCU le inyecta la zona horaria exacta y las coordenadas geográficas al Warehouse Number, vital para los cálculos de labor management y rutas de transporte.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 11: Organización de Compras (Purchasing Org)</h3>\n            <p>Negocia con proveedores. Centralizada (Sociedad) o Descentralizada (Centro).</p>\n            <details>\n                <summary>Ver explicación a fondo (Estrategias de Negociación)</summary>\n                <div class=\"details-content\">\n                    <p>Si es Centralizada, negocia precios masivos para todos los centros del país (economía de escala). Si es Descentralizada, cada Centro negocia localmente. Es responsable de emitir las <strong>Purchase Orders (POs)</strong> que luego EWM recibe físicamente en el muelle de descarga mediante los Inbound Deliveries.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 12: Organización de Ventas (Sales Org)</h3>\n            <p>Responsable jurídica ante clientes. SD Module.</p>\n            <details>\n                <summary>Ver explicación a fondo (Gestión Comercial)</summary>\n                <div class=\"details-content\">\n                    <p>Fija listas de precios, políticas de descuentos y recibe las devoluciones de clientes. En conjunto con el Canal de Distribución y el Sector (Division), conforma el <strong>Sales Area</strong>. Los pedidos de venta creados aquí viajan a EWM como <em>Outbound Delivery Orders</em> para ser recolectados.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 13: Puesto de Expedición (Shipping Point)</h3>\n            <p>Coordina carga Outbound basándose en Condición de Expedición, Grupo de Carga y Centro.</p>\n            <details>\n                <summary>Ver explicación a fondo (Algoritmo de Despacho)</summary>\n                <div class=\"details-content\">\n                    <p>Es la entidad lógica que realiza el despacho. El ERP usa 3 variables para determinarlo automáticamente: 1) Cómo se envía (Express, Marítimo), 2) Qué equipo necesita (Grúa para contenedores vs Montacargas ligero) y 3) De qué Centro sale. Sin Shipping Point, es imposible crear una entrega de salida hacia EWM.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 14: Tablas Core SQL</h3>\n            <p>T000 (Mandante), T001 (Sociedad), T001W (Plant), T001L (SLoc), TVST (Shipping Point).</p>\n            <details>\n                <summary>Ver explicación a fondo (Depuración y Queries)</summary>\n                <div class=\"details-content\">\n                    <p>Como consultor, si un reporte estándar de SAP falla, debes ir a la transacción <strong>SE16N</strong> y cruzar estas tablas manualmente (Data Browser). Conocer de memoria la T001W (Plant) te salva la vida en auditorías logísticas cuando buscas fallos de configuración maestra.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 15: Matriz de Asignaciones</h3>\n            <p>SPRO. Plant a Company Code (OX18). SLoc a Plant (OX09). Sin asignación, el sistema colapsa.</p>\n            <details>\n                <summary>Ver explicación a fondo (Enterprise Structure Linkage)</summary>\n                <div class=\"details-content\">\n                    <p>Crear los elementos es solo el 50% del trabajo. La integración (Assignment) es la estructura vascular de SAP. Si olvidas enlazar el SLoc al Centro en la transacción <strong>OX09</strong>, el módulo EWM jamás recibirá mercancía porque SAP no sabrá a qué centro de costos asignarle el valor contable de los palets recibidos.</p>\n                </div>\n            </details>"
+ ],
+ "resumen": "Resumen: Mandante (T000) -> Sociedad (T001) -> Centro (T001W) -> Almacén (T001L) -> Número de Almacén (EWM). Todo impacta FI.",
+ "examen": [
+  {
+   "pregunta": "¿Entorno para UAT (User Acceptance Testing)?",
+   "opciones": [
+    {
+     "texto": "PRD",
+     "correcta": false
+    },
+    {
+     "texto": "QAS",
+     "correcta": true
+    },
+    {
+     "texto": "DEV",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Orden de Transporte para código ABAP?",
+   "opciones": [
+    {
+     "texto": "Customizing",
+     "correcta": false
+    },
+    {
+     "texto": "Workbench",
+     "correcta": true
+    }
+   ]
+  },
+  {
+   "pregunta": "Tabla de Sociedades:",
+   "opciones": [
+    {
+     "texto": "T001W",
+     "correcta": false
+    },
+    {
+     "texto": "T001",
+     "correcta": true
+    },
+    {
+     "texto": "T000",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Entidad que presenta Balance General?",
+   "opciones": [
+    {
+     "texto": "Plant",
+     "correcta": false
+    },
+    {
+     "texto": "Company Code",
+     "correcta": true
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Dónde se ejecuta el MRP?",
+   "opciones": [
+    {
+     "texto": "Plant (Centro)",
+     "correcta": true
+    },
+    {
+     "texto": "SLoc",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿A qué nivel se recomienda el Área de Valoración en S/4HANA?",
+   "opciones": [
+    {
+     "texto": "Plant",
+     "correcta": true
+    },
+    {
+     "texto": "Client",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Entidad ciega al espacio 3D (pasillos/estantes)?",
+   "opciones": [
+    {
+     "texto": "Warehouse Number",
+     "correcta": false
+    },
+    {
+     "texto": "Storage Location (IM)",
+     "correcta": true
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Entidad que gestiona Handling Units (HUs) y tareas RF?",
+   "opciones": [
+    {
+     "texto": "Warehouse Number (EWM)",
+     "correcta": true
+    },
+    {
+     "texto": "Plant",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Transacción para asignar SLoc a Plant?",
+   "opciones": [
+    {
+     "texto": "OX18",
+     "correcta": false
+    },
+    {
+     "texto": "OX09",
+     "correcta": true
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Las variables que determinan el Shipping Point son?",
+   "opciones": [
+    {
+     "texto": "Condición de expedición, grupo de carga y Centro",
+     "correcta": true
+    },
+    {
+     "texto": "Peso y volumen",
+     "correcta": false
+    }
+   ]
+  }
+ ]
+}

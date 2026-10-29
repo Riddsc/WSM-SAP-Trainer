@@ -1,0 +1,863 @@
+{
+ "id": "s4_m1",
+ "paginas": [
+  "<h3>Capítulo 1: La Física y Economía del Cross-Docking (CD)</h3>\n            <p>En la ingeniería clásica de almacenes, un producto atraviesa cuatro etapas costosas: Recepción (Inbound), Almacenamiento en Rack (Putaway), Recolección (Picking) y Expedición (Shipping). Estudios industriales demuestran que el <strong>Putaway y el Picking consumen hasta el 65% del costo operativo total (OPEX)</strong> de un centro de distribución en horas-hombre, desgaste de montacargas y depreciación de baterías.</p>\n            <p>El <strong>Cross-Docking (CD)</strong> es la estrategia arquitectónica que cortocircuita el almacén: la mercancía que baja del camión del proveedor en el muelle de entrada (Inbound Door) se redirige directamente hacia el muelle de salida (Outbound Door) para cubrir una demanda activa, tocando únicamente el piso de consolidación (Staging Area) por pocas horas o minutos.</p>\n            <ul>\n                <li><strong>Impacto en el Working Capital:</strong> Reduce el tiempo de ciclo de pedido (Order Lead Time) de 48 horas a menos de 2 horas.</li>\n                <li><strong>Impacto en la Huella Espacial:</strong> Disminuye la necesidad de ubicaciones en rack alto (High Rack Storage), liberando capacidad cúbica para SKUs de baja rotación.</li>\n                <li><strong>Requisito Crítico:</strong> Sincronización milimétrica de datos mediante códigos de barras GS1-128 (SSCC) e integración en tiempo real entre las órdenes de entrada y salida.</li>\n            </ul>",
+  "<h3>Capítulo 2: Tipologías de Cross-Docking en SAP S/4HANA EWM</h3>\n            <p>SAP EWM no trata el Cross-Docking como un proceso único, sino que ofrece cinco motores algorítmicos distintos según el origen de la decisión y la industria:</p>\n            <ul>\n                <li><strong>1. Transportation Cross-Docking (TCD):</strong> El almacén actúa como un mero \"Hub de Tránsito\". El palet (HU) entra cerrado y sale cerrado hacia otro centro o cliente final sin abrirse jamás. Es gobernado en conjunto con SAP TM (Transportation Management).</li>\n                <li><strong>2. Merchandise Distribution (Retail Push & Pull):</strong> Típico de supermercados y moda. Un proveedor entrega 1,000 camisas en un palet madre; en la zona de Cross-Docking se abre el palet y se reparten inmediatamente 20 unidades para la Tienda A, 50 para la Tienda B y 30 para la Tienda C según documentos de asignación previos (Allocation Tables en SAP S/4HANA Retail).</li>\n                <li><strong>3. Pick-from-Goods-Receipt (PfGR):</strong> Variante reactiva donde la mercancía se recibe en el muelle 9010 y desde ahí mismo se generan las tareas de extracción hacia las cajas de los clientes (Pick-HUs).</li>\n                <li><strong>4. Planned Cross-Docking:</strong> El enlace entre la Inbound Delivery y la Outbound Delivery ya viene sellado desde el sistema ERP o SAP APO antes de que el camión toque la garita.</li>\n                <li><strong>5. EWM-Triggered Opportunistic Cross-Docking:</strong> El motor más inteligente. Ni el ERP ni el proveedor saben que habrá Cross-Docking; es el propio cerebro de SAP EWM quien intercepta la mercancía en pleno muelle de descarga al detectar urgencias de salida.</li>\n            </ul>",
+  "<h3>Capítulo 3: Arquitectura del Opportunistic Cross-Docking</h3>\n            <p>El <strong>Opportunistic Cross-Docking</strong> ocurre de forma 100% dinámica dentro de SAP EWM y se divide en dos vertientes operativas: <em>Inbound-Driven</em> (impulsado por la entrada) y <em>Outbound-Driven</em> (impulsado por la salida).</p>\n            <p>En el escenario <strong>Inbound-Driven</strong>, un camión llega al muelle y el operario contabiliza el Post Goods Receipt (PGR) o intenta crear la tarea de Putaway. En ese milisegundo, antes de buscar un Bin vacío en el rack mediante el STSS, SAP EWM escanea la tabla de órdenes de salida (<code>/SCWM/DB_PROCH_O</code> y <code>/SCWM/DB_PROCI_O</code>) buscando <strong>Outbound Delivery Orders (ODOs)</strong> que tengan ese mismo Material, Lote y Tipo de Stock pendientes de asignación o en estado de Backorder.</p>\n            <p>En el escenario <strong>Outbound-Driven</strong>, el proceso ocurre al revés: al liberar una Ola (Wave Release) para hacer Picking, el sistema nota que en los racks el stock es insuficiente o decide optimizar movimientos mirando si ya existe stock recién descargado sentado en la <strong>GR Zone (Storage Type 9010)</strong>. En lugar de mandar al montacarguista al pasillo 40 nivel 8, el sistema secuestra el palet que está en la puerta de recepción, cancela su Putaway pendiente y crea una Warehouse Task directa hacia la <strong>GI Zone (Storage Type 9020)</strong>.</p>",
+  "<h3>Capítulo 4: División de Tareas (WT Split) y Ruteo Complejo CD</h3>\n            <p>¿Qué sucede cuando el camión del proveedor descarga un EuroPalet con <strong>100 unidades</strong> de un componente electrónico, pero la Outbound Delivery Order urgente del cliente solo exige <strong>35 unidades</strong>? SAP EWM ejecuta automáticamente una maniobra de <strong>División de Tareas (Warehouse Task Split)</strong> apalancada en un <em>Work Center</em> de desconsolidación o directamente en el muelle:</p>\n            <ul>\n                <li><strong>WT 1 (Cross-Docking Allocation):</strong> Por 35 unidades, con origen en la GR Zone (9010) y destino en la GI Staging Area (9020), vinculada directamente al documento ODO de salida mediante una referencia cruzada en la tabla <code>/SCWM/ORDIM_O</code>.</li>\n                <li><strong>WT 2 (Putaway Remanente):</strong> Por las 65 unidades sobrantes, ejecutando el algoritmo normal de Putaway (PACI -> STSS -> Storage Section -> Bin) para guardarlas en el rack de reserva.</li>\n            </ul>\n            <p>Además, en centros logísticos gigantescos donde las puertas Inbound están en el Ala Norte y las puertas Outbound en el Ala Sur (a más de 600 metros de distancia), el sistema aplica <strong>Layout-Oriented Storage Control (LOSC)</strong>. Esto divide el traslado en sub-tareas pasando por puntos intermedios de transferencia (Identification Points / Pick Points) para que un montacargas de muelle no abandone su zona asignada.</p>",
+  "<h3>Capítulo 5: Introducción a SAP Material Flow System (MFS)</h3>\n            <p>Cuando un almacén supera cierto umbral de volumen (por ejemplo, despachar 150,000 cajas diarias), los montacargas conducidos por humanos se vuelven un cuello de botella físico. Las empresas instalan entonces <strong>automatización mecatrónica</strong>: kilómetros de fajas transportadoras de rodillos (Conveyors), desviadores neumáticos (Sorters), elevadores verticales y grúas robóticas de pasillo estrecho conocidas como <strong>ASRS (Automated Storage and Retrieval Systems)</strong> o transelevadores.</p>\n            <p>El módulo <strong>SAP MFS (Material Flow System)</strong> es el componente nativo dentro de SAP S/4HANA EWM diseñado para gobernar este hardware mecatrónico en tiempo real. A través de MFS, SAP controla cada motor, cada sensor fotoeléctrico y cada brazo robótico del centro de distribución, convirtiendo una orden lógica de negocio en impulsos eléctricos industriales sin intervención humana.</p>",
+  "<h3>Capítulo 6: La Muerte del Middleware WCS</h3>\n            <p>En la arquitectura legada de los años 90 y 2000 (SAP WM clásico), SAP era incapaz de comunicarse a velocidades de milisegundos con la maquinaria. Por ello existía una arquitectura de 3 capas:</p>\n            <ol>\n                <li><strong>Capa Superior (WMS - SAP):</strong> Tenía el inventario financiero y lanzaba una orden genérica (\"Bajar palet X del rack\").</li>\n                <li><strong>Capa Intermedia (WCS - Warehouse Control System):</strong> Un software de terceros (de fabricantes como Dematic, Knapp, Vanderlande o Swisslog) con su propia base de datos que recibía la orden de SAP, decidía la ruta física en las fajas y hablaba con las máquinas.</li>\n                <li><strong>Capa Inferior (PLC - Programmable Logic Controller):</strong> Las computadoras industriales (Siemens Simatic S7, Allen-Bradley) conectadas a los motores eléctricos.</li>\n            </ol>\n            <p>Esta arquitectura de 3 capas sufría un defecto crónico: <strong>desincronización de bases de datos (Split-Brain Syndrome)</strong>. Si un palet se caía en la faja, el WCS lo sabía, pero SAP creía que seguía en camino. <strong>SAP EWM MFS elimina por completo el WCS intermedio</strong>: SAP absorbe la inteligencia de control de tráfico y se conecta por cable de red (TCP/IP) directamente al PLC Siemens o Allen-Bradley. Una sola base de datos (HANA), cero interfaces duplicadas y visibilidad absoluta en tiempo real.</p>",
+  "<h3>Capítulo 7: Los 5 Objetos Maestros de la Arquitectura MFS</h3>\n            <p>Para que SAP EWM pueda modelar digitalmente un circuito de fajas y grúas (Digital Twin), el arquitecto funcional debe configurar cinco entidades maestras interconectadas en el Customizing (SPRO) y datos maestros:</p>\n            <ul>\n                <li><strong>1. PLC (Controlador Lógico Programable):</strong> Representa en SAP al cerebro electrónico físico que controla un sector de máquinas. Define qué protocolo y estructura de mensajes utiliza.</li>\n                <li><strong>2. Communication Channel (Canal de Comunicación):</strong> Define el túnel TCP/IP (Dirección IP, Puerto Socket, Timeout de respuesta, secuencia de Handshake) entre el servidor SAP S/4HANA y el PLC. Un PLC puede tener múltiples canales (ej. Canal A para envío, Canal B para recepción).</li>\n                <li><strong>3. Communication Point (Punto de Comunicación / CP):</strong> Es la representación lógica de un punto físico en la faja donde hay un <strong>escáner láser de código de barras, una báscula o un sensor óptico (I-Point)</strong>. Cada CP se mapea a un Storage Bin técnico en SAP.</li>\n                <li><strong>4. Conveyor Segment (Segmento de Transporte):</strong> Es el tramo de faja física que une el Punto de Comunicación A con el Punto de Comunicación B.</li>\n                <li><strong>5. Resource MFS (Vehículo / Grúa):</strong> Representa a un transelevador (Stacker Crane) o carro satelital (Shuttle) que se mueve sobre rieles y tiene capacidad de carga definida.</li>\n            </ul>",
+  "<h3>Capítulo 8: Anatomía de un Telegrama MFS y Protocolo RFC/TCP</h3>\n            <p>Un PLC industrial tiene memoria medida en Kilobytes; no entiende archivos JSON pesados, ni XML, ni llamadas OData. Por eso, SAP MFS se comunica con los PLCs mediante <strong>Telegramas</strong>: cadenas de caracteres ASCII o flujos binarios de longitud fija (por ejemplo, exactamente 64 o 128 bytes) donde la posición de cada carácter tiene un significado estricto.</p>\n            <p>Veamos la disección de un telegrama real de orden de transporte (<code>WT_TASK</code>) enviado por SAP a un PLC Siemens:</p>\n            <p><code>[STX]00452|CHAN01|WT99821|CP_IN_01|CP_OUT_04|00180005009123456789|ACK[ETX]</code></p>\n            <ul>\n                <li><strong>STX / ETX:</strong> Caracteres de control hexadecimal que marcan el inicio (Start of Text) y fin (End of Text) del paquete en el cable de red.</li>\n                <li><strong>Sequence Number (00452):</strong> Contador correlativo anti-pérdida. Si el PLC recibió el 00451 y luego recibe el 00453, detecta pérdida de paquetes y detiene el canal.</li>\n                <li><strong>Source & Destination (CP_IN_01 -> CP_OUT_04):</strong> Coordenadas físicas de qué sensor a qué desviador debe moverse el motor.</li>\n                <li><strong>Payload (00180005009123456789):</strong> El código SSCC de 20 dígitos de la Handling Unit que está viajando sobre los rodillos.</li>\n                <li><strong>Handshake (ACK / NAK):</strong> Todo telegrama exige un acuse de recibo técnico a nivel de capa de transporte en menos de 200 milisegundos. Si el PLC no responde <code>ACK</code>, SAP retransmite automáticamente el telegrama según el contador de reintentos del canal.</li>\n            </ul>",
+  "<h3>Capítulo 9: ABAP Push Channels (APC) vs SAP Plant Connectivity (PCo)</h3>\n            <p>¿Cómo logra un servidor SAP (escrito en lenguaje ABAP, históricamente transaccional) mantener una conexión de Socket TCP/IP abierta permanentemente las 24 horas escuchando a un PLC en milisegundos? En SAP S/4HANA existen dos arquitecturas de conectividad física:</p>\n            <ul>\n                <li><strong>Arquitectura Moderna Directa — ABAP Push Channels (APC) + TCP Sockets:</strong> Introducida en el kernel moderno de S/4HANA. El servidor de aplicaciones ABAP abre directamente un Socket TCP/IP nativo (transacción <code>SAPC</code>) que escucha y transmite paquetes TCP crudos al PLC sin ningún software externo. Es la arquitectura recomendada por SAP por su latencia inferior a 15 milisegundos.</li>\n                <li><strong>Arquitectura Clásica — SAP Plant Connectivity (SAP PCo):</strong> Un pequeño servicio instalado en un servidor Windows local en la planta que convierte los Sockets TCP/IP del PLC en llamadas RFC (Remote Function Call) hacia SAP. Se sigue utilizando cuando el servidor S/4HANA está en la nube pública (HEC / RISE with SAP) y por seguridad de firewall corporativo se requiere un concentrador local en el almacén físico.</li>\n            </ul>",
+  "<h3>Capítulo 10: Routing Points, Escáneres Láser y Layout-Oriented Storage Control (LOSC)</h3>\n            <p>Cuando un palet avanza sobre una faja transportadora a 1.5 metros por segundo, el sistema ejecuta el <strong>Layout-Oriented Storage Control (LOSC)</strong> paso a paso, de sensor en sensor (Routing Point a Routing Point), en lugar de revelar la ruta entera de una sola vez al PLC.</p>\n            <p>Imagina que un palet debe ir desde el Muelle de Recepción (<code>BIN-GR-01</code>) hasta el Rack Automatizado Pasillo 5, Nivel 12, Profundidad 2 (<code>05-12-02</code>):</p>\n            <ol>\n                <li>En SAP existe una <strong>Warehouse Task Madre</strong>: Origen <code>BIN-GR-01</code> -> Destino Final <code>05-12-02</code> (Estado: <em>Waiting</em>, bloqueada porque antes debe pasar por los puntos de control de la faja).</li>\n                <li>El operario deja el palet al inicio de la faja (<code>CP01 - I-Point</code>). El túnel de rayos láser mide altura, ancho, pesa el palet y lee el código SSCC.</li>\n                <li>El PLC envía a SAP un telegrama de notificación en el punto <code>CP01</code>. SAP valida que el palet no tenga sobrepeso ni deformaciones (Contour Error) y crea la <strong>Sub-WT 1</strong>: de <code>CP01</code> hacia el cruce del Pasillo 5 (<code>CP_AISLE_05</code>).</li>\n                <li>Cuando el palet llega al sensor <code>CP_AISLE_05</code>, el PLC avisa a SAP. SAP confirma la Sub-WT 1 y libera la <strong>WT Madre</strong> para que el transelevador (grúa robótica del Pasillo 5) tome el palet de la faja y lo inyecte en el hueco final <code>05-12-02</code>.</li>\n            </ol>",
+  "<h3>Capítulo 11: Control de Capacidad de Fajas y Prevención de Atascos (Deadlocks)</h3>\n            <p>En una autopista de rodillos industriales, si SAP envía 50 palets seguidos hacia el punto de transferencia del Pasillo 3, pero la grúa del Pasillo 3 solo puede guardar 20 palets por hora, la faja colapsará, bloqueando la arteria principal e impidiendo que los palets que iban al Pasillo 4 puedan pasar. Esto se conoce en ingeniería como <strong>Bloqueo Mutuo (Deadlock) o Congestión de Línea</strong>.</p>\n            <p>SAP MFS previene este desastre mediante los <strong>Capacity Limits de Communication Points y Conveyor Segments</strong>:</p>\n            <ul>\n                <li>Cada punto de acumulación antes de una grúa tiene configurado en SAP un parámetro <code>Max. Number of HUs</code> (por ejemplo, máximo 4 palets en cola física).</li>\n                <li>SAP lleva el conteo en memoria de cuántas Warehouse Tasks activas están viajando hacia ese segmento (<code>Current Load</code>).</li>\n                <li>Cuando se alcanza el límite de 4 palets en tránsito, SAP MFS <strong>congela la liberación de nuevas WTs</strong> hacia ese ramal o desvía el palet nº 5 para que dé una vuelta en el carrusel de recirculación (Loop Conveyor) hasta que el PLC envíe el telegrama de confirmación indicando que la grúa ya liberó espacio en el buffer.</li>\n            </ul>",
+  "<h3>Capítulo 12: Cinemática de Grúas ASRS, Single/Dual Command y Multi-Deep</h3>\n            <p>Los transelevadores o grúas robóticas (<strong>Stacker Cranes</strong>) en un almacén de gran altura (Silo de 40 metros) son gobernados en SAP MFS como recursos especializados. Para maximizar su velocidad, SAP MFS aplica algoritmos de cinemática y optimización de ciclos:</p>\n            <ul>\n                <li><strong>Single Command Cycle (Ciclo Simple):</strong> La grúa toma un palet en la cabecera del pasillo, viaja al hueco <code>X,Y</code>, lo deposita y regresa vacía a la cabecera. Es ineficiente en horas pico.</li>\n                <li><strong>Dual Command Cycle (Ciclo Doble / MFS Task Interleaving):</strong> SAP MFS empareja automáticamente una tarea de entrada (Putaway) con una tarea de salida (Picking) dentro del mismo pasillo. La grúa lleva el Palet A y lo guarda en la coordenada <code>05-10-01</code>; sin regresar a la base, se desplaza solo dos metros hasta <code>05-11-01</code>, extrae el Palet B que se necesita para un pedido de venta, y vuelve a la cabecera cargada. <strong>Ahorra hasta un 40% de desplazamientos mecánicos</strong>.</li>\n                <li><strong>Almacenamiento Multi-Deep (Doble o Triple Profundidad):</strong> Las estanterías automatizadas suelen guardar dos o tres palets de fondo para ahorrar pasillos. Si SAP necesita sacar el palet del fondo (Posición B), pero adelante está bloqueando otro palet (Posición A), el motor MFS genera automáticamente una <strong>Tarea de Reubicación (Stock Rearrangement WT)</strong> para mover el palet delantero a un hueco vacío cercano antes de extraer el objetivo.</li>\n            </ul>",
+  "<h3>Capítulo 13: Manejo de Excepciones Mecánicas en Tiempo Real</h3>\n            <p>El mundo físico es imperfecto: las etiquetas de código de barras se rasgan, la madera de los EuroPalets se astilla en los rodillos y los sensores ópticos se ensucian. SAP MFS traduce los códigos de fallo del PLC en <strong>MFS Exception Codes</strong> que detonan acciones correctivas instantáneas sin detener la planta:</p>\n            <ul>\n                <li><strong>Excepción NOREAD (Scanner No-Read) / CONT (Contour Error):</strong> El palet pasa por el I-Point pero el láser no logra leer el SSCC o detecta que una caja sobresale 5 cm del borde del palet (riesgo de derrumbe en el rack a 30 metros de altura). SAP MFS cancela la ruta hacia el rack y envía inmediatamente un telegrama desviando el palet hacia el <strong>Ramal de Rechazo (Reject Spur / Clearing Station)</strong>, donde un operario humano re-etiqueta o acomoda la carga.</li>\n                <li><strong>Excepción BINF (Bin Full Physically):</strong> La grúa llega al hueco supuestamente vacío en SAP, pero su sensor óptico en la horquilla detecta que ya hay un obstáculo físico (Fantasma en el Bin). El PLC aborta la inserción y envía el código de error a SAP; SAP marca ese Bin como bloqueado para inventario, mantiene el palet sobre la horquilla de la grúa y en menos de 100 milisegundos calcula un <strong>Nuevo Bin Destino</strong> en el mismo pasillo enviando un nuevo telegrama a la grúa.</li>\n                <li><strong>Caída de Grúa (Resource Out of Order):</strong> Si un motor entra en fallo térmico, el PLC notifica el estado inactivo del recurso. SAP MFS recalcula las olas de salida buscando stock idéntico en los pasillos vecinos cuyas grúas siguen operativas.</li>\n            </ul>",
+  "<h3>Capítulo 14: Tablas SQL Core y el Monitor MFS (/SCWM/MON)</h3>\n            <p>Un arquitecto de soporte nivel 3 debe dominar el modelo de datos subyacente de MFS y las herramientas de control en el <strong>Warehouse Management Monitor (<code>/SCWM/MON</code>)</strong> bajo el nodo especializado <em>Material Flow System</em>:</p>\n            <ul>\n                <li><strong>Tabla <code>/SCWM/MFS_PLC</code>:</strong> Configuración maestra de los PLCs e interfaz de comunicación.</li>\n                <li><strong>Tabla <code>/SCWM/MFS_CH</code>:</strong> Estado operativo en vivo de los Communication Channels (Abierto, Cerrado, Secuencia actual de envío/recepción, IP y Puerto).</li>\n                <li><strong>Tabla <code>/SCWM/MFS_CP</code>:</strong> Maestro y estado de ocupación actual de los Communication Points.</li>\n                <li><strong>Tabla <code>/SCWM/MFS_WT</code> y <code>/SCWM/ORDIM_O</code>:</strong> Cola de telegramas pendientes y tareas de almacén activas en el circuito automatizado.</li>\n                <li><strong>Tabla <code>/SCWM/MFSTELELOG</code>:</strong> El registro forense (Log de Telegramas). Guarda cada cadena ASCII enviada y recibida con marca de tiempo en microsegundos. Se activa y audita con las transacciones <code>/SCWM/MFS_ACS</code> o directamente desde los métodos del monitor para iniciar/detener canales, reiniciar contadores de secuencia o reenviar un telegrama atascado.</li>\n            </ul>",
+  "<h3>Capítulo 15: Integración End-to-End (Cross-Docking + MFS) y Emulación de Estrés</h3>\n            <p>El pináculo de la ingeniería logística ocurre cuando combinamos ambos mundos: <strong>Opportunistic Cross-Docking ejecutado sobre SAP MFS</strong>. Cuando un camión descarga un palet y el operario lo deposita en el rodillo de entrada (I-Point), el láser escanea el SSCC. SAP recibe el telegrama, ejecuta el PGR automático, detecta un Backorder urgente mediante el motor de Cross-Docking y, en lugar de enviar el palet hacia los transelevadores ASRS, le ordena al PLC de las fajas que desvíe el palet a toda velocidad por el carril rápido directo hacia la rampa de carga del camión de salida. El palet cruza la bodega entera en 4 minutos sin que ningún ser humano ni montacargas lo toque.</p>\n            <p>Antes del Go-Live de una planta automatizada, detener el almacén real por un bug de configuración cuesta millones de dólares. Por ello, SAP incluye herramientas de simulación y diagnóstico como <strong><code>/SCWM/MFS_SIM</code> (Simulador de PLC)</strong> y generadores de telegramas de prueba, que permiten a los consultores simular el paso de miles de HUs virtuales por los Communication Points, provocando fallos artificiales (<code>BINF</code>, <code>CONT</code>) para certificar que las colas, las BAdIs de ruteo y el servidor S/4HANA resisten la carga máxima sin bloqueos de base de datos.</p>"
+ ],
+ "resumen": "Regla de Oro: El Cross-Docking elimina el Putaway y el Picking intermedio redirigiendo la HU desde la zona GR (9010) hacia la zona GI (9020). SAP MFS ejecuta ese movimiento físico sin middleware WCS, traduciendo Warehouse Tasks en Telegramas ASCII enviados por ABAP Push Channels (APC) directo a la IP del PLC.",
+ "examen": [
+  {
+   "pregunta": "¿Qué porcentaje aproximado del costo operativo (OPEX) de un almacén tradicional representan las tareas combinadas de Putaway y Picking que el Cross-Docking busca eliminar?",
+   "opciones": [
+    {
+     "texto": "Hasta el 65% del costo operativo.",
+     "correcta": true
+    },
+    {
+     "texto": "Menos del 5% del costo operativo.",
+     "correcta": false
+    },
+    {
+     "texto": "Exactamente el 100%, ya que no hay otros costos.",
+     "correcta": false
+    },
+    {
+     "texto": "Solo el costo de facturación en SAP SD.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En SAP S/4HANA EWM, ¿cuál es la diferencia arquitectónica entre Planned Cross-Docking y Opportunistic Cross-Docking?",
+   "opciones": [
+    {
+     "texto": "Planned CD viene pre-vinculado desde ERP/APO antes de la llegada; Opportunistic CD lo decide EWM dinámicamente en tiempo real durante la operación.",
+     "correcta": true
+    },
+    {
+     "texto": "Planned CD solo usa montacargas y Opportunistic CD solo usa grúas robóticas.",
+     "correcta": false
+    },
+    {
+     "texto": "Planned CD no requiere documentos de entrega y Opportunistic CD usa MIGO manual.",
+     "correcta": false
+    },
+    {
+     "texto": "Son exactamente el mismo algoritmo con diferente nombre comercial.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué modalidad de Cross-Docking se utiliza cuando una HU cerrada entra al almacén y vuelve a salir cerrada hacia otro centro sin abrirse jamás, actuando la bodega como un Hub de tránsito?",
+   "opciones": [
+    {
+     "texto": "Transportation Cross-Docking (TCD).",
+     "correcta": true
+    },
+    {
+     "texto": "Merchandise Distribution Push.",
+     "correcta": false
+    },
+    {
+     "texto": "Two-Step Replenishment.",
+     "correcta": false
+    },
+    {
+     "texto": "Discrete Cartonization.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En la industria Retail, cuando un palet del proveedor se recibe y se desagrega inmediatamente en el andén para repartir cajas específicas a 50 tiendas distintas según una tabla de asignación previa, hablamos de:",
+   "opciones": [
+    {
+     "texto": "Merchandise Distribution (Retail Push/Pull).",
+     "correcta": true
+    },
+    {
+     "texto": "Transportation Cross-Docking.",
+     "correcta": false
+    },
+    {
+     "texto": "Bulk Storage Putaway.",
+     "correcta": false
+    },
+    {
+     "texto": "Physical Inventory Cycle Counting.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En un escenario de Opportunistic Cross-Docking 'Inbound-Driven', ¿en qué momento exacto intercepta SAP EWM la mercancía?",
+   "opciones": [
+    {
+     "texto": "Al contabilizar el PGR o al intentar crear la Warehouse Task de Putaway para la entrega entrante.",
+     "correcta": true
+    },
+    {
+     "texto": "Seis meses antes, durante la corrida anual del presupuesto en SAP CO.",
+     "correcta": false
+    },
+    {
+     "texto": "Después de que el palet lleva 15 días almacenado en el High Rack.",
+     "correcta": false
+    },
+    {
+     "texto": "Al emitir la factura fiscal al cliente en la transacción VF01.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En el Opportunistic Cross-Docking 'Outbound-Driven', ¿qué acción toma SAP EWM al liberar una Ola de salida si detecta que el stock necesario acaba de ser descargado en la zona GR (9010)?",
+   "opciones": [
+    {
+     "texto": "Cancela la tarea de Putaway pendiente del palet en GR Zone y crea una WT de picking directo hacia la GI Zone (9020).",
+     "correcta": true
+    },
+    {
+     "texto": "Obliga al montacarguista a subir primero el palet al rack alto y bajarlo 5 minutos después.",
+     "correcta": false
+    },
+    {
+     "texto": "Bloquea la Outbound Delivery Order con un error fatal M7 022.",
+     "correcta": false
+    },
+    {
+     "texto": "Borra la Inbound Delivery del sistema ERP.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si llega un palet con 100 unidades a la zona de recepción, pero el pedido urgente en Backorder solo requiere 35 unidades, ¿qué ejecuta el motor de Cross-Docking de SAP EWM?",
+   "opciones": [
+    {
+     "texto": "Un WT Split: genera una WT de 35 unidades hacia GI Staging (Cross-Docking) y otra WT de 65 unidades hacia el rack (Putaway normal).",
+     "correcta": true
+    },
+    {
+     "texto": "Envía las 100 unidades al cliente y le regala las 65 sobrantes.",
+     "correcta": false
+    },
+    {
+     "texto": "Rechaza el Cross-Docking porque las cantidades no coinciden al 100%.",
+     "correcta": false
+    },
+    {
+     "texto": "Envía las 100 unidades al rack y cancela el pedido del cliente.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué tabla de base de datos de SAP EWM almacena las Warehouse Tasks abiertas donde se refleja el vínculo operativo del movimiento?",
+   "opciones": [
+    {
+     "texto": "/SCWM/ORDIM_O",
+     "correcta": true
+    },
+    {
+     "texto": "T001W",
+     "correcta": false
+    },
+    {
+     "texto": "MARA",
+     "correcta": false
+    },
+    {
+     "texto": "BSEG",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué mecanismo de SAP EWM divide un traslado largo dentro del almacén en sub-tareas pasando por puntos intermedios de transferencia o identificación?",
+   "opciones": [
+    {
+     "texto": "Layout-Oriented Storage Control (LOSC).",
+     "correcta": true
+    },
+    {
+     "texto": "Valuation Class Determination.",
+     "correcta": false
+    },
+    {
+     "texto": "Batch Input Session (SM35).",
+     "correcta": false
+    },
+    {
+     "texto": "Material Ledger Closing.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué significa la sigla MFS dentro de SAP S/4HANA Extended Warehouse Management?",
+   "opciones": [
+    {
+     "texto": "Material Flow System.",
+     "correcta": true
+    },
+    {
+     "texto": "Master Financial Ledger System.",
+     "correcta": false
+    },
+    {
+     "texto": "Manual Forklift Scheduling.",
+     "correcta": false
+    },
+    {
+     "texto": "Material Forecasting Strategy.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál es la principal revolución arquitectónica de implementar SAP EWM MFS frente a un esquema de automatización tradicional?",
+   "opciones": [
+    {
+     "texto": "Elimina la capa intermedia de software de terceros (WCS - Warehouse Control System), comunicando a SAP directamente con los PLCs.",
+     "correcta": true
+    },
+    {
+     "texto": "Reemplaza los motores eléctricos de las fajas por operarios con carretillas manuales.",
+     "correcta": false
+    },
+    {
+     "texto": "Elimina la necesidad de usar códigos de barras en los palets.",
+     "correcta": false
+    },
+    {
+     "texto": "Permite llevar la contabilidad sin usar cuentas de mayor (G/L Accounts).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En las arquitecturas antiguas de 3 capas (ERP/WMS -> WCS -> PLC), ¿qué problema crítico ocurría frecuentemente y se resuelve al usar SAP MFS directo?",
+   "opciones": [
+    {
+     "texto": "Desincronización de bases de datos (Split-Brain) entre el inventario lógico de SAP y la posición real en el WCS.",
+     "correcta": true
+    },
+    {
+     "texto": "Imposibilidad de crear materiales tipo FERT en la MM01.",
+     "correcta": false
+    },
+    {
+     "texto": "Falta de soporte para monedas extranjeras en las órdenes de compra.",
+     "correcta": false
+    },
+    {
+     "texto": "Bloqueo del módulo de Recursos Humanos.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué es un PLC en el contexto de un almacén automatizado conectado a SAP MFS?",
+   "opciones": [
+    {
+     "texto": "Un Controlador Lógico Programable (computadora industrial de tiempo real que gobierna motores, sensores y grúas).",
+     "correcta": true
+    },
+    {
+     "texto": "Un documento contable de liquidación de fletes.",
+     "correcta": false
+    },
+    {
+     "texto": "El código de barras impreso en la etiqueta del proveedor.",
+     "correcta": false
+    },
+    {
+     "texto": "Un tipo de sociedad financiera en SAP FI.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En la arquitectura maestra de SAP MFS, ¿qué objeto define la dirección IP, el puerto TCP/IP, el tiempo de espera (Timeout) y las reglas de Handshake con un PLC?",
+   "opciones": [
+    {
+     "texto": "Communication Channel (Canal de Comunicación).",
+     "correcta": true
+    },
+    {
+     "texto": "Storage Section Indicator.",
+     "correcta": false
+    },
+    {
+     "texto": "Purchasing Organization.",
+     "correcta": false
+    },
+    {
+     "texto": "Putaway Control Indicator (PACI).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué representa un 'Communication Point' (CP) o 'Routing Point' dentro de SAP MFS?",
+   "opciones": [
+    {
+     "texto": "Una posición física en la faja o circuito equipada con escáner/sensor donde el PLC se comunica con SAP para tomar una decisión de ruteo.",
+     "correcta": true
+    },
+    {
+     "texto": "La oficina donde se reúnen los gerentes de logística.",
+     "correcta": false
+    },
+    {
+     "texto": "El servidor de correo electrónico corporativo.",
+     "correcta": false
+    },
+    {
+     "texto": "Un lote de producción vencido en calidad.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿A qué entidad maestra del almacén EWM debe mapearse obligatoriamente cada Communication Point (CP) para que el inventario de la HU sea rastreable en cada tramo de la faja?",
+   "opciones": [
+    {
+     "texto": "A un Storage Bin (Ubicación lógica/técnica).",
+     "correcta": true
+    },
+    {
+     "texto": "A un Company Code distinto.",
+     "correcta": false
+    },
+    {
+     "texto": "A un Vendor Master Record.",
+     "correcta": false
+    },
+    {
+     "texto": "A un Cost Center de Controlling.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué objeto maestro de SAP MFS modela el tramo físico de rodillos que conecta un Communication Point A con un Communication Point B?",
+   "opciones": [
+    {
+     "texto": "Conveyor Segment (Segmento de Transporte).",
+     "correcta": true
+    },
+    {
+     "texto": "Wave Template.",
+     "correcta": false
+    },
+    {
+     "texto": "Account Assignment Category.",
+     "correcta": false
+    },
+    {
+     "texto": "Packing Instruction.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cómo transmite SAP MFS las instrucciones de movimiento a un PLC industrial a través de la red?",
+   "opciones": [
+    {
+     "texto": "Mediante 'Telegramas' (cadenas de caracteres ASCII o tramas binarias de estructura fija ultraligera por Sockets TCP/IP).",
+     "correcta": true
+    },
+    {
+     "texto": "Enviando archivos PDF adjuntos por correo SMTP.",
+     "correcta": false
+    },
+    {
+     "texto": "Mediante hojas de cálculo Excel compartidas en red.",
+     "correcta": false
+    },
+    {
+     "texto": "A través de llamadas telefónicas analógicas.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Dentro de la estructura de un Telegrama MFS, ¿para qué sirve el campo 'Sequence Number' (Número de Secuencia correlativo)?",
+   "opciones": [
+    {
+     "texto": "Para garantizar el orden de los paquetes y detectar inmediatamente si un mensaje se perdió o duplicó en la red.",
+     "correcta": true
+    },
+    {
+     "texto": "Para indicar el precio unitario del producto en dólares.",
+     "correcta": false
+    },
+    {
+     "texto": "Para definir el número de teléfono del transportista.",
+     "correcta": false
+    },
+    {
+     "texto": "Para calcular el impuesto al valor agregado (IVA).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Cuando SAP envía un telegrama de acción a un PLC, ¿qué respuesta técnica inmediata exige a nivel de protocolo antes de dar por entregado el paquete?",
+   "opciones": [
+    {
+     "texto": "Un telegrama de confirmación técnica (Handshake ACK).",
+     "correcta": true
+    },
+    {
+     "texto": "Una firma manuscrita del montacarguista.",
+     "correcta": false
+    },
+    {
+     "texto": "Un documento contable de pago en SAP FI.",
+     "correcta": false
+    },
+    {
+     "texto": "Un reinicio completo del servidor S/4HANA.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué sucede en SAP MFS si el PLC no responde con el Handshake 'ACK' dentro del tiempo límite (Timeout) configurado en el Communication Channel?",
+   "opciones": [
+    {
+     "texto": "SAP retransmite automáticamente el telegrama hasta agotar el número máximo de reintentos y, si persiste, reinicia o marca el canal en error.",
+     "correcta": true
+    },
+    {
+     "texto": "SAP borra definitivamente la Handling Unit y ajusta el inventario a cero.",
+     "correcta": false
+    },
+    {
+     "texto": "SAP ignora el fallo y envía mil telegramas más sin esperar.",
+     "correcta": false
+    },
+    {
+     "texto": "Se desinstala el módulo EWM automáticamente.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué tecnología nativa del kernel de SAP S/4HANA permite abrir Sockets TCP/IP directos desde ABAP hacia los PLCs sin requerir servidores intermedios?",
+   "opciones": [
+    {
+     "texto": "ABAP Push Channels (APC) con soporte nativo de TCP Sockets.",
+     "correcta": true
+    },
+    {
+     "texto": "SAPScript Legacy Printing.",
+     "correcta": false
+    },
+    {
+     "texto": "LSMW (Legacy System Migration Workbench).",
+     "correcta": false
+    },
+    {
+     "texto": "SmartForms.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿En qué caso se sigue utilizando el componente 'SAP Plant Connectivity (PCo)' entre SAP EWM MFS y los PLCs?",
+   "opciones": [
+    {
+     "texto": "Cuando el servidor S/4HANA está en la nube/remoto y se requiere un concentrador local en la planta para traducir Sockets TCP/IP a llamadas RFC seguras.",
+     "correcta": true
+    },
+    {
+     "texto": "Cuando el almacén no tiene ningún equipo automatizado y todo se mueve a mano.",
+     "correcta": false
+    },
+    {
+     "texto": "Únicamente para imprimir etiquetas de precios en tiendas.",
+     "correcta": false
+    },
+    {
+     "texto": "Para liquidar sueldos en SAP HCM.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Cuando un palet avanza por una faja automatizada gobernada por LOSC, ¿cómo gestiona SAP EWM la Warehouse Task desde el muelle hasta el rack final?",
+   "opciones": [
+    {
+     "texto": "Mantiene una WT Madre hacia el destino final en espera y va creando/confirmando Sub-WTs tramo por tramo entre cada Communication Point.",
+     "correcta": true
+    },
+    {
+     "texto": "No crea ninguna Warehouse Task hasta que el palet sale vendido un mes después.",
+     "correcta": false
+    },
+    {
+     "texto": "Obliga al operario a confirmar manualmente en su celular cada metro que avanza el rodillo.",
+     "correcta": false
+    },
+    {
+     "texto": "Crea un documento MIGO 101 en cada sensor de la faja.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué es un 'I-Point' (Identification Point) al inicio de una línea automatizada MFS?",
+   "opciones": [
+    {
+     "texto": "Un pórtico de entrada con escáneres láser, báscula y sensores ópticos de gálibo (contorno) que valida la HU antes de inyectarla al sistema ASRS.",
+     "correcta": true
+    },
+    {
+     "texto": "El punto donde los camiones cargan combustible diésel.",
+     "correcta": false
+    },
+    {
+     "texto": "Una transacción de contabilidad general.",
+     "correcta": false
+    },
+    {
+     "texto": "Un almacén externo sin gestión de ubicaciones.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cómo evita SAP MFS que una faja transportadora colapse por exceso de palets acumulados (Deadlock/Congestión) antes de entrar a un pasillo de grúa?",
+   "opciones": [
+    {
+     "texto": "Mediante los Capacity Limits configurados en el Communication Point o Conveyor Segment, deteniendo o desviando el envío de nuevas HUs si el buffer está lleno.",
+     "correcta": true
+    },
+    {
+     "texto": "Apagando la electricidad de toda la fábrica cada 10 minutos.",
+     "correcta": false
+    },
+    {
+     "texto": "Aumentando la velocidad de los rodillos a 50 kilómetros por hora.",
+     "correcta": false
+    },
+    {
+     "texto": "Borrando los pedidos de los clientes en SAP SD.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si el ramal de entrada al Pasillo 3 ha alcanzado su límite máximo de capacidad (ej. 4 HUs en cola), ¿qué puede hacer SAP MFS con el quinto palet que viene avanzando por la arteria principal?",
+   "opciones": [
+    {
+     "texto": "Mantenerlo dando una vuelta en el carrusel de recirculación (Loop Conveyor) o retenerlo en el punto previo hasta que se libere un espacio.",
+     "correcta": true
+    },
+    {
+     "texto": "Empujarlo fuera de la faja hacia el piso.",
+     "correcta": false
+    },
+    {
+     "texto": "Facturarlo inmediatamente como pérdida financiera.",
+     "correcta": false
+    },
+    {
+     "texto": "Cambiarle el número de material en la tabla MARA.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En la operación de transelevadores (grúas ASRS), ¿en qué consiste el 'Dual Command Cycle' (Ciclo Doble) optimizado por SAP MFS?",
+   "opciones": [
+    {
+     "texto": "En intercalar una tarea de Putaway con una de Picking en el mismo viaje dentro del pasillo, evitando que la grúa regrese vacía (Task Interleaving mecánico).",
+     "correcta": true
+    },
+    {
+     "texto": "En usar dos grúas chocando en el mismo riel para cargar un solo palet ligero.",
+     "correcta": false
+    },
+    {
+     "texto": "En exigir que dos supervisores digiten su contraseña para mover un palet.",
+     "correcta": false
+    },
+    {
+     "texto": "En duplicar el peso contable del material.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En un rack automatizado 'Multi-Deep' (ej. Doble Profundidad), ¿qué hace SAP MFS automáticamente si necesita extraer el palet del fondo pero hay otro palet bloqueando la posición delantera?",
+   "opciones": [
+    {
+     "texto": "Genera automáticamente una Warehouse Task previa de reubicación (Stock Rearrangement) para mover el palet delantero a otro hueco vacío del pasillo.",
+     "correcta": true
+    },
+    {
+     "texto": "Cancela el pedido del cliente porque el palet está inaccesible.",
+     "correcta": false
+    },
+    {
+     "texto": "Atraviesa y destruye el palet delantero con la horquilla de la grúa.",
+     "correcta": false
+    },
+    {
+     "texto": "Detiene el PLC en estado de pánico crítico.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si un palet pasa por el pórtico láser (I-Point) y una caja rota sobresale 8 cm fuera del perímetro permitido del EuroPalet, ¿qué excepción recibe SAP MFS y cómo actúa?",
+   "opciones": [
+    {
+     "texto": "Recibe una excepción de contorno/perfil (CONT) y rutea automáticamente la HU hacia el ramal de rechazo/acondicionamiento (Reject Spur).",
+     "correcta": true
+    },
+    {
+     "texto": "Lo mete a la fuerza en el rack de 30 metros de altura ignorando el sensor.",
+     "correcta": false
+    },
+    {
+     "texto": "Genera una orden de compra nueva al proveedor automáticamente.",
+     "correcta": false
+    },
+    {
+     "texto": "Cambia la moneda de la sociedad en la tabla T001.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué ocurre si el escáner láser de un Routing Point no logra leer el código de barras SSCC porque la etiqueta se despegó (Excepción NOREAD)?",
+   "opciones": [
+    {
+     "texto": "SAP MFS desvía la HU con un ID temporal hacia la estación de clearing/excepciones para que un operario la identifique y re-etiquete.",
+     "correcta": true
+    },
+    {
+     "texto": "La faja tritura el palet automáticamente.",
+     "correcta": false
+    },
+    {
+     "texto": "SAP asigna el palet al azar a cualquier cliente.",
+     "correcta": false
+    },
+    {
+     "texto": "Se apaga la base de datos HANA.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Cuando una grúa ASRS intenta depositar un palet en el Bin 04-08-01 (que figuraba vacío en SAP), pero su sensor óptico detecta que el hueco está físicamente ocupado por un palet fantasma, ¿qué excepción envía el PLC?",
+   "opciones": [
+    {
+     "texto": "Excepción de Bin Lleno (BINF - Bin Full), tras lo cual SAP bloquea ese Bin y calcula al instante un nuevo Bin destino para que la grúa deposite la carga.",
+     "correcta": true
+    },
+    {
+     "texto": "Excepción de falta de pago del cliente.",
+     "correcta": false
+    },
+    {
+     "texto": "Código de movimiento 102 de reversión de compras.",
+     "correcta": false
+    },
+    {
+     "texto": "Error de sintaxis ABAP en el entorno DEV.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿En qué transacción central los consultores y supervisores monitorean el estado de los PLCs, abren/cierran canales TCP/IP y auditan el log de telegramas en vivo?",
+   "opciones": [
+    {
+     "texto": "/SCWM/MON (bajo el nodo Material Flow System).",
+     "correcta": true
+    },
+    {
+     "texto": "MMBE (Resumen de Stocks IM).",
+     "correcta": false
+    },
+    {
+     "texto": "ME21N (Crear Pedido de Compras).",
+     "correcta": false
+    },
+    {
+     "texto": "VA01 (Crear Pedido de Ventas).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál es la tabla de base de datos de SAP EWM que registra el historial forense (Log) de todos los telegramas enviados y recibidos entre SAP y los PLCs?",
+   "opciones": [
+    {
+     "texto": "/SCWM/MFSTELELOG",
+     "correcta": true
+    },
+    {
+     "texto": "MARD",
+     "correcta": false
+    },
+    {
+     "texto": "T001L",
+     "correcta": false
+    },
+    {
+     "texto": "EKKO",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué tabla técnica almacena el estado actual de los Communication Channels (si el Socket está abierto, cerrado o con secuencia desincronizada)?",
+   "opciones": [
+    {
+     "texto": "/SCWM/MFS_CH",
+     "correcta": true
+    },
+    {
+     "texto": "MARC",
+     "correcta": false
+    },
+    {
+     "texto": "LFA1",
+     "correcta": false
+    },
+    {
+     "texto": "KNA1",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si después de un mantenimiento eléctrico del PLC los contadores de secuencia de telegramas entre SAP y el PLC quedan desfasados (ej. SAP va por el 500 y el PLC volvió a 001), ¿qué debe hacerse desde el Monitor MFS?",
+   "opciones": [
+    {
+     "texto": "Detener el canal, ejecutar el reseteo/sincronización de contadores de secuencia del canal y volver a iniciarlo.",
+     "correcta": true
+    },
+    {
+     "texto": "Formatear el servidor de producción PRD.",
+     "correcta": false
+    },
+    {
+     "texto": "Crear un nuevo almacén desde cero en SPRO.",
+     "correcta": false
+    },
+    {
+     "texto": "Hacer un inventario físico anual de todos los racks.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si una grúa robótica del Pasillo 2 entra en fallo mecánico y su PLC reporta estado 'Out of Order', ¿cómo protege SAP EWM el cumplimiento de los pedidos de salida?",
+   "opciones": [
+    {
+     "texto": "Inhabilita el recurso/pasillo afectado y busca stock equivalente en los demás pasillos cuyas grúas siguen operativas.",
+     "correcta": true
+    },
+    {
+     "texto": "Detiene todas las demás grúas del almacén por solidaridad.",
+     "correcta": false
+    },
+    {
+     "texto": "Cancela todas las entregas de salida del mes.",
+     "correcta": false
+    },
+    {
+     "texto": "Cambia el precio estándar de los materiales a cero.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cómo se denomina la funcionalidad que permite encender visores luminosos digitales directamente en los estantes para indicar al operario la posición y cantidad exacta a recolectar?",
+   "opciones": [
+    {
+     "texto": "Pick-by-Light (integrado vía MFS o sub-sistemas RF/PLC).",
+     "correcta": true
+    },
+    {
+     "texto": "Post Goods Issue (PGI).",
+     "correcta": false
+    },
+    {
+     "texto": "Invoice Verification (MIRO).",
+     "correcta": false
+    },
+    {
+     "texto": "Automatic Account Determination (OBYC).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Para qué sirve el simulador interno de PLC en SAP EWM antes del lanzamiento a producción (Go-Live)?",
+   "opciones": [
+    {
+     "texto": "Para emular el envío y recepción de miles de telegramas y validar toda la lógica de ruteo MFS, capacidad y excepciones sin necesitar el hardware físico conectado.",
+     "correcta": true
+    },
+    {
+     "texto": "Para diseñar planos arquitectónicos en 3D con AutoCAD.",
+     "correcta": false
+    },
+    {
+     "texto": "Para calcular la depreciación contable de los montacargas en SAP FI-AA.",
+     "correcta": false
+    },
+    {
+     "texto": "Para entrenar modelos de lenguaje natural.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En una integración perfecta de Cross-Docking Oportunista con SAP MFS, ¿qué ocurre cuando un palet con Backorder pasa por el escáner I-Point del muelle de entrada?",
+   "opciones": [
+    {
+     "texto": "SAP contabiliza la entrada, intercepta la HU para Cross-Docking y envía un telegrama al PLC para desviarla por las fajas directo hacia la rampa de salida sin tocar el rack ASRS.",
+     "correcta": true
+    },
+    {
+     "texto": "El palet se guarda obligatoriamente 24 horas en el silo ASRS antes de poder salir.",
+     "correcta": false
+    },
+    {
+     "texto": "El PLC apaga las fajas porque no soporta Cross-Docking.",
+     "correcta": false
+    },
+    {
+     "texto": "El operario debe cargar el palet al hombro hasta el camión de salida.",
+     "correcta": false
+    }
+   ]
+  }
+ ]
+}

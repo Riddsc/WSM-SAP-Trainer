@@ -1,0 +1,68 @@
+{
+ "id": "s6_l2",
+ "pasos": [
+  {
+   "instruccion": "Iniciar Entorno de Desarrollo (Eclipse/HANA)",
+   "comando": "HANA-STUDIO",
+   "pista": "HANA-STUDIO",
+   "exito": "> SAP HANA Studio (ABAP Development Tools - ADT) iniciado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Codificar CDS View (Consumption)",
+   "comando": "CREATE-CDS-VIEW",
+   "pista": "CREATE-CDS-VIEW",
+   "exito": "> Vista 'ZC_EWM_Productivity' creada uniendo /SCWM/WHO y /SCWM/RSRC.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Inyectar Anotaciones de API y UI",
+   "comando": "ADD-ODATA-ANNOTATION",
+   "pista": "ADD-ODATA-ANNOTATION",
+   "exito": "> @OData.publish:true y @UI.chart inyectados. SQLScript compilado y empujado a Base de Datos.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Activar Servicio OData (SAP Gateway)",
+   "comando": "ACTIVATE-API",
+   "pista": "ACTIVATE-API",
+   "exito": "> RESTful API Endpoint Activo: /sap/opu/odata/sap/ZC_EWM_PRODUCTIVITY_CDS",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Abrir Entorno Directivo Web",
+   "comando": "FIORI-LAUNCHPAD",
+   "pista": "FIORI-LAUNCHPAD",
+   "exito": "> Fiori Launchpad logueado. Perfil: Director Global Supply Chain.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Entrar al Modelador Analítico",
+   "comando": "KPI-WORKSPACE",
+   "pista": "KPI-WORKSPACE",
+   "exito": "> App 'Manage KPIs and Reports' cargada (Fiori Elements Smart Templates).",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Enlazar Gráfico con API CDS",
+   "comando": "LINK-API",
+   "pista": "LINK-API",
+   "exito": "> Datasource enlazado. Eje X (Horas), Eje Y (Warehouse Orders). Datos Live en 115 milisegundos.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Publicar Dashboard en Catálogo",
+   "comando": "PUBLISH-DASHBOARD",
+   "pista": "PUBLISH-DASHBOARD",
+   "exito": "> App Fiori creada y publicada en el catálogo directivo.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Recibir Certificación Global EWM",
+   "comando": "MASTERY-ACHIEVED",
+   "pista": "MASTERY-ACHIEVED",
+   "exito": "> SEMESTRES 1 a 6 SUPERADOS. Eres oficialmente Arquitecto Consultor Senior de SAP S/4HANA EWM. Misión cumplida.",
+   "placeholder": ""
+  }
+ ]
+}

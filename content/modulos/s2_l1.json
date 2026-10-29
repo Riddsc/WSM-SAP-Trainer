@@ -1,0 +1,54 @@
+{
+ "id": "s2_l1",
+ "pasos": [
+  {
+   "instruccion": "Crear ASN",
+   "comando": "VL31N",
+   "pista": "VL31N",
+   "exito": "> Dynpro VL31N.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Referencia PO",
+   "comando": "PO-SONY99",
+   "pista": "PO-SONY99",
+   "exito": "> Validada.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Cantidad",
+   "comando": "500",
+   "pista": "500",
+   "exito": "> Tolerancia OK.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Empacar en HU",
+   "comando": "PACK",
+   "pista": "PACK",
+   "exito": "> SSCC Generado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Modificar ASN",
+   "comando": "VL32N",
+   "pista": "VL32N",
+   "exito": "> ASN Abierto.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Ejecutar PGR",
+   "comando": "PGR",
+   "pista": "PGR",
+   "exito": "> GR Contabilizado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Verificar Saldo",
+   "comando": "MMBE",
+   "pista": "MMBE",
+   "exito": "> 500 EA Confirmados.",
+   "placeholder": ""
+  }
+ ]
+}

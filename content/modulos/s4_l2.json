@@ -1,0 +1,75 @@
+{
+ "id": "s4_l2",
+ "pasos": [
+  {
+   "instruccion": "Abrir IMG de Resource Management",
+   "comando": "SPRO",
+   "pista": "SPRO",
+   "exito": "> Nodos de Resource Management y Labor Management cargados.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Configurar Maestro de Recurso Retráctil",
+   "comando": "/SCWM/RSRC",
+   "pista": "/SCWM/RSRC",
+   "exito": "> Recurso FORK-01 (Tipo RT_HIGH, Vel 2.5 m/s, Acceso BA03) creado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Abrir Secuencia de Colas por Grupo",
+   "comando": "/SCWM/QSEQ",
+   "pista": "/SCWM/QSEQ",
+   "exito": "> Grupo RG_ALTURA abierto: Prioridad 1 Q_PUTAWAY, Prioridad 2 Q_PICKING.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Activar Flag de Task Interleaving y Radio 50m",
+   "comando": "INTERLEAVE-ACT",
+   "pista": "INTERLEAVE-ACT",
+   "exito": "> Flag Interleaving = X activado entre Q_PUTAWAY y Q_PICKING. Radio TDC: 50m.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Lanzar Terminal de Radiofrecuencia",
+   "comando": "/SCWM/RFUI",
+   "pista": "/SCWM/RFUI",
+   "exito": "> Pantalla ITSmobile 16x20 iniciada.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Autenticar Operario en Montacargas FORK-01",
+   "comando": "LOGIN-FORK01",
+   "pista": "LOGIN-FORK01",
+   "exito": "> Sesión activa en FORK-01. Modo: System-Guided Processing.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Confirmar Putaway en Pasillo 04 Bin 04-10-02",
+   "comando": "PUTAWAY-CONF",
+   "pista": "PUTAWAY-CONF",
+   "exito": "> WO 600011 confirmada. Ubicación actual del recurso: 04-10-02.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Solicitar Siguiente Tarea (Motor Interleaving)",
+   "comando": "AUTO-PICK-WO",
+   "pista": "AUTO-PICK-WO",
+   "exito": "> ¡INTERLEAVING EJECUTADO! Salto a Q_PICKING: WO 700089 asignada en Bin 04-11-01 (a 2.8m).",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Confirmar Extracción y Entrega en GI Zone 9020",
+   "comando": "PICK-CONF",
+   "pista": "PICK-CONF",
+   "exito": "> Picking confirmado en 9020. Viaje en vacío: 0%. Doble ciclo completado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Auditar Eficiencia ELS y Executed Workload",
+   "comando": "/SCWM/MON-KPI",
+   "pista": "/SCWM/MON-KPI",
+   "exito": "> Tabla /SCWM/EXCLD actualizada: Eficiencia ELS 108.4%. SEMESTRE 4 COMPLETADO.",
+   "placeholder": ""
+  }
+ ]
+}

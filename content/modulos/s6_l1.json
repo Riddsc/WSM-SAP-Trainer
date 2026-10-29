@@ -1,0 +1,68 @@
+{
+ "id": "s6_l1",
+ "pasos": [
+  {
+   "instruccion": "Abrir TM Freight Order",
+   "comando": "NWBC-FO",
+   "pista": "NWBC-FO",
+   "exito": "> Freight Order 99550 abierto en Fiori/NWBC. Estado: Planeado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Ejecutar Check-in de Tractomula",
+   "comando": "CHECK-IN",
+   "pista": "CHECK-IN",
+   "exito": "> Evento ARRIV_YARD marcado. Estado EWM/TM sincronizado a 'In Yard'.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Emular RF para Operario de Carga",
+   "comando": "/SCWM/RFUI",
+   "pista": "/SCWM/RFUI",
+   "exito": "> Terminal iniciada. Menú 'Loading by Freight Order'.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Iniciar Proceso de Carga",
+   "comando": "OUTBOUND-LOAD",
+   "pista": "OUTBOUND-LOAD",
+   "exito": "> ODO seleccionada. Rampa de carga 920 confirmada.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Escanear SSCC del Palet al Camión",
+   "comando": "SCAN-SSCC",
+   "pista": "SCAN-SSCC",
+   "exito": "> Palet 558000 cargado físicamente. TM Volumen actualizado al 100%.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Confirmar Fin de Carga (PGI)",
+   "comando": "LOAD-COMPLETE",
+   "pista": "LOAD-COMPLETE",
+   "exito": "> PGI Ejecutado. Camión despachado (Check-out). Costos FSD listos para pago.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Abrir Monitor Central de Facturación",
+   "comando": "/SCWM/MON",
+   "pista": "/SCWM/MON",
+   "exito": "> EWM Monitor cargado. Nodo 'Warehouse Billing'.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Extraer KPIs de la Jornada (Measurement)",
+   "comando": "RUN-MEASUREMENT",
+   "pista": "RUN-MEASUREMENT",
+   "exito": "> Measurement Service: 1 Palet Cargado (Tarifa $15 USD).",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Generar Cobro al Cliente 3PL (BDR)",
+   "comando": "GENERATE-BDR",
+   "pista": "GENERATE-BDR",
+   "exito": "> Billing Document Request (BDR) enviado a SAP SD exitosamente. FACTURACIÓN CERRADA.",
+   "placeholder": ""
+  }
+ ]
+}

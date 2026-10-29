@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "modulos": [
+    {
+      "id": "s1_m1",
+      "semestre": 1,
+      "tipo": "theory",
+      "titulo": "1.1 Arquitectura Empresarial Definitiva",
+      "duracion": "15 Horas • Certificación",
+      "descripcion": "Inmersión absoluta en el mapeo legal, financiero y operativo de SAP S/4HANA. 15 capítulos de teoría y 50 preguntas de certificación.",
+      "requisito": null
+    },
+    {
+      "id": "s1_l1",
+      "semestre": 1,
+      "tipo": "lab",
+      "titulo": "1.2 Lab Multi-Paso: Arquitectura (SPRO)",
+      "duracion": "1 Hora",
+      "descripcion": "Crear un Almacén Lógico (OX09).",
+      "requisito": "s1_m1"
+    },
+    {
+      "id": "s1_m2",
+      "semestre": 1,
+      "tipo": "theory",
+      "titulo": "1.3 Material Master Definitivo (El ADN del Inventario)",
+      "duracion": "18 Horas • Certificación Avanzada",
+      "descripcion": "Disección absoluta de las vistas logísticas del Material Master (MARA, MARC, MARD). 10 capítulos teóricos y un examen bloqueante de 40 preguntas.",
+      "requisito": "s1_l1"
+    },
+    {
+      "id": "s1_l2",
+      "semestre": 1,
+      "tipo": "lab",
+      "titulo": "1.4 Lab Multi-Paso: Alta de Producto Terminado",
+      "duracion": "1 Hora 15 Min",
+      "descripcion": "Crea un Producto Terminado (FERT) y define sus métricas críticas de almacén.",
+      "requisito": "s1_m2"
+    },
+    {
+      "id": "s2_m1",
+      "semestre": 2,
+      "tipo": "theory",
+      "titulo": "2.1 Ingeniería Inbound: ASN, MIGO y Yard Management",
+      "duracion": "20 Horas • Especialización Inbound",
+      "descripcion": "Domina el proceso de recepción de clase mundial. Diferencias entre MIGO y VL31N, gestión de patios (Yard Management), y unidades de manipulación (HUM).",
+      "requisito": "s1_l2"
+    },
+    {
+      "id": "s2_l1",
+      "semestre": 2,
+      "tipo": "lab",
+      "titulo": "2.2 Lab Multi-Paso: Recepción Inbound (VL31N / PGR)",
+      "duracion": "1 Hora 30 Min",
+      "descripcion": "El camión de Sony ha llegado a la garita. Ejecuta el ASN y el Post Goods Receipt para ingresar 500 consolas al inventario corporativo.",
+      "requisito": "s2_m1"
+    },
+    {
+      "id": "s2_m2",
+      "semestre": 2,
+      "tipo": "theory",
+      "titulo": "2.3 Algoritmos EWM: Putaway, Slotting y Cross-Docking",
+      "duracion": "25 Horas • Arquitectura EWM",
+      "descripcion": "El cerebro matemático de SAP EWM. Entiende cómo el sistema evalúa millones de coordenadas tridimensionales en milisegundos para decidir dónde almacenar un palet.",
+      "requisito": "s2_l1"
+    },
+    {
+      "id": "s2_l2",
+      "semestre": 2,
+      "tipo": "lab",
+      "titulo": "2.4 Lab Multi-Paso: Algoritmo Storage Type Search",
+      "duracion": "1 Hora 45 Min",
+      "descripcion": "Configura la matriz algorítmica troncal (STSS) en SPRO para garantizar que los palets identificados como pesados busquen espacio en piso antes que en racks en altura.",
+      "requisito": "s2_m2"
+    },
+    {
+      "id": "s3_m1",
+      "semestre": 3,
+      "tipo": "theory",
+      "titulo": "3.1 Arquitectura Outbound y Wave Management",
+      "duracion": "25 Horas • Especialización Outbound",
+      "descripcion": "El arte de sacar la mercancía. Desde la conversión de documentos ERP->EWM hasta los algoritmos de agrupación en Olas (Waves) para optimizar el picking masivo.",
+      "requisito": "s2_l2"
+    },
+    {
+      "id": "s3_l1",
+      "semestre": 3,
+      "tipo": "lab",
+      "titulo": "3.2 Lab Multi-Paso: Wave Release & Picking",
+      "duracion": "1 Hora 45 Min",
+      "descripcion": "El cliente Amazon requiere 1,000 unidades. Libera la Ola y ejecuta el PGI.",
+      "requisito": "s3_m1"
+    },
+    {
+      "id": "s3_m2",
+      "semestre": 3,
+      "tipo": "theory",
+      "titulo": "3.3 Excepciones Outbound y Replenishment",
+      "duracion": "25 Horas • Arquitectura de Crisis",
+      "descripcion": "Domina el caos. Qué hacer cuando el sistema falla, cuando el rack está vacío (Pick Denial), y cómo el Reabastecimiento salva las Olas de Picking.",
+      "requisito": "s3_l1"
+    },
+    {
+      "id": "s3_l2",
+      "semestre": 3,
+      "tipo": "lab",
+      "titulo": "3.4 Lab Multi-Paso: Resolución Pick Denial",
+      "duracion": "2 Horas • Crisis Management",
+      "descripcion": "El operario llegó al Bin A-01 y reporta que el rack está vacío. Registra la excepción y dispara el reabastecimiento.",
+      "requisito": "s3_m2"
+    },
+    {
+      "id": "s4_m1",
+      "semestre": 4,
+      "tipo": "theory",
+      "titulo": "4.1 Cross-Docking Avanzado y Material Flow System (MFS)",
+      "duracion": "35 Horas • Certificación Arquitecto Senior",
+      "descripcion": "Inmersión de nivel consultor senior en la automatización extrema de SAP S/4HANA EWM. Domina el motor matemático de Cross-Docking (Planned, Opportunistic y Merchandise Distribution) y la arquitectura de comunicación directa por Sockets TCP/IP con PLCs, transelevadores ASRS y fajas transportadoras mediante SAP MFS. 15 capítulos profundos y 40 preguntas de certificación.",
+      "requisito": "s3_l2"
+    },
+    {
+      "id": "s4_l1",
+      "semestre": 4,
+      "tipo": "lab",
+      "titulo": "4.2 Lab Multi-Paso: Cross-Docking sobre Circuito MFS",
+      "duracion": "2 Horas 30 Min • Simulación Industrial",
+      "descripcion": "Acaba de acoplarse un camión con 100 servidores rackeables. Existe un Backorder crítico de 40 unidades para un Data Center. Debes levantar el canal TCP/IP del PLC, procesar el palet en el I-Point láser, activar la intercepción de Cross-Docking Oportunista y auditar el telegrama que desvía las 40 unidades directo al muelle de salida 9020.",
+      "requisito": "s4_m1"
+    },
+    {
+      "id": "s4_m2",
+      "semestre": 4,
+      "tipo": "theory",
+      "titulo": "4.3 Ingeniería de Recursos (Resource Management), Task Interleaving y Labor Management",
+      "duracion": "35 Horas • Certificación Optimización Operativa",
+      "descripcion": "Domina la orquestación matemática de la flota de montacargas, operarios pedestres y terminales de Radiofrecuencia (RFUI). Aprende a erradicar los viajes en vacío mediante Task Interleaving, diseñar secuencias de colas dinámicas, modelar redes de distancia (TDC) y medir la productividad al segundo con SAP EWM Labor Management. 15 capítulos profundos y 40 preguntas de certificación.",
+      "requisito": "s4_l1"
+    },
+    {
+      "id": "s4_l2",
+      "semestre": 4,
+      "tipo": "lab",
+      "titulo": "4.4 Lab Multi-Paso: Task Interleaving y Auditoría de Flota RF",
+      "duracion": "2 Horas 30 Min • Optimización Maestra",
+      "descripcion": "La flota de montacargas retráctiles presenta un 48% de viajes en vacío (Deadheading). Configura el recurso FORK-01, activa el flag de Task Interleaving en la secuencia de colas (/SCWM/QSEQ), ejecuta el ciclo doble en el emulador /SCWM/RFUI (Putaway en Pasillo 04 seguido de Picking automático a 3 metros) y audita el documento Executed Workload en el Monitor.",
+      "requisito": "s4_m2"
+    },
+    {
+      "id": "s5_m1",
+      "semestre": 5,
+      "tipo": "theory",
+      "titulo": "5.1 Integración Avanzada de Producción (PP-EWM)",
+      "duracion": "40 Horas • Arquitectura de Manufactura",
+      "descripcion": "El puente entre la logística pura y la manufactura industrial. Aprende a sincronizar SAP EWM con SAP PP (Production Planning) y sistemas MES para abastecer líneas de ensamblaje mediante Production Material Requests (PMRs), ciclos de control Kanban y backflushing en tiempo real. 15 capítulos profundos y 40 preguntas de certificación.",
+      "requisito": "s4_l2"
+    },
+    {
+      "id": "s5_l1",
+      "semestre": 5,
+      "tipo": "lab",
+      "titulo": "5.2 Lab Multi-Paso: Staging PP-EWM y Backflushing",
+      "duracion": "2 Horas 15 Min • Integración Industrial",
+      "descripcion": "El departamento de Manufactura ha liberado la Orden de Producción #90050 para ensamblar un Motor V8. Entra al monitor de Staging de EWM, analiza el PMR, verifica que haya capacidad en la estantería del PSA (Línea de Ensamblaje 1), crea las tareas de montacargas y audita el consumo automático retrospectivo (Backflush) tras el ensamblaje.",
+      "requisito": "s5_m1"
+    },
+    {
+      "id": "s5_m2",
+      "semestre": 5,
+      "tipo": "theory",
+      "titulo": "5.3 Gestión de Calidad Integrada (SAP QM-EWM)",
+      "duracion": "40 Horas • Arquitectura de Aseguramiento (QA)",
+      "descripcion": "El control absoluto sobre la calidad del inventario corporativo. Aprende cómo SAP EWM y SAP QM se integran mediante Inspection Object Types (IOTs) para bloquear lotes farmacéuticos, generar muestreos estadísticos, rutar productos hacia laboratorios de pruebas destructivas y ejecutar Decisiones de Empleo (Usage Decisions) sin fricciones logísticas. 15 capítulos teóricos y 40 preguntas de certificación.",
+      "requisito": "s5_l1"
+    },
+    {
+      "id": "s5_l2",
+      "semestre": 5,
+      "tipo": "lab",
+      "titulo": "5.4 Lab Multi-Paso: Inspección de Calidad (QM-EWM Firewall)",
+      "duracion": "2 Horas 30 Min • Contingencia Sanitaria",
+      "descripcion": "Acaba de llegar un lote de 5,000 vacunas importadas (Inbound Delivery). Por normativas sanitarias, está sometido a IOT 4. Ejecuta el PGR, observa cómo el sistema confisca el palet bajo estado 'Q', extrae la muestra para el Work Center de QA, y como Gerente, registra un 'Usage Decision' de rechazo (R) por ruptura de cadena de frío, enviando todo el lote a la cámara de Destrucción.",
+      "requisito": "s5_m2"
+    },
+    {
+      "id": "s6_m1",
+      "semestre": 6,
+      "tipo": "theory",
+      "titulo": "6.1 Advanced Shipping & Receiving (ASR) y EWM Billing (3PL)",
+      "duracion": "40 Horas • Arquitectura de Transporte y Facturación",
+      "descripcion": "El nivel cumbre de rentabilidad logística. Aprende a fusionar EWM con SAP TM (Transportation Management) para consolidar fletes directamente sobre el Freight Order (FO) mediante el framework ASR. Además, domina Warehouse Billing para operadores 3PL, cobrando a los clientes por metros cúbicos ocupados, palets movidos y servicios de empaque usando Measurement Services. 15 capítulos profundos y 20 preguntas de certificación ejecutiva.",
+      "requisito": "s5_l2"
+    },
+    {
+      "id": "s6_l1",
+      "semestre": 6,
+      "tipo": "lab",
+      "titulo": "6.2 Lab Multi-Paso: Carga ASR (TM-EWM) y Facturación 3PL",
+      "duracion": "2 Horas 30 Min • Consolidación Final",
+      "descripcion": "El Freight Order #99550 (Tractomula) ha llegado a la puerta para cargar mercancía de tu cliente 3PL. Realiza el Check-in (ASR), carga el palet con RF y emite la orden de facturación automática del almacén (Billing Document) por los servicios de despacho prestados.",
+      "requisito": "s6_m1"
+    },
+    {
+      "id": "s6_m2",
+      "semestre": 6,
+      "tipo": "theory",
+      "titulo": "6.3 Arquitectura Analítica, Core Data Services (CDS) y APIs EWM",
+      "duracion": "30 Horas • Desarrollo y Cloud Extensibility",
+      "descripcion": "El futuro de SAP. Abandona los pesados reportes ABAP ALV y abraza la arquitectura 'In-Memory'. Aprende cómo SAP S/4HANA utiliza Vistas CDS (Core Data Services) empujadas a la base de datos HANA para renderizar tableros Fiori Elements (KPI Dashboards) en milisegundos. Explora cómo exponer los datos de EWM al exterior usando OData v4 APIs para integración con la nube (BTP).",
+      "requisito": "s6_l1"
+    },
+    {
+      "id": "s6_l2",
+      "semestre": 6,
+      "tipo": "lab",
+      "titulo": "6.4 Lab Multi-Paso: Creación Analítica (CDS, API & Fiori)",
+      "duracion": "2 Horas 30 Min • Certificación Arquitecto Cloud",
+      "descripcion": "El Director de Logística requiere ver en su celular la eficiencia del almacén. Asume el rol de Arquitecto HANA: consulta las tablas transaccionales EWM, publica una CDS View como API OData RESTful (Code-to-Data), y configura el Smart Template en el KPI Workspace de Fiori Elements. Celebra la culminación de tu maestría.",
+      "requisito": "s6_m2"
+    }
+  ]
+}

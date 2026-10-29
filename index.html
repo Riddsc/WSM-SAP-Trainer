@@ -2,9 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Logística Pro - SAP EWM</title>
-    <link rel="stylesheet" href="css/components.css?v=4.0">
+    <meta name="theme-color" content="#0A0F1C">
+    <link rel="stylesheet" href="css/components.css?v=5.0">
 </head>
 <body>
     <div class="app-container">
@@ -21,7 +22,7 @@
                     <span>S/4HANA &amp; EWM</span>
                 </div>
             </div>
-            <div class="progress-container">
+            <div class="progress-container" role="progressbar" aria-label="Avance de la maestría">
                 <div class="progress-bar-bg"><div class="progress-bar" id="progress-bar"></div></div>
                 <span class="progress-text" id="progress-text">0%</span>
             </div>
@@ -69,20 +70,22 @@
     <div id="sap-terminal-overlay" class="terminal-hidden">
         <div class="terminal-header">
             <div class="terminal-status">
-                <span class="status-dot"></span> CONECTADO A S/4HANA PRD
+                <span class="status-dot"></span> SIMULADOR S/4HANA
             </div>
             <button id="terminal-close-btn" class="terminal-close" aria-label="Cerrar Terminal" type="button">✕</button>
         </div>
         
         <div id="terminal-body" class="terminal-body">
             <div id="terminal-history">
-                <div class="log-system">SAP EWM Kernel 7.89 - Terminal Emulator Inicializado.</div>
+                <div class="log-system">SAP S/4HANA · Simulador de práctica de Logística Pro</div>
                 <div class="log-system">Cargando escenario de laboratorio...</div>
             </div>
             
             <div class="terminal-input-wrapper">
                 <span class="terminal-prompt">EWM_PRD:/&gt;</span>
-                <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" autocapitalize="characters" placeholder="">
+                <label for="terminal-input" class="sr-only">Comando o valor</label>
+                <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" autocapitalize="characters" enterkeyhint="send" placeholder="">
+                <button type="button" id="terminal-exec-btn" class="terminal-exec" aria-label="Ejecutar">▶</button>
             </div>
         </div>
         
@@ -160,12 +163,14 @@
         </svg>
     </button>
 
-    <!-- Orden Estricto de Carga (Arquitectura MVC) -->
-    <script src="js/data/syllabus.js?v=4.0"></script>
-    <script src="js/core/audio.js?v=4.0"></script>
-    <script src="js/core/state.js?v=4.0"></script>
-    <script src="js/components/ui-render.js?v=4.0"></script>
-    <script src="js/simulators/sap-engine.js?v=4.0"></script>
-    <script src="js/core/router.js?v=4.0"></script>
+    <!-- Orden de carga: versión, datos y núcleo primero; pantallas y navegación al final -->
+    <script src="js/version.js"></script>
+    <script src="js/core/content.js?v=5.0"></script>
+    <script src="js/core/native.js?v=5.0"></script>
+    <script src="js/core/audio.js?v=5.0"></script>
+    <script src="js/core/state.js?v=5.0"></script>
+    <script src="js/components/ui-render.js?v=5.0"></script>
+    <script src="js/simulators/sap-engine.js?v=5.0"></script>
+    <script src="js/core/router.js?v=5.0"></script>
 </body>
 </html>

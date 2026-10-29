@@ -1,0 +1,443 @@
+{
+ "id": "s6_m1",
+ "paginas": [
+  "<h3>Capítulo 1: El Ecosistema 3PL (Third Party Logistics)</h3>\n            <p>Un operador logístico (ej. DHL, Kuehne+Nagel) no vende productos; vende el espacio de su almacén y el sudore de sus montacarguistas.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Negocio de la Logística)</summary>\n                <div class=\"details-content\">\n                    <p>Si eres un 3PL, tienes el inventario de 50 empresas distintas (Entitled to Dispose) en un mismo Centro. La rentabilidad depende de cobrar por cada acción: por guardar un palet 10 días, por etiquetar una caja (Value-Added Services - VAS) y por cada camión cargado. SAP EWM debe actuar como un taxímetro milimétrico que registre cada evento y lo facture automáticamente a fin de mes.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 2: Warehouse Billing (Facturación de Almacén)</h3>\n            <p>La arquitectura financiera para cobrar servicios logísticos mediante Snapshots de inventario.</p>\n            <details>\n                <summary>Ver explicación a fondo (Integración EWM-SD)</summary>\n                <div class=\"details-content\">\n                    <p><strong>Warehouse Billing</strong> captura dos tipos de cargos. 1) <strong>Cargos Recurrentes:</strong> ¿Cuántos metros cúbicos ocupó el cliente X hoy a medianoche? SAP toma un 'Snapshot' del inventario diario y cobra tarifa de almacenamiento. 2) <strong>Cargos Transaccionales:</strong> ¿Cuántas Warehouse Orders se confirmaron para el cliente Y? Se cobra una tarifa fija por cada movimiento de Putaway o Picking.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 3: Measurement Services (Servicios de Medición)</h3>\n            <p>Algoritmos nocturnos que barren la base de datos de EWM buscando KPIs facturables.</p>\n            <details>\n                <summary>Ver explicación a fondo (Extracción de Métricas)</summary>\n                <div class=\"details-content\">\n                    <p>Un Measurement Service es una consulta SQL sofisticada parametrizada en EWM. Ejemplo: <em>\"Contar el número de Handling Units del Partner 1000 que entraron por el muelle entre las 08:00 y las 18:00\"</em>. El resultado de esta medición (ej. 450 HUs) se envía mediante un <strong>Billing Document Request (BDR)</strong> hacia SAP SD (Sales and Distribution), quien multiplica 450 por $2 USD para emitir la factura final.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 4: Value-Added Services (VAS - Servicios de Valor Agregado)</h3>\n            <p>Emplayar, etiquetar precios especiales, armar kits de promoción (Kitting).</p>\n            <details>\n                <summary>Ver explicación a fondo (Work Centers de Empaque)</summary>\n                <div class=\"details-content\">\n                    <p>El cliente pide que a los perfumes se les pegue una etiqueta de \"Día de la Madre\" antes de enviarlos a tienda. Esto es un <strong>VAS</strong>. EWM genera una Orden VAS paralela a la Warehouse Order. Detiene el palet en el Work Center (Zona 8000), el operario escanea el material de empaque consumido (film plástico, etiquetas) y EWM registra el tiempo laboral para cobrárselo al cliente en la facturación mensual.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 5: Evolución de Integración de Transporte (SAP TM)</h3>\n            <p>De sistemas separados (ERP + TM + EWM) a una única base de datos incrustada en S/4HANA.</p>\n            <details>\n                <summary>Ver explicación a fondo (Embedded TM vs Standalone)</summary>\n                <div class=\"details-content\">\n                    <p>Históricamente, SAP EWM y SAP TM hablaban mediante pesados mensajes SOAP/XML. El TM planificaba el camión y le enviaba un mensaje a EWM para que creara un \"Transportation Unit\" (TU). La redundancia de datos causaba bloqueos. <strong>S/4HANA Embedded TM</strong> unifica el código: el TM y el EWM corren en el mismo servidor y memoria, eliminando las interfaces redundantes y los desfases de estado de los camiones.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 6: Freight Units (FU) y Freight Orders (FO)</h3>\n            <p>El lenguaje maestro de SAP Transportation Management.</p>\n            <details>\n                <summary>Ver explicación a fondo (La Matemática del Flete)</summary>\n                <div class=\"details-content\">\n                    <p>Cuando se crea un pedido de venta, SAP TM genera <strong>Freight Units (FUs)</strong>, que representan el requerimiento logístico (ej. \"Mover 2 toneladas de Cemento de Bogotá a Cali\"). El planificador consolida múltiples FUs en un <strong>Freight Order (FO)</strong>, que representa el camión físico (ej. Tractomula Placa XYZ-123). Este FO es el documento rector para EWM.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 7: Advanced Shipping & Receiving (ASR)</h3>\n            <p>El framework moderno de S/4HANA que erradica la redundancia de las Transportation Units (TUs).</p>\n            <details>\n                <summary>Ver explicación a fondo (El Fin de Yard Management Duplicado)</summary>\n                <div class=\"details-content\">\n                    <p>Con <strong>ASR</strong> activado, EWM ya no utiliza su viejo módulo de TUs para despachar. El documento de ejecución del almacén se vuelve directamente el <strong>Freight Order de TM</strong>. Si el guardia de seguridad marca \"Llegada a Garita\" en el documento TM, el monitor de EWM (/SCWM/MON) refleja instantáneamente que el camión está en puerta, compartiendo la misma tabla SQL. Simplifica la arquitectura radicalmente.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 8: Load Planning (Planificación de Carga en 3D)</h3>\n            <p>Motor gráfico de TM que dicta a EWM el orden exacto en que debe cargar los palets en el tráiler.</p>\n            <details>\n                <summary>Ver explicación a fondo (Axle Weight & Reverse Stop)</summary>\n                <div class=\"details-content\">\n                    <p>El TM Load Optimizer evalúa el peso por ejes del camión para evitar multas de carretera y el orden de paradas (Reverse Stop-Sequence). Si el camión descarga primero en Medellín y luego en Cartagena, EWM recibe instrucciones de cargar primero los palets de Cartagena (al fondo) y luego los de Medellín (a la puerta). Esto altera el orden del Wave Release en EWM.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 9: Direct Integration EWM-TM (Escenario Outbound)</h3>\n            <p>Sincronización milimétrica: EWM reporta si las cajas ocuparon más volumen del estimado por TM.</p>\n            <details>\n                <summary>Ver explicación a fondo (Actualización de Volumen Real)</summary>\n                <div class=\"details-content\">\n                    <p>TM planeó el flete asumiendo 10 metros cúbicos. Pero durante el proceso de empaque (Cartonization) en EWM, el operario usó cajas más grandes y el volumen real subió a 12 m3. Al escanear la HU cerrada, EWM notifica automáticamente al Freight Order en TM. TM recalcula la tarifa del transportista o alerta si el camión ya no tiene capacidad para cerrar puertas.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 10: Transit Warehousing (EWM como Hub Aéreo/Terrestre)</h3>\n            <p>Operación de aeropuertos de carga o hubs postales donde la mercancía nunca es tuya, solo transita.</p>\n            <details>\n                <summary>Ver বাধা fondo (Air Freight Consolidation)</summary>\n                <div class=\"details-content\">\n                    <p>Aplica para FedEx, DHL Express. En <strong>Transit Warehousing</strong>, EWM no conoce los productos internos (televisores, ropa). Solo gestiona HUs ciegas (cajas cerradas) guiadas por el Air Waybill (AWB) de TM. EWM escanea el paquete entrante, lo dirige a la zona de exportación correspondiente y arma palets aéreos (ULDs - Unit Load Devices) optimizando contornos cilíndricos para aviones.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 11: Freight Settlement (Liquidación de Gastos de Transporte)</h3>\n            <p>El puente entre TM y Finanzas (MM/FI) para pagarle al transportista.</p>\n            <details>\n                <summary>Ver explicación a fondo (Freight Settlement Document - FSD)</summary>\n                <div class=\"details-content\">\n                    <p>Una vez que EWM confirma el <em>Post Goods Issue (PGI)</em>, la operación física termina. TM toma los costos calculados en el Freight Order y genera un <strong>FSD (Freight Settlement Document)</strong>. Este documento viaja automáticamente a SAP MM, creando una Hoja de Entrada de Servicios y una factura logística (MIRO) para liberar el pago en tesorería al dueño de la tractomula.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 12: Gestión de Daños en Carga (Discrepancy / Damage Recording)</h3>\n            <p>Si el palet sale sano de EWM pero llega roto a destino, el seguro debe intervenir.</p>\n            <details>\n                <summary>Ver explicación a fondo (Notificación de Excepciones TM)</summary>\n                <div class=\"details-content\">\n                    <p>Al descargar en un almacén receptor con ASR, el operario escanea la caja. Si nota humedad o roturas, usa un Exception Code en la RF (ej. DAMG) y toma una foto con la terminal (attachment). Esto se refleja instantáneamente en el FO de TM como una Discrepancia, reteniendo automáticamente el pago de la liquidación de flete hasta que se resuelva la disputa con la empresa transportista.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 13: Monitor EWM / Nodo Transporte y ASR</h3>\n            <p>El tablero unificado para el supervisor de andenes (Dock Manager).</p>\n            <details>\n                <summary>Ver explicación a fondo (Control de Tráfico)</summary>\n                <div class=\"details-content\">\n                    <p>Con ASR, el monitor de EWM adquiere poderes de TM. En el nodo de <strong>Shipping & Receiving</strong>, el supervisor ve los Freight Orders activos, qué porcentaje de la carga ya está en la zona de Staging, qué camiones están en el Yard esperando, y puede ejecutar bloqueos de salida si faltan precintos de seguridad (Seals) en las puertas del tráiler.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 14: Manejo de Mercancías Peligrosas (Dangerous Goods - DG)</h3>\n            <p>Integración EWM-TM con regulaciones globales (IATA, ADR, IMDG).</p>\n            <details>\n                <summary>Ver explicación a fondo (Compliance de Transporte)</summary>\n                <div class=\"details-content\">\n                    <p>Si EWM carga un barril de Ácido Sulfúrico y otro de Cianuro, TM detecta una violación a las reglas de segregación química (no pueden viajar en el mismo remolque). EWM bloquea la confirmación de la Loading WT. El Freight Order exige generar e imprimir documentos de materiales peligrosos (Tremcards) obligatorios para que el chofer los presente en los peajes o aduanas.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 15: Arquitectura Cross-System para Multinacionales</h3>\n            <p>Un centro en EWM Descentralizado S/4HANA integrado a un TM Global en otro servidor.</p>\n            <details>\n                <summary>Ver explicación a fondo (Arquitectura Hub)</summary>\n                <div class=\"details-content\">\n                    <p>Las corporaciones inmensas pueden tener el ERP en un continente, y usar S/4HANA EWM como un sistema puramente descentralizado junto a TM. En este modelo Hub-and-Spoke, los mensajes SOA (Service Oriented Architecture) garantizan que, si el ERP matriz cae, la distribución local regional, la planeación de fletes y los cobros a los clientes sigan operando en el Hub EWM/TM independiente 24/7.</p>\n                </div>\n            </details>"
+ ],
+ "resumen": "Regla de Oro: En S/4HANA moderno (ASR), EWM y TM comparten la misma base de datos. Ya no existen TUs (Transportation Units) duplicadas en EWM; el camión físico se representa directamente mediante el TM Freight Order (FO). Para 3PLs, el EWM Measurement Service captura las métricas de operación y genera automáticamente el Billing Document en SAP SD para cobrar los servicios.",
+ "examen": [
+  {
+   "pregunta": "En un escenario 3PL (Third Party Logistics), ¿cuál es el objetivo arquitectónico del módulo 'Warehouse Billing' de SAP EWM?",
+   "opciones": [
+    {
+     "texto": "Capturar, calcular y enviar a SAP SD todos los costos de los servicios de almacenamiento, empaque y manipulación (Putaway/Picking) para facturarlos al cliente dueño del inventario.",
+     "correcta": true
+    },
+    {
+     "texto": "Pagar las nóminas de los operarios de montacargas a través de SAP HCM.",
+     "correcta": false
+    },
+    {
+     "texto": "Cobrar los impuestos de aduana a los proveedores extranjeros.",
+     "correcta": false
+    },
+    {
+     "texto": "Imprimir facturas en las pistolas de radiofrecuencia (RF).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Dentro del EWM Billing, ¿qué es un 'Measurement Service' (Servicio de Medición)?",
+   "opciones": [
+    {
+     "texto": "Una consulta o algoritmo programado que barre EWM (ej. contando HUs almacenadas o Warehouse Orders completadas) para generar las cantidades facturables (BDRs).",
+     "correcta": true
+    },
+    {
+     "texto": "El proceso físico de pesar un camión en la báscula de entrada (Yard Management).",
+     "correcta": false
+    },
+    {
+     "texto": "Una herramienta para medir el desgaste de las llantas de los montacargas.",
+     "correcta": false
+    },
+    {
+     "texto": "Un sensor láser que mide las dimensiones de las cajas de cartón vacías.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cómo se denomina en SAP EWM a los servicios adicionales solicitados por el cliente, tales como emplayar palets, armar kits promocionales o etiquetar precios antes del despacho?",
+   "opciones": [
+    {
+     "texto": "Value-Added Services (VAS - Servicios de Valor Agregado).",
+     "correcta": true
+    },
+    {
+     "texto": "Transportation Cross-Docking (TCD).",
+     "correcta": false
+    },
+    {
+     "texto": "Post Goods Issue (PGI).",
+     "correcta": false
+    },
+    {
+     "texto": "Storage Type Search Sequence (STSS).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En la evolución de S/4HANA, ¿cuál es la mayor ventaja del modelo 'Embedded TM' (Transportation Management embebido) sobre la versión histórica Standalone?",
+   "opciones": [
+    {
+     "texto": "EWM y TM corren en el mismo servidor y base de datos, eliminando la pesada mensajería middleware (XML/SOAP) y los desfases de sincronización de documentos.",
+     "correcta": true
+    },
+    {
+     "texto": "Es gratuito y de código abierto (Open Source).",
+     "correcta": false
+    },
+    {
+     "texto": "Solo funciona si el almacén está operado por robots.",
+     "correcta": false
+    },
+    {
+     "texto": "Permite usar bases de datos Oracle en lugar de HANA.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En SAP TM, ¿qué documento técnico representa el requerimiento logístico puro de transporte de mercancía antes de asignarse a un camión específico?",
+   "opciones": [
+    {
+     "texto": "Freight Unit (FU).",
+     "correcta": true
+    },
+    {
+     "texto": "Purchase Requisition (PR).",
+     "correcta": false
+    },
+    {
+     "texto": "Handling Unit (HU).",
+     "correcta": false
+    },
+    {
+     "texto": "Warehouse Order (WO).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En SAP TM, ¿qué documento técnico representa la capacidad consolidada, es decir, el camión físico (con chofer y placa) planificado para ejecutar el viaje?",
+   "opciones": [
+    {
+     "texto": "Freight Order (FO).",
+     "correcta": true
+    },
+    {
+     "texto": "Sales Order (SO).",
+     "correcta": false
+    },
+    {
+     "texto": "Inbound Delivery (IBD).",
+     "correcta": false
+    },
+    {
+     "texto": "Measurement Document.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Con el nuevo framework ASR (Advanced Shipping & Receiving) de S/4HANA, ¿qué objeto histórico y redundante de EWM queda obsoleto al sincronizarse directamente con el Freight Order de TM?",
+   "opciones": [
+    {
+     "texto": "El Transportation Unit (TU) de EWM Yard Management.",
+     "correcta": true
+    },
+    {
+     "texto": "El Material Master (MARA).",
+     "correcta": false
+    },
+    {
+     "texto": "El Storage Bin (/SCWM/LS01).",
+     "correcta": false
+    },
+    {
+     "texto": "El Inbound Delivery de SAP ERP.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si el optimizador 3D de SAP TM ('Load Planning') detecta que un camión tiene múltiples paradas (Stop-Sequence: descargar primero en Cali, luego en Buenaventura), ¿cómo afecta esto a EWM?",
+   "opciones": [
+    {
+     "texto": "TM dicta el orden de carga a EWM; EWM altera sus olas y tareas para cargar al fondo los palets de Buenaventura y en la puerta los de Cali (LIFO en el camión).",
+     "correcta": true
+    },
+    {
+     "texto": "EWM ignora a TM y carga todo alfabéticamente.",
+     "correcta": false
+    },
+    {
+     "texto": "TM cancela el camión porque no permite múltiples paradas.",
+     "correcta": false
+    },
+    {
+     "texto": "EWM cobra el doble de facturación al transportista.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué proceso de integración ocurre si, durante el empaque en EWM, las dimensiones reales del palet resultan ser 20% más grandes de lo que TM planificó originalmente?",
+   "opciones": [
+    {
+     "texto": "EWM actualiza el volumen real de la HU; TM recibe la notificación instantánea, recalcula la ocupación del camión (Load Planning) y ajusta los costos del flete.",
+     "correcta": true
+    },
+    {
+     "texto": "TM rechaza el palet, obligando a EWM a destruir la mercancía sobrante.",
+     "correcta": false
+    },
+    {
+     "texto": "EWM manda el exceso por correo postal a expensas de la compañía.",
+     "correcta": false
+    },
+    {
+     "texto": "El ERP genera un reporte de fraude.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En un escenario de 'Transit Warehousing' (Hub aeroportuario/courier), ¿cuál es la característica operativa principal de SAP EWM?",
+   "opciones": [
+    {
+     "texto": "EWM no necesita conocer el producto interno; opera 'a ciegas' guiado por etiquetas externas de TM (AWB), moviendo cajas cerradas hacia los palets aéreos (ULDs).",
+     "correcta": true
+    },
+    {
+     "texto": "EWM desarma todas las cajas para inspeccionar cada cable interno y contar el inventario en el ERP.",
+     "correcta": false
+    },
+    {
+     "texto": "EWM solo permite movimientos manuales sin pistolas RF.",
+     "correcta": false
+    },
+    {
+     "texto": "El módulo TM se desactiva permanentemente.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Después de que un camión sale del almacén EWM (PGI), ¿qué documento de TM es el puente final para crear la cuenta por pagar al transportista en SAP MM/FI?",
+   "opciones": [
+    {
+     "texto": "Freight Settlement Document (FSD).",
+     "correcta": true
+    },
+    {
+     "texto": "Outbound Delivery Order (ODO).",
+     "correcta": false
+    },
+    {
+     "texto": "Proof of Delivery (POD).",
+     "correcta": false
+    },
+    {
+     "texto": "Customer Invoice (VF01).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si un cliente reporta mercancía dañada por culpa del transportista y se registra una 'Discrepancia' (Damage Recording) en la aplicación de llegada ASR, ¿qué sucede en TM?",
+   "opciones": [
+    {
+     "texto": "TM retiene o bloquea temporalmente el proceso de Freight Settlement (liquidación de pago) al transportista hasta que el departamento de finanzas resuelva la disputa.",
+     "correcta": true
+    },
+    {
+     "texto": "TM aprueba el pago e incrementa un bono de premio al transportista.",
+     "correcta": false
+    },
+    {
+     "texto": "SAP borra el camión de la base de datos.",
+     "correcta": false
+    },
+    {
+     "texto": "El almacén EWM expulsa automáticamente al cliente de la base de datos.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En materia de Compliance, ¿qué sucede si la integración TM-EWM detecta la carga simultánea de mercancías peligrosas incompatibles (Dangerous Goods - DG) en el mismo Freight Order?",
+   "opciones": [
+    {
+     "texto": "El sistema emite errores críticos de segregación; EWM bloquea las Warehouse Tasks de carga hacia ese andén y TM detiene el Freight Order.",
+     "correcta": true
+    },
+    {
+     "texto": "El sistema imprime advertencias, pero permite el envío sin restricciones.",
+     "correcta": false
+    },
+    {
+     "texto": "EWM apaga el servidor HANA para prevenir incendios.",
+     "correcta": false
+    },
+    {
+     "texto": "TM aumenta el seguro de vida del chofer automáticamente pero autoriza la salida.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cómo se comunican internamente TM y EWM en la arquitectura 'Embedded S/4HANA' moderna sin utilizar TUs?",
+   "opciones": [
+    {
+     "texto": "Comparten la misma base de datos (HANA) y los mismos objetos de negocio (Documentos de Transporte de ASR), eliminando la mensajería XML asíncrona.",
+     "correcta": true
+    },
+    {
+     "texto": "A través de correos electrónicos internos de SAP Business Workplace.",
+     "correcta": false
+    },
+    {
+     "texto": "Mediante llamadas telefónicas de los planificadores.",
+     "correcta": false
+    },
+    {
+     "texto": "Utilizando discos duros externos (USB).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué transacción/consola utiliza un supervisor logístico (3PL) para generar el Billing Document Request (BDR) tras recolectar los Measurement Services del mes?",
+   "opciones": [
+    {
+     "texto": "La transacción de Liquidación de Servicios de Almacén (Warehouse Billing Settlement).",
+     "correcta": true
+    },
+    {
+     "texto": "La creación de pedidos de compras ME21N.",
+     "correcta": false
+    },
+    {
+     "texto": "El planificador MRP (MD04).",
+     "correcta": false
+    },
+    {
+     "texto": "El registro de tiempos de empleados CAT2.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si un cliente 3PL requiere cobrar 5 USD por cada palet recibido por el muelle de entrada, ¿qué mecanismo configuras?",
+   "opciones": [
+    {
+     "texto": "Un Measurement Service Transaccional en EWM que cuente las Warehouse Tasks de Putaway confirmadas para ese cliente y las transmita a SAP SD.",
+     "correcta": true
+    },
+    {
+     "texto": "Una multa de recursos humanos.",
+     "correcta": false
+    },
+    {
+     "texto": "Un descuento en la Orden de Venta estándar.",
+     "correcta": false
+    },
+    {
+     "texto": "Un incremento en el precio promedio móvil del material.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si un cliente 3PL requiere cobrar 10 USD por metro cúbico ocupado en los racks al finalizar cada día, ¿qué mecanismo configuras?",
+   "opciones": [
+    {
+     "texto": "Un Measurement Service de Inventario (Snapshot) que fotografíe la ocupación volumétrica a medianoche y envíe los agregados a la facturación SD.",
+     "correcta": true
+    },
+    {
+     "texto": "Un documento de inventario físico anual (PI).",
+     "correcta": false
+    },
+    {
+     "texto": "Una orden de mantenimiento de activos fijos (SAP PM).",
+     "correcta": false
+    },
+    {
+     "texto": "Un reporte de control de calidad IOT4.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿A qué módulo del ecosistema corporativo S/4HANA llegan los BDRs de EWM para generar la Factura Legal (Invoice) que se envía al cliente 3PL?",
+   "opciones": [
+    {
+     "texto": "SAP SD (Sales and Distribution).",
+     "correcta": true
+    },
+    {
+     "texto": "SAP PP (Production Planning).",
+     "correcta": false
+    },
+    {
+     "texto": "SAP QM (Quality Management).",
+     "correcta": false
+    },
+    {
+     "texto": "SAP TM (Transportation Management).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Bajo ASR, el Check-in y Check-out del camión en la puerta de la planta actualiza directamente el estado de:",
+   "opciones": [
+    {
+     "texto": "El Freight Order (FO).",
+     "correcta": true
+    },
+    {
+     "texto": "La Orden de Producción (CO01).",
+     "correcta": false
+    },
+    {
+     "texto": "El Maestro de Proveedores.",
+     "correcta": false
+    },
+    {
+     "texto": "El Asiento Contable (Journal Entry).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál es el principal documento legal impreso generado por TM y entregado al chofer, que ampara la propiedad y ruta de la carga consolidada (ej. Bill of Lading)?",
+   "opciones": [
+    {
+     "texto": "El Waybill o Bill of Lading, asociado directamente al Freight Order y a los Dangerous Goods documents.",
+     "correcta": true
+    },
+    {
+     "texto": "El recibo de nómina del almacén.",
+     "correcta": false
+    },
+    {
+     "texto": "La lista de precios del supermercado.",
+     "correcta": false
+    },
+    {
+     "texto": "El currículum del transportista.",
+     "correcta": false
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,174 @@
+{
+ "id": "s3_m1",
+ "paginas": [
+  "<h3>Capítulo 1: El Flujo Outbound</h3>\n            <p>El pedido nace en SAP SD. Al llegar a la fecha, se crea la Outbound Delivery, que viaja a EWM.</p>\n            <details>\n                <summary>Ver explicación a fondo (Integración SD-EWM)</summary>\n                <div class=\"details-content\">\n                    <p>La logística de salida nunca nace en el almacén; nace en una venta corporativa (Sales Order en SAP SD) o en un traslado entre plantas (STO en MM). Cuando la fecha de disponibilidad del material (Material Availability Date - MAD) se cumple, el ERP genera automáticamente la <strong>Outbound Delivery (VL01N)</strong>, la cual se transmite vía qRFC hacia el sistema descentralizado EWM para iniciar la operación física.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 2: ODR y ODO</h3>\n            <p>ODR recibe el mensaje. ODO (Outbound Delivery Order) es el documento operativo del almacén.</p>\n            <details>\n                <summary>Ver explicación a fondo (Conversión de Documentos)</summary>\n                <div class=\"details-content\">\n                    <p>En EWM, el mensaje de ERP aterriza primero como un <strong>Outbound Delivery Request (ODR)</strong>, que es solo un espejo pasivo del requerimiento. Inmediatamente y sin intervención humana, SAP EWM lo convierte en un <strong>Outbound Delivery Order (ODO)</strong>. El ODO es el \"Rey del Outbound\": sobre este documento se arman las olas, se hacen los pickings, se empaca y se despacha usando la transacción <code>/SCWM/PRDO</code>.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 3: Discrete Picking</h3>\n            <p>Recolectar pedido por pedido es ineficiente. El operario camina kilómetros innecesarios.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Desperdicio del Recorrido)</summary>\n                <div class=\"details-content\">\n                    <p>El Picking Discreto ocurre cuando le das a un operario la lista de 1 cliente, él va por todo el almacén recolectando y vuelve a la puerta. Si tienes 100 clientes que pidieron el mismo modelo de iPhone, tendrías a 100 operarios viajando al mismo pasillo 100 veces en un día. Esto satura los pasillos y multiplica los tiempos logísticos. La solución a esto es agrupar.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 4: Wave Management (Olas)</h3>\n            <p>Agrupa líneas de diferentes ODOs bajo criterios lógicos (Ruta, Zona, Horario) para optimizar el picking.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Cerebro del Despacho)</summary>\n                <div class=\"details-content\">\n                    <p>El <strong>Wave Management</strong> rompe los pedidos de clientes y los agrupa en una gran \"Ola de trabajo\". En lugar de recoger por cliente, el montacarguista del Ala Norte recibe la orden de recoger TODOS los iPhones de todos los clientes de las 5:00 PM de un solo viaje, llevándolos a una zona central de empaque donde se separan por pedido. Esto reduce el recorrido total de la flota hasta en un 60%.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 5: Wave Templates</h3>\n            <p>Define Cut-off time y Release time. Automatiza la creación de olas.</p>\n            <details>\n                <summary>Ver explicación a fondo (Tiempos de Corte)</summary>\n                <div class=\"details-content\">\n                    <p>Las Olas no se crean a mano; las generan los <strong>Wave Templates</strong>. Configuras parámetros críticos: <em>Release Time</em> (Ej. 2:00 PM, momento en que las tareas caen a las pistolas RF) y <em>Cut-off Time</em> (Ej. 1:45 PM, si un pedido entra 1:46 PM, se patea automáticamente para la ola del día siguiente). Esto asegura que el camión de las 5:00 PM salga a tiempo.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 6: Wave Release</h3>\n            <p>Al liberar la Ola, EWM crea Warehouse Tasks (WTs) y las agrupa en Warehouse Orders (WOs) según ruta.</p>\n            <details>\n                <summary>Ver explicación a fondo (Creación de Tareas y WOCR)</summary>\n                <div class=\"details-content\">\n                    <p>Al hacer el <strong>Wave Release</strong>, SAP genera cientos de Warehouse Tasks. Sin embargo, no se las lanza sueltas al operario. Pasan por las reglas <strong>WOCR (Warehouse Order Creation Rules)</strong>, que agrupan las tareas lógicamente. Por ejemplo: \"No le des al operario más tareas de las que caben por volumen en su carrito de picking\", o \"Agrupa las tareas formando un recorrido en forma de 'U' o 'Z' para que no camine en zigzag\".</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 7: Pick-HU</h3>\n            <p>El operario toma una caja vacía (Pick-HU), escanea los productos y los mete lógicamente en ella.</p>\n            <details>\n                <summary>Ver explicación a fondo (Virtualización del Empaque)</summary>\n                <div class=\"details-content\">\n                    <p>En el Picking moderno, no recolectas en las manos. Al iniciar su ruta en la pistola RF, el operario escanea el código de barras de una caja de cartón vacía convirtiéndola en una <strong>Pick-Handling Unit</strong>. A medida que extrae unidades del rack, las va asociando lógicamente a esa caja (Nesting). Al final del pasillo, la caja ya está lista, empaquetada y rastreable en el sistema.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 8: Two-Step Picking</h3>\n            <p>Paso 1: Withdrawal (Bajar palet entero). Paso 2: Allocation (Distribuir en cajas de clientes).</p>\n            <details>\n                <summary>Ver explicación a fondo (Optimización Retail)</summary>\n                <div class=\"details-content\">\n                    <p>Ideal si 50 clientes piden el mismo material. <strong>Paso 1 (Withdrawal/Retiro):</strong> Un montacargas de gran altura baja un palet completo con 500 unidades a la zona media. <strong>Paso 2 (Allocation/Asignación):</strong> Los operarios pedestres de picking rápido toman de ese palet las unidades exactas para cada cliente. Evita que la máquina pesada haga 50 viajes al mismo hueco.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 9: Staging y Loading</h3>\n            <p>Consolidación en andenes (920). Carga escaneando el SSCC al subirlo al camión.</p>\n            <details>\n                <summary>Ver explicación a fondo (Auditoría de Carga)</summary>\n                <div class=\"details-content\">\n                    <p>El <strong>Staging Area (Zona 920)</strong> es la cuadrícula pintada en el piso frente a la puerta del andén. Una vez consolidada la mercancía, inicia el proceso de <strong>Loading (Carga)</strong> en RF. El operario debe escanear el palet al subirlo por la rampa del camión. Si intenta subir el palet del Cliente A al camión del Cliente B, el sistema lo bloquea con una alerta acústica grave.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 10: Post Goods Issue (PGI)</h3>\n            <p>El botón final. Desaparece el inventario, detona la facturación en SD y registra el COGS en FI.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Cierre Financiero)</summary>\n                <div class=\"details-content\">\n                    <p>El PGI sella el ciclo logístico. Físicamente, el camión cierra puertas. En SAP, la mercancía desaparece del almacén de EWM (disminuye LQUA). A nivel ERP, se registra el asiento contable de Costo de Ventas (COGS contra Inventario) y se levanta el bloqueo comercial, permitiendo que el módulo SD emita la factura legal para cobrarle al cliente.</p>\n                </div>\n            </details>"
+ ],
+ "resumen": "Sales Order -> Outbound Delivery -> ODR -> ODO. El ODO es el documento sobre el que se ejecutan todas las tareas de salida en EWM.",
+ "examen": [
+  {
+   "pregunta": "Documento puente desde ERP a EWM en salidas:",
+   "opciones": [
+    {
+     "texto": "Outbound Delivery",
+     "correcta": true
+    },
+    {
+     "texto": "Sales Order",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Documento operativo rey en EWM para salidas:",
+   "opciones": [
+    {
+     "texto": "Outbound Delivery Order (ODO)",
+     "correcta": true
+    },
+    {
+     "texto": "ODR",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Transacción para gestionar despachos (ODOs):",
+   "opciones": [
+    {
+     "texto": "/SCWM/PRDO",
+     "correcta": true
+    },
+    {
+     "texto": "VL01N",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Técnica para agrupar pedidos y optimizar rutas:",
+   "opciones": [
+    {
+     "texto": "Wave Management",
+     "correcta": true
+    },
+    {
+     "texto": "Discrete Picking",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué evita el Wave Management?",
+   "opciones": [
+    {
+     "texto": "Caminar múltiples veces por el mismo pasillo.",
+     "correcta": true
+    },
+    {
+     "texto": "Usar escáneres RF.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Al liberar la Ola (Release), el sistema crea:",
+   "opciones": [
+    {
+     "texto": "WTs agrupadas en WOs.",
+     "correcta": true
+    },
+    {
+     "texto": "Facturas.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Paquete de trabajo optimizado para el operario:",
+   "opciones": [
+    {
+     "texto": "Warehouse Order (WO)",
+     "correcta": true
+    },
+    {
+     "texto": "Purchase Order",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Caja vacía con SSCC para recolectar:",
+   "opciones": [
+    {
+     "texto": "Pick-HU",
+     "correcta": true
+    },
+    {
+     "texto": "Cartonization",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Two-Step Picking se usa cuando:",
+   "opciones": [
+    {
+     "texto": "Muchos clientes piden el mismo producto.",
+     "correcta": true
+    },
+    {
+     "texto": "Hay pocos clientes.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Botón transaccional final de salida:",
+   "opciones": [
+    {
+     "texto": "Post Goods Issue (PGI)",
+     "correcta": true
+    },
+    {
+     "texto": "Post Goods Receipt",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Impacto financiero del PGI:",
+   "opciones": [
+    {
+     "texto": "Disminuye inventario y registra COGS.",
+     "correcta": true
+    },
+    {
+     "texto": "Paga al proveedor.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿EWM factura sin hacer PGI?",
+   "opciones": [
+    {
+     "texto": "No. Bloquea facturación hasta PGI.",
+     "correcta": true
+    },
+    {
+     "texto": "Sí.",
+     "correcta": false
+    }
+   ]
+  }
+ ]
+}

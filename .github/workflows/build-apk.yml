@@ -1,76 +1,101 @@
-name: Build Production APK
+name: Construir APK
 
 on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
 
+# Solo lectura: el flujo ya no guarda nada en el repositorio.
 permissions:
-  contents: write # Permite al bot guardar la llave en tu repo
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      APP_VERSION_NAME: "2.0.${{ github.run_number }}"
+      APP_VERSION_CODE: "${{ github.run_number }}"
+
     steps:
-      - name: Checkout repository
+      - name: Descargar el repositorio
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Preparar Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
 
-      - name: Set up JDK 17
+      - name: Preparar Java 21
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: '21'
 
-      - name: Crear o Recuperar Llave de Producción (Firma Persistente)
-        run: |
-          if [ ! -f "logistica.keystore" ]; then
-            echo "Llave no encontrada. Generando una nueva y guardándola en el repositorio..."
-            keytool -genkey -v -keystore logistica.keystore -alias logistica_alias -keyalg RSA -keysize 2048 -validity 10000 -storepass logistica123 -keypass logistica123 -dname "CN=Logistica Pro, OU=Masterclass, O=Logistica, L=Armenia, S=Quindio, C=CO"
-            git config --global user.name "GitHub Actions Bot"
-            git config --global user.email "actions@github.com"
-            git add logistica.keystore
-            git commit -m "🔐 Guardar llave de producción persistente"
-            git push
-          else
-            echo "Llave persistente encontrada. Usando la existente para garantizar actualizaciones sobre la misma app."
-          fi
-
-      - name: Instalar Dependencias
+      - name: Instalar dependencias
         run: npm install
 
-      - name: Crear Ícono Nativo
+      - name: Revisar el contenido de los cursos
+        run: npm run validar
+
+      - name: Crear el ícono nativo
         run: |
           mkdir -p assets
-          cp icon.svg assets/icon.svg
-          sudo apt-get update && sudo apt-get install -y librsvg2-bin
-          rsvg-convert -w 1024 -h 1024 assets/icon.svg -o assets/icon.png
+          sudo apt-get update -qq && sudo apt-get install -y -qq librsvg2-bin
+          rsvg-convert -w 1024 -h 1024 icon.svg -o assets/icon.png
           cp assets/icon.png assets/splash.png
 
-      - name: Empaquetar Arquitectura Modular
+      - name: Empaquetar la app web
         run: |
-          mkdir -p www
-          cp index.html www/ 2>/dev/null || :
-          [ -d "css" ] && cp -r css www/
-          [ -d "js" ] && cp -r js www/
+          rm -rf www && mkdir -p www
+          cp index.html icon.svg www/
+          cp -r css js content www/
+          echo "window.APP_VERSION = '${APP_VERSION_NAME}';" > www/js/version.js
+
+      - name: Generar el proyecto Android
+        run: |
           rm -rf android
           npx cap add android
           npx capacitor-assets generate --android
           npx cap sync android
+          # Número de versión único en cada APK
+          sed -i -E "s/versionCode [0-9]+/versionCode ${APP_VERSION_CODE}/" android/app/build.gradle
+          sed -i -E "s/versionName \"[^\"]*\"/versionName \"${APP_VERSION_NAME}\"/" android/app/build.gradle
+          grep -E "versionCode|versionName" android/app/build.gradle
 
-      - name: Compilar APK Final (Release Seguro)
+      - name: Compilar APK (sin firmar)
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease -Pandroid.injected.signing.store.file=${{ github.workspace }}/logistica.keystore -Pandroid.injected.signing.store.password=logistica123 -Pandroid.injected.signing.key.alias=logistica_alias -Pandroid.injected.signing.key.password=logistica123
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Firmar APK con la llave guardada en Secrets
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
+            echo "::error::Faltan los Secrets de firma (ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD). La app compiló bien, pero no se puede firmar sin ellos."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/firma.keystore"
+          BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          UNSIGNED=android/app/build/outputs/apk/release/app-release-unsigned.apk
+          "$BUILD_TOOLS/zipalign" -p -f 4 "$UNSIGNED" "$RUNNER_TEMP/alineado.apk"
+          "$BUILD_TOOLS/apksigner" sign \
+            --ks "$RUNNER_TEMP/firma.keystore" \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass env:KEYSTORE_PASSWORD \
+            --key-pass env:KEY_PASSWORD \
+            --out "LogisticaPro-${APP_VERSION_NAME}.apk" \
+            "$RUNNER_TEMP/alineado.apk"
+          "$BUILD_TOOLS/apksigner" verify "LogisticaPro-${APP_VERSION_NAME}.apk"
+          rm -f "$RUNNER_TEMP/firma.keystore"
 
       - name: Subir APK
         uses: actions/upload-artifact@v4
         with:
-          name: LogisticaPro-App
-          path: android/app/build/outputs/apk/release/app-release.apk
+          name: LogisticaPro-${{ env.APP_VERSION_NAME }}
+          path: LogisticaPro-*.apk

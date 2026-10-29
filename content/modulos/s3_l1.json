@@ -1,0 +1,54 @@
+{
+ "id": "s3_l1",
+ "pasos": [
+  {
+   "instruccion": "Consola de Olas",
+   "comando": "/SCWM/WAVE",
+   "pista": "/SCWM/WAVE",
+   "exito": "> Gestión de Olas.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Filtrar Ola",
+   "comando": "9901",
+   "pista": "9901",
+   "exito": "> Ola 9901 localizada.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Liberación",
+   "comando": "RELEASE",
+   "pista": "RELEASE",
+   "exito": "> WO 50000123 creada.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Confirmación Manual",
+   "comando": "/SCWM/TO_CONF",
+   "pista": "/SCWM/TO_CONF",
+   "exito": "> Interfaz abierta.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Post Confirmación",
+   "comando": "CONFIRM",
+   "pista": "CONFIRM",
+   "exito": "> Stock en Staging (920).",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Monitor Despachos",
+   "comando": "/SCWM/PRDO",
+   "pista": "/SCWM/PRDO",
+   "exito": "> ODO seleccionada.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Ejecutar PGI",
+   "comando": "PGI",
+   "pista": "PGI",
+   "exito": "> OPERACIÓN CERRADA.",
+   "placeholder": ""
+  }
+ ]
+}

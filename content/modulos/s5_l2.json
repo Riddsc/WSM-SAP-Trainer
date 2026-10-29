@@ -1,0 +1,68 @@
+{
+ "id": "s5_l2",
+ "pasos": [
+  {
+   "instruccion": "Cargar Inbound Delivery EWM",
+   "comando": "/SCWM/PRDI",
+   "pista": "/SCWM/PRDI",
+   "exito": "> IBD #88001 (5,000 Dosis Vacuna). Lote 0001.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Contabilizar PGR",
+   "comando": "PGR-IOT4",
+   "pista": "PGR-IOT4",
+   "exito": "> PGR EJECUTADO. IOT 4 Activado: Lote de Inspección #991000 creado. Stock en Cuarentena (Q).",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Auditar Bloqueo en EWM",
+   "comando": "/SCWM/MON-Q",
+   "pista": "/SCWM/MON-Q",
+   "exito": "> Palet SSCC-8822 inmovilizado en GR Zone (9010). Stock Type: Q.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Extraer Muestra Médica",
+   "comando": "SAMPLE-EXTRACT",
+   "pista": "SAMPLE-EXTRACT",
+   "exito": "> WT 4001: 50 dosis separadas hacia Q-Work Center. 4,950 dosis bajo resguardo de seguridad.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Ingresar a Worklist QA (ERP)",
+   "comando": "ERP-QA32",
+   "pista": "ERP-QA32",
+   "exito": "> QA32 Worklist Abierto. Lote #991000 listo para evaluación.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Registrar Resultados Analíticos",
+   "comando": "RECORD-RESULTS",
+   "pista": "RECORD-RESULTS",
+   "exito": "> MIC Temperatura reporta 18°C (Límite max 8°C). FALLO CRÍTICO (Out of Spec).",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Firmar Usage Decision (Rechazo)",
+   "comando": "UD-REJECT",
+   "pista": "UD-REJECT",
+   "exito": "> UD FIRMADO: R (Rechazado). Follow-Up Action: SCRAP. Mensaje qRFC enviado a EWM.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Verificar Tarea de Retiro EWM",
+   "comando": "/SCWM/TO_CONF",
+   "pista": "/SCWM/TO_CONF",
+   "exito": "> WT Automática #80992 generada: Origen 9010 (Palet inmovilizado) -> Destino: INCINERADOR-01.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Destruir Lote Contaminado",
+   "comando": "SCRAP-ZONE",
+   "pista": "SCRAP-ZONE",
+   "exito": "> STOCK ELIMINADO FÍSICA Y CONTABLEMENTE. Riesgo de Salud Pública mitigado al 100%.",
+   "placeholder": ""
+  }
+ ]
+}

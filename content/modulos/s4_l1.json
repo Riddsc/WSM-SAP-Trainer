@@ -1,0 +1,75 @@
+{
+ "id": "s4_l1",
+ "pasos": [
+  {
+   "instruccion": "Abrir Monitor Central EWM",
+   "comando": "/SCWM/MON",
+   "pista": "/SCWM/MON",
+   "exito": "> Monitor cargado. Nodo Material Flow System desplegado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Iniciar Canal TCP/IP con PLC Siemens",
+   "comando": "MFS-START",
+   "pista": "MFS-START",
+   "exito": "> Socket APC 192.168.10.50:4000 ABIERTO. Handshake OK.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Abrir Entrega Entrante (ASN)",
+   "comando": "/SCWM/PRDI",
+   "pista": "/SCWM/PRDI",
+   "exito": "> IBD 180009941 cargada (100 EA Servidores en HU 800091).",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Contabilizar Entrada en I-Point",
+   "comando": "PGR",
+   "pista": "PGR",
+   "exito": "> PGR OK. Escáner CP01 leyó SSCC. ¡Alerta Backorder ODO 84001 (40 EA)!",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Ejecutar Motor Opportunistic CD",
+   "comando": "CD-INTERCEPT",
+   "pista": "CD-INTERCEPT",
+   "exito": "> Putaway anulado. Intercepción Cross-Docking activada.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Dividir Tarea (40 Salida / 60 Rack)",
+   "comando": "WT-SPLIT",
+   "pista": "WT-SPLIT",
+   "exito": "> WT-1 (40 EA -> GI 9020) y WT-2 (60 EA -> ASRS Silo) creadas.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Transmitir Telegrama de Desvío al PLC",
+   "comando": "TELE-SEND",
+   "pista": "TELE-SEND",
+   "exito": "> TX: [STX]00891|CHAN01|WT-1|CP01|CP_OUT_9020|ACK[ETX]",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Verificar Acuse Técnico del PLC",
+   "comando": "ACK-WAIT",
+   "pista": "ACK-WAIT",
+   "exito": "> RX: Telegrama ACK recibido en 12ms. Desviador neumático activado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Confirmar Llegada a Rampa Outbound",
+   "comando": "/SCWM/TO_CONF",
+   "pista": "/SCWM/TO_CONF",
+   "exito": "> Sensor CP_OUT_9020 confirma llegada física a Staging de Salida.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Contabilizar Salida de Mercancía",
+   "comando": "PGI",
+   "pista": "PGI",
+   "exito": "> PGI CONTABILIZADO. Cross-Docking MFS ejecutado en 3 min 40 seg.",
+   "placeholder": ""
+  }
+ ]
+}

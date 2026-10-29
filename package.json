@@ -1,14 +1,22 @@
 {
-  "name": "logistica-pro-masterclass",
-  "version": "1.0.0",
-  "description": "LMS Avanzado sobre Arquitectura SAP y WMS",
+  "name": "logistica-pro",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Logística Pro: maestría práctica en SAP para logística de bodega (WM y EWM) y transporte (TM)",
+  "scripts": {
+    "validar": "node scripts/validar-contenido.js"
+  },
   "dependencies": {
-    "@capacitor/core": "^5.0.0",
-    "@capacitor/android": "^5.0.0",
-    "@capacitor/app": "^5.0.0"
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/filesystem": "^8.0.0",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/local-notifications": "^8.0.0",
+    "@capacitor/share": "^8.0.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "^5.0.0",
-    "@capacitor/assets": "^3.0.5"
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.0"
   }
 }

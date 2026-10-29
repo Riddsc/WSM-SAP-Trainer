@@ -1,0 +1,863 @@
+{
+ "id": "s5_m1",
+ "paginas": [
+  "<h3>Capítulo 1: La Frontera entre el Almacén y la Fábrica</h3>\n            <p>El almacén logístico resguarda el inventario, pero la planta de manufactura lo consume. La sincronización entre EWM y PP es vital.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Cuello de Botella Industrial)</summary>\n                <div class=\"details-content\">\n                    <p>Si la línea de ensamblaje automotriz pide 50 motores y el almacén demora 20 minutos en enviarlos, la línea se detiene (Downtime). Cada minuto de línea parada cuesta miles de dólares. La integración <strong>PP-EWM (Production Planning - Extended Warehouse Management)</strong> automatiza el suministro de componentes justo a tiempo (JIT) hacia los estantes de la fábrica, leyendo la lista de materiales (BOM) de la Orden de Producción.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 2: Production Supply Area (PSA)</h3>\n            <p>El PSA es la zona de estanterías físicas ubicada a escasos metros de la máquina de producción.</p>\n            <details>\n                <summary>Ver explicación a fondo (Mapeo Logístico del PSA)</summary>\n                <div class=\"details-content\">\n                    <p>En SAP, el <strong>PSA (Área de Suministro de Producción)</strong> es el punto de encuentro entre PP y EWM. En el ERP (PP), el PSA es un dato maestro (PK05). En EWM, ese mismo PSA se mapea a un Storage Bin físico específico (ej. <code>BIN-LINEA-01</code>). EWM envía la mercancía desde el rack general de reserva hasta este Bin del PSA, y desde ahí la máquina \"jala\" el componente para consumirlo.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 3: El Documento PMR (Production Material Request)</h3>\n            <p>El documento nativo de S/4HANA EWM para abastecimiento de producción. Sustituye a las entregas de salida.</p>\n            <details>\n                <summary>Ver explicación a fondo (Evolución Arquitectónica)</summary>\n                <div class=\"details-content\">\n                    <p>Históricamente (SAP WM), abastecer a producción requería crear una Delivery en el ERP, lo que inflaba la base de datos de LIKP/LIPS. S/4HANA introdujo el <strong>PMR</strong>. Al liberar una Orden de Producción (CO02), el ERP envía una señal a EWM. EWM crea un PMR localmente que consolida todos los componentes requeridos, simplificando el modelo de datos y permitiendo el Staging dinámico.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 4: Tipos de Suministro: Pick Parts vs Crate Parts</h3>\n            <p>No todos los componentes se abastecen igual. ¿Necesitas piezas exactas o canastillas completas?</p>\n            <details>\n                <summary>Ver explicación a fondo (Staging Indicators)</summary>\n                <div class=\"details-content\">\n                    <p><strong>Pick Parts:</strong> Abastecimiento exacto. Si la orden dice 14 tuercas, EWM te hace extraer 14 tuercas. <strong>Crate Parts (Cajas Completas):</strong> Típico para tornillería a granel. Aunque la orden pida 14 tuercas, el sistema te obliga a bajar un palet o caja completa de 1,000 unidades al PSA para que la máquina tome lo que necesite, devolviendo el sobrante a fin de mes.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 5: Release Order Parts (Componentes de Orden de Liberación)</h3>\n            <p>Se usan cuando múltiples órdenes de producción consumen el mismo componente continuamente durante el día.</p>\n            <details>\n                <summary>Ver explicación a fondo (Agrupación de Demanda)</summary>\n                <div class=\"details-content\">\n                    <p>Si fabricas 10 modelos de computadoras y todos usan el mismo microprocesador, hacer Pick Parts crearía 10 tareas de almacén al mismo pasillo. <strong>Release Order Parts</strong> suma la cantidad de procesadores de las 10 órdenes y crea un solo gran PMR consolidado. El montacarguista hace un solo viaje con 500 procesadores al PSA de la línea de ensamblaje.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 6: Integración con Kanban de SAP PP</h3>\n            <p>Filosofía Toyota. Un recipiente vacío es la señal visual y lógica para que el almacén lo rellene.</p>\n            <details>\n                <summary>Ver explicación a fondo (Señal de Tarjeta - Kanban)</summary>\n                <div class=\"details-content\">\n                    <p>En el tablero Kanban (PK13N), la máquina tiene dos cajas de etiquetas. Cuando la máquina vacía la Caja 1, el operario escanea el código de barras Kanban cambiándolo a estado <code>EMPTY</code> (Rojo). Esto dispara instantáneamente una Warehouse Task en EWM. El montacargas llena la caja y al depositarla en el PSA, la tarjeta cambia automáticamente a estado <code>FULL</code> (Verde).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 7: Control Cycles (Ciclos de Control - LSK)</h3>\n            <p>El dato maestro que une al Material, al Centro, al PSA y define cómo se abastecerá (Kanban, PMR, WM).</p>\n            <details>\n                <summary>Ver explicación a fondo (Transacción LPK1)</summary>\n                <div class=\"details-content\">\n                    <p>Sin <strong>Control Cycles</strong>, el ERP no sabe hablar con EWM sobre manufactura. En S/4HANA (Transacción LSK o LPK1), defines para cada SKU cómo viaja hacia cada línea de producción. Defines el <em>Staging Indicator</em> (ej. \"3\" para Pick Parts) y el Bin de EWM destino. Es la matriz de enrutamiento industrial.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 8: Proceso de Staging en EWM (/SCWM/STAGE)</h3>\n            <p>La consola de control donde el supervisor de almacén decide cuándo y cómo surtir a la fábrica.</p>\n            <details>\n                <summary>Ver explicación a fondo (Planificación de Desplazamiento)</summary>\n                <div class=\"details-content\">\n                    <p>El planificador entra a <code>/SCWM/STAGE</code>, visualiza todos los PMRs activos y los agrupa. No se envía todo al mismo tiempo para no saturar físicamente la fábrica. El sistema verifica el <em>Capacity Check</em> del PSA (para no mandar 10 palets si el PSA solo tiene espacio para 2) y crea las Warehouse Tasks escalonadas hacia los montacargas.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 9: Consumo de Materiales (Backflushing)</h3>\n            <p>Cuando la máquina consume el material, el inventario debe desaparecer en SAP y generar un cargo contable.</p>\n            <details>\n                <summary>Ver explicación a fondo (Deducción Retrospectiva)</summary>\n                <div class=\"details-content\">\n                    <p>El <strong>Backflush (Movimiento 261)</strong> es el consumo automático. Cuando el operario de la máquina reporta en PP que fabricó 1 Televisor (Movimiento 101), SAP PP lee la receta (BOM) y automáticamente da de baja (deduce) 1 Pantalla y 2 Bocinas del Bin del PSA en EWM. No se escanea el consumo componente por componente; se asume matemáticamente.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 10: Recepción de Producto Terminado (Inbound from Production)</h3>\n            <p>El televisor ya está ensamblado. Ahora debe viajar de la fábrica hacia el rack de Producto Terminado del almacén.</p>\n            <details>\n                <summary>Ver explicación a fondo (Expected Goods Receipt EWM-PP)</summary>\n                <div class=\"details-content\">\n                    <p>Al final de la línea hay una empacadora. Cuando se arma el EuroPalet con 20 televisores, se le imprime un SSCC y se declara la entrada (MIGO 101) contra la Orden de Producción. Esto genera automáticamente una <strong>Inbound Delivery</strong> en EWM. El montacargas escanea el SSCC en la zona de producción y el algoritmo PACI/STSS le dice en qué rack guardarlo.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 11: Limpieza del PSA (Clear PSA)</h3>\n            <p>Finaliza la producción y quedan tornillos sobrantes en la línea. Deben volver a la bodega principal.</p>\n            <details>\n                <summary>Ver explicación a fondo (Transacción /SCWM/CLEAR_PSA)</summary>\n                <div class=\"details-content\">\n                    <p>Si la fábrica operó con <em>Crate Parts</em>, sobrarán componentes en el piso de planta. Usando la transacción <code>/SCWM/CLEAR_PSA</code>, el sistema escanea todos los PSA buscando stock que no tiene órdenes de producción activas vinculadas, y genera tareas automáticas de <strong>Putaway de Retorno</strong> hacia la zona de reserva, manteniendo el piso de planta despejado.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 12: Co-Products y By-Products (Subproductos)</h3>\n            <p>En industrias químicas o lácteas, al fabricar el Producto A, inevitablemente sale un Producto B (ej. Suero de leche).</p>\n            <details>\n                <summary>Ver explicación a fondo (Movimiento 531)</summary>\n                <div class=\"details-content\">\n                    <p>Un <strong>Co-Product</strong> tiene valor comercial (se vende); un <strong>By-Product</strong> suele ser merma o requerir reproceso. En ambos casos, PP genera una recepción automática con movimiento 531 en EWM. EWM debe tener configuradas estrategias de almacenamiento (Putaway) específicas para aislar estos subproductos, frecuentemente en silos de tanques líquidos.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 13: Determinación de Lotes (Batch Determination) en Producción</h3>\n            <p>Asegurar que la fábrica consuma los ingredientes más próximos a vencer (FEFO) para minimizar mermas.</p>\n            <details>\n                <summary>Ver explicación a fondo (Integración BMBC y EWM)</summary>\n                <div class=\"details-content\">\n                    <p>La <strong>Determinación de Lotes</strong> puede ocurrir en ERP (PP) o directamente en EWM. La best-practice recomienda hacerla en EWM durante la creación de la Warehouse Task de Staging. EWM evalúa la condición FEFO y busca en el rack el ingrediente activo más viejo, asegurando que la orden de producción se alimente con componentes a punto de expirar.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 14: Nested HUs (Unidades de Manipulación Anidadas) en Producción</h3>\n            <p>Abastecer kits pre-armados. Una caja grande que contiene 4 cajitas más pequeñas, cada una con código de barras.</p>\n            <details>\n                <summary>Ver explicación a fondo (Multilevel Packing)</summary>\n                <div class=\"details-content\">\n                    <p>La manufactura automotriz o aeroespacial utiliza carritos de kitting. EWM arma un carrito (HU Madre) que contiene gavetas (HUs Hijas). EWM mueve la HU Madre completa hacia la línea de ensamblaje (PSA). Al consumir, PP hace backflush leyendo directamente los componentes dentro de las HUs Hijas anidadas de forma transparente.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 15: Integración MES (Manufacturing Execution Systems)</h3>\n            <p>Cuando SAP no opera solo. El almacén habla con EWM y la fábrica con un software MES de terceros (Siemens, Rockwell).</p>\n            <details>\n                <summary>Ver explicación a fondo (Arquitectura SAP MII / PCo)</summary>\n                <div class=\"details-content\">\n                    <p>Las fábricas ultramodernas usan un MES para controlar los robots soldadores. La integración <strong>S/4HANA EWM <-> MES</strong> se realiza vía APIs (OData, SOAP) intermediadas por SAP MII (Manufacturing Integration and Intelligence) o PCo. El MES envía un mensaje de \"Máquina lista para lote 2\"; SAP MII lo traduce a EWM, quien lanza la grúa MFS para entregar el palet en el robot.</p>\n                </div>\n            </details>"
+ ],
+ "resumen": "Regla de Oro: En SAP EWM avanzado ya no usamos Outbound Deliveries para abastecer producción. Usamos el documento nativo PMR (Production Material Request) que lee directamente los componentes de la Orden de Fabricación (CO01) y calcula el Staging exacto hacia el PSA (Production Supply Area) sin duplicar documentos financieros.",
+ "examen": [
+  {
+   "pregunta": "¿Cuál es el principal documento operativo introducido en SAP S/4HANA EWM diseñado exclusivamente para gestionar el abastecimiento de componentes a las órdenes de producción sin generar entregas de salida masivas?",
+   "opciones": [
+    {
+     "texto": "Production Material Request (PMR).",
+     "correcta": true
+    },
+    {
+     "texto": "Outbound Delivery Order (ODO).",
+     "correcta": false
+    },
+    {
+     "texto": "Material Document (MIGO).",
+     "correcta": false
+    },
+    {
+     "texto": "Kanban Control Card.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En el contexto de la integración EWM-PP, ¿qué significa la sigla PSA?",
+   "opciones": [
+    {
+     "texto": "Production Supply Area (Área de Suministro de Producción / Estanterías físicas junto a la máquina).",
+     "correcta": true
+    },
+    {
+     "texto": "Process Sequence Algorithm.",
+     "correcta": false
+    },
+    {
+     "texto": "Plant Security Agreement.",
+     "correcta": false
+    },
+    {
+     "texto": "Putaway Strategy Assessment.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué indicador de Staging (Staging Indicator) se utiliza cuando el sistema EWM extrae la cantidad exacta de piezas requeridas por la orden de producción sin sobrar un solo tornillo?",
+   "opciones": [
+    {
+     "texto": "Pick Parts (Piezas de Selección Exacta).",
+     "correcta": true
+    },
+    {
+     "texto": "Crate Parts.",
+     "correcta": false
+    },
+    {
+     "texto": "Bulk Materials.",
+     "correcta": false
+    },
+    {
+     "texto": "Release Order Parts.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué indicador de Staging fuerza al sistema a abastecer un palet o caja completa (Ej. 1,000 unidades) al piso de producción independientemente de que la orden exija una cantidad menor?",
+   "opciones": [
+    {
+     "texto": "Crate Parts (Cajas Completas).",
+     "correcta": true
+    },
+    {
+     "texto": "Pick Parts.",
+     "correcta": false
+    },
+    {
+     "texto": "By-Products.",
+     "correcta": false
+    },
+    {
+     "texto": "Direct Consumption.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si fabricas 20 órdenes de producción distintas en el día que consumen la misma materia prima de alta rotación, ¿qué estrategia de Staging agrupa las 20 necesidades en un solo requerimiento acumulado de transporte hacia el PSA?",
+   "opciones": [
+    {
+     "texto": "Release Order Parts (Componentes de Orden de Liberación).",
+     "correcta": true
+    },
+    {
+     "texto": "Pick Parts.",
+     "correcta": false
+    },
+    {
+     "texto": "Discrete Cartonization.",
+     "correcta": false
+    },
+    {
+     "texto": "Task Interleaving.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué dato maestro de SAP vincula al Material, el Centro y el PSA para dictaminar la estrategia de reabastecimiento (ej. si debe usarse EWM, Kanban o WM clásico)?",
+   "opciones": [
+    {
+     "texto": "Control Cycles (Ciclos de Control).",
+     "correcta": true
+    },
+    {
+     "texto": "Purchasing Info Record.",
+     "correcta": false
+    },
+    {
+     "texto": "Sales Area Data.",
+     "correcta": false
+    },
+    {
+     "texto": "Valuation Class.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En la integración Kanban con EWM, ¿qué evento del mundo físico detona de manera automática e instantánea la creación de una Warehouse Task de reabastecimiento hacia el montacargas?",
+   "opciones": [
+    {
+     "texto": "El escaneo o cambio de estado de la tarjeta Kanban a 'EMPTY' (Vacío) en el área de producción.",
+     "correcta": true
+    },
+    {
+     "texto": "La impresión de una factura de cliente.",
+     "correcta": false
+    },
+    {
+     "texto": "El pago mensual de la nómina de empleados.",
+     "correcta": false
+    },
+    {
+     "texto": "El inicio de sesión del Gerente en el Fiori Launchpad.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Dentro del flujo de SAP, ¿qué significa el concepto de 'Backflushing' en manufactura?",
+   "opciones": [
+    {
+     "texto": "La deducción (consumo) automática y retroactiva de los componentes del inventario en el PSA basándose en la declaración de producto terminado y la Lista de Materiales (BOM).",
+     "correcta": true
+    },
+    {
+     "texto": "Limpiar la fábrica con mangueras de agua a presión al terminar el turno.",
+     "correcta": false
+    },
+    {
+     "texto": "Revertir una factura de proveedor por error de precios.",
+     "correcta": false
+    },
+    {
+     "texto": "Eliminar los lotes caducados de la base de datos SQL.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Cuando finaliza el ensamblaje de un televisor y se empaca en la línea de producción, ¿qué proceso detona SAP para ingresarlo al almacén general de reserva de EWM?",
+   "opciones": [
+    {
+     "texto": "Genera una Inbound Delivery desde Producción (movimiento 101 contra la Orden de Producción) permitiendo su Putaway guiado en EWM.",
+     "correcta": true
+    },
+    {
+     "texto": "Se emite directamente la factura al cliente final.",
+     "correcta": false
+    },
+    {
+     "texto": "Se borra la Orden de Producción del sistema.",
+     "correcta": false
+    },
+    {
+     "texto": "Se lanza un Wave Release de salida.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué transacción especializada utiliza el supervisor de almacén en EWM para agrupar PMRs, verificar capacidades de planta y crear las órdenes de trabajo escalonadas hacia los montacargas para abastecer a la fábrica?",
+   "opciones": [
+    {
+     "texto": "/SCWM/STAGE (Consola de Staging).",
+     "correcta": true
+    },
+    {
+     "texto": "MMBE.",
+     "correcta": false
+    },
+    {
+     "texto": "ME21N.",
+     "correcta": false
+    },
+    {
+     "texto": "VK11.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Para qué sirve el proceso y transacción 'Clear PSA' (/SCWM/CLEAR_PSA) en SAP EWM?",
+   "opciones": [
+    {
+     "texto": "Para limpiar los remanentes del piso de fábrica, identificando stock en el PSA que ya no tiene órdenes activas y generando WTs de retorno hacia el rack de reserva.",
+     "correcta": true
+    },
+    {
+     "texto": "Para eliminar el historial de auditoría de los usuarios antiguos.",
+     "correcta": false
+    },
+    {
+     "texto": "Para reiniciar el servidor SAP S/4HANA por memoria llena.",
+     "correcta": false
+    },
+    {
+     "texto": "Para archivar los clientes que no han comprado en 3 años.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En un proceso de refinería, al procesar petróleo (Producto Principal) se obtiene alquitrán que requiere tratamiento (Subproducto o By-Product). ¿Qué tipo de movimiento y acción detona en SAP EWM?",
+   "opciones": [
+    {
+     "texto": "Movimiento 531 (Entrada de By-Product), detonando una recepción automática y un Putaway hacia silos o zonas de almacenamiento designadas.",
+     "correcta": true
+    },
+    {
+     "texto": "Movimiento 601 de Venta directa al cliente.",
+     "correcta": false
+    },
+    {
+     "texto": "Movimiento 102 de anulación de compras.",
+     "correcta": false
+    },
+    {
+     "texto": "Un Short Dump de sistema porque EWM no soporta líquidos.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Dónde recomienda la arquitectura de best-practices de SAP S/4HANA realizar la Determinación de Lotes (Batch Determination - FEFO) para componentes de fabricación?",
+   "opciones": [
+    {
+     "texto": "En EWM, directamente durante la creación de la Warehouse Task de Staging, para que el algoritmo busque físicamente en el rack el ingrediente más viejo disponible.",
+     "correcta": true
+    },
+    {
+     "texto": "En Finanzas, durante el cálculo de la depreciación anual.",
+     "correcta": false
+    },
+    {
+     "texto": "Un mes después de haber consumido los materiales.",
+     "correcta": false
+    },
+    {
+     "texto": "En Recursos Humanos, cruzado con la fecha de nacimiento del operario.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué estructura lógica de EWM se utiliza para gestionar 'Kits de ensamblaje' o carritos donde una caja grande contiene 10 cajitas independientes escaneables?",
+   "opciones": [
+    {
+     "texto": "Nested Handling Units (HUs Anidadas / Empaque Multinivel).",
+     "correcta": true
+    },
+    {
+     "texto": "Cross-Company Code Stock Transfers.",
+     "correcta": false
+    },
+    {
+     "texto": "Material Ledgers.",
+     "correcta": false
+    },
+    {
+     "texto": "Profitability Analysis (CO-PA).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En una arquitectura industrial automatizada, ¿qué siglas recibe el software de piso de fábrica (terceros) que interactúa con robots y habla con SAP EWM a través de SAP MII/PCo?",
+   "opciones": [
+    {
+     "texto": "MES (Manufacturing Execution System).",
+     "correcta": true
+    },
+    {
+     "texto": "CRM (Customer Relationship Management).",
+     "correcta": false
+    },
+    {
+     "texto": "SRM (Supplier Relationship Management).",
+     "correcta": false
+    },
+    {
+     "texto": "BW (Business Warehouse).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En un ambiente integrado EWM-PP, si el inventario financiero de SAP ERP no concuerda con el físico reportado por el PSA en EWM, ¿cuál suele ser la causa más común?",
+   "opciones": [
+    {
+     "texto": "Consumos reales de la máquina que no fueron reportados vía Backflushing, o mermas de producción no declaradas en el ERP.",
+     "correcta": true
+    },
+    {
+     "texto": "Hackers internacionales atacando la base de datos.",
+     "correcta": false
+    },
+    {
+     "texto": "Un error en el servidor de correos Exchange.",
+     "correcta": false
+    },
+    {
+     "texto": "Que el material está configurado como Servicio (DIEN) y no como Producto.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Es posible configurar SAP EWM para que abastezca una línea de producción sin que exista una Orden de Producción (CO01) previa en el ERP?",
+   "opciones": [
+    {
+     "texto": "No, en el modelo de PMR avanzado la Orden de Producción u Orden de Proceso es el requisito mandatorio del cual EWM extrae la lista de requerimientos (BOM).",
+     "correcta": true
+    },
+    {
+     "texto": "Sí, EWM adivina lo que la fábrica necesita mágicamente.",
+     "correcta": false
+    },
+    {
+     "texto": "Sí, usando una Orden de Venta estándar (VA01) directamente.",
+     "correcta": false
+    },
+    {
+     "texto": "Depende de la fase lunar.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Un 'Storage Bin' asignado a un PSA (Production Supply Area) logísticamente pertenece a:",
+   "opciones": [
+    {
+     "texto": "EWM (Se parametriza en la estructura del Warehouse Number para tener trazabilidad 3D del piso de fábrica).",
+     "correcta": true
+    },
+    {
+     "texto": "FI (Finanzas).",
+     "correcta": false
+    },
+    {
+     "texto": "HCM (Recursos Humanos).",
+     "correcta": false
+    },
+    {
+     "texto": "QM (Calidad).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué sucede si una Warehouse Task de abastecimiento (Staging) sufre una excepción BIDF (Bin Denied / Rack Vacío) durante su recolección?",
+   "opciones": [
+    {
+     "texto": "EWM lanza el manejo de excepciones, bloquea el rack vacío y recalcula el STSS para buscar el componente en otro rack y evitar parar la línea de producción.",
+     "correcta": true
+    },
+    {
+     "texto": "La Orden de Producción se borra irreversiblemente de SAP.",
+     "correcta": false
+    },
+    {
+     "texto": "El cliente recibe un correo de que su pedido fue cancelado.",
+     "correcta": false
+    },
+    {
+     "texto": "El montacargas se bloquea con clave.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál es el principal beneficio de cambiar la antigua logística WM basada en Outbound Deliveries por la nueva integración PP-EWM basada en PMRs?",
+   "opciones": [
+    {
+     "texto": "Evita la generación de miles de documentos de entrega (Deliveries) redundantes en el ERP, reduciendo la carga de base de datos y unificando el control en EWM.",
+     "correcta": true
+    },
+    {
+     "texto": "Aumenta el cobro de impuestos corporativos.",
+     "correcta": false
+    },
+    {
+     "texto": "Permite imprimir en impresoras de inyección de tinta.",
+     "correcta": false
+    },
+    {
+     "texto": "Reduce el peso físico del acero de las estanterías.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si la máquina de ensamblaje solicita 2 palets completos pero el PSA solo tiene capacidad volumétrica para 1 palet a la vez, ¿cómo lo gestiona EWM?",
+   "opciones": [
+    {
+     "texto": "Mediante el Capacity Check del Bin del PSA, fraccionando o escalonando la creación de las WTs de abastecimiento desde la consola de Staging.",
+     "correcta": true
+    },
+    {
+     "texto": "Lanzando los 2 palets para que se estrellen en el piso.",
+     "correcta": false
+    },
+    {
+     "texto": "Suspendiendo la producción por 1 semana.",
+     "correcta": false
+    },
+    {
+     "texto": "Apagando la pantalla RF del operario.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué transacción clásica de SAP ERP se utiliza para notificar (confirmar) la fabricación de un producto final y detonar los Backflushes?",
+   "opciones": [
+    {
+     "texto": "CO11N / CO15 / MFBF (para manufactura repetitiva).",
+     "correcta": true
+    },
+    {
+     "texto": "FB50 (Asiento de diario).",
+     "correcta": false
+    },
+    {
+     "texto": "ME21N (Pedido de compras).",
+     "correcta": false
+    },
+    {
+     "texto": "SU01 (Creación de usuarios).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Un 'Co-Product' fabricado junto al producto principal puede almacenarse en EWM con su propia valoración contable en SAP FI?",
+   "opciones": [
+    {
+     "texto": "Sí, los co-productos son inventariables y tienen su propia Valuation Class para recibir costos del proceso conjunto.",
+     "correcta": true
+    },
+    {
+     "texto": "No, solo el producto principal puede valorarse.",
+     "correcta": false
+    },
+    {
+     "texto": "Sí, pero solo si no tienen código de barras.",
+     "correcta": false
+    },
+    {
+     "texto": "No, los co-productos son ilegales contablemente.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En Kanban Clásico (2-Bin System), ¿cuántas tarjetas o cajas físicas requiere la máquina para nunca detenerse?",
+   "opciones": [
+    {
+     "texto": "Dos (una caja en uso siendo consumida y otra caja vacía que viaja/avisa a EWM para ser rellenada).",
+     "correcta": true
+    },
+    {
+     "texto": "Cincuenta cajas.",
+     "correcta": false
+    },
+    {
+     "texto": "Ninguna caja.",
+     "correcta": false
+    },
+    {
+     "texto": "Solo la pantalla de una computadora.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué protocolo técnico utiliza SAP EWM para conversar nativamente con el ERP en el modelo descentralizado para confirmar los consumos y recepciones de producción?",
+   "opciones": [
+    {
+     "texto": "Mensajería qRFC (Queued Remote Function Call).",
+     "correcta": true
+    },
+    {
+     "texto": "Bluetooth.",
+     "correcta": false
+    },
+    {
+     "texto": "Cables HDMI.",
+     "correcta": false
+    },
+    {
+     "texto": "Impresión de códigos QR.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si el material 'Motor V8' está marcado como 'Pick Parts' y se requieren 5 unidades, ¿qué generará EWM?",
+   "opciones": [
+    {
+     "texto": "Una WT exacta por 5 unidades desde el rack hasta el PSA.",
+     "correcta": true
+    },
+    {
+     "texto": "Una WT por el palet entero de 50 motores.",
+     "correcta": false
+    },
+    {
+     "texto": "Una alerta de error porque Pick Parts es solo para tornillos.",
+     "correcta": false
+    },
+    {
+     "texto": "Una factura proforma de exportación.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si el material 'Tornillo de Acero' está marcado como 'Crate Parts' y la orden requiere 5 unidades, sabiendo que la caja base trae 1,000, ¿qué generará EWM?",
+   "opciones": [
+    {
+     "texto": "Una WT por la caja completa de 1,000 unidades hacia el PSA.",
+     "correcta": true
+    },
+    {
+     "texto": "Una WT exacta por 5 tornillos forzando al operario a contarlos a mano.",
+     "correcta": false
+    },
+    {
+     "texto": "Cero WTs, porque asume que hay stock infinito.",
+     "correcta": false
+    },
+    {
+     "texto": "Un bloqueo automático por diferencia de cantidades.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué ocurre con las 995 unidades sobrantes del Crate Part que quedaron en el PSA al final de la jornada si la máquina solo ensambló un equipo?",
+   "opciones": [
+    {
+     "texto": "Quedan físicamente en el PSA y lógicamente en EWM, listas para ser usadas por otra orden, o se devuelven al rack mediante /SCWM/CLEAR_PSA.",
+     "correcta": true
+    },
+    {
+     "texto": "Se desaparecen de la base de datos automáticamente.",
+     "correcta": false
+    },
+    {
+     "texto": "Se facturan al gobierno.",
+     "correcta": false
+    },
+    {
+     "texto": "El ERP las considera destruidas por mermas.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "El 'Staging' en manufactura significa:",
+   "opciones": [
+    {
+     "texto": "El proceso físico y sistémico de mover y posicionar los componentes logísticos desde el almacén hacia el borde de la línea de producción.",
+     "correcta": true
+    },
+    {
+     "texto": "El proceso de auditar los estados financieros de la empresa.",
+     "correcta": false
+    },
+    {
+     "texto": "La capacitación de los nuevos operarios de limpieza.",
+     "correcta": false
+    },
+    {
+     "texto": "La configuración de los escáneres Zebra en la red Wi-Fi.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál es el riesgo de NO utilizar Backflush en una línea de producción de alta velocidad (ej. embotelladora a 3,000 botellas/hora)?",
+   "opciones": [
+    {
+     "texto": "Que se necesite un ejército de operarios tecleando manualmente el consumo de tapas y botellas en SAP, lo cual es humanamente imposible y trabaría la fábrica.",
+     "correcta": true
+    },
+    {
+     "texto": "Que el líquido se eche a perder más rápido.",
+     "correcta": false
+    },
+    {
+     "texto": "Que SAP EWM funcione más lento por exceso de RAM.",
+     "correcta": false
+    },
+    {
+     "texto": "Ningún riesgo; Backflush es solo un adorno gráfico en Fiori.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En la integración EWM-MES, si el brazo robótico soldador falla, ¿cómo evita el MES que SAP EWM siga mandando palets de metal hacia el robot?",
+   "opciones": [
+    {
+     "texto": "El MES envía un mensaje de estado por API a SAP para bloquear el PSA o pausar temporalmente las WTs de abastecimiento dirigidas a esa celda.",
+     "correcta": true
+    },
+    {
+     "texto": "El robot llama por teléfono al gerente de almacén.",
+     "correcta": false
+    },
+    {
+     "texto": "El MES detiene el reloj del sistema operativo Windows.",
+     "correcta": false
+    },
+    {
+     "texto": "SAP EWM detecta el humo físicamente por las cámaras.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué es un BOM (Bill of Materials) y por qué es crítico para EWM en procesos de manufactura?",
+   "opciones": [
+    {
+     "texto": "Es la receta técnica de componentes de un producto. Es crítico porque EWM usa el BOM para calcular qué materiales, y en qué cantidad, debe abastecer vía PMR.",
+     "correcta": true
+    },
+    {
+     "texto": "Es el recibo de sueldo de los operarios del almacén.",
+     "correcta": false
+    },
+    {
+     "texto": "Es un reporte de finanzas sobre materiales dañados.",
+     "correcta": false
+    },
+    {
+     "texto": "Es la factura de flete del transportista.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿A qué nivel de la estructura organizativa de SAP se define un Control Cycle (Ciclo de Control)?",
+   "opciones": [
+    {
+     "texto": "A nivel de Centro (Plant) y Área de Suministro de Producción (PSA).",
+     "correcta": true
+    },
+    {
+     "texto": "A nivel de Mandante (Cross-Client).",
+     "correcta": false
+    },
+    {
+     "texto": "A nivel de Sociedad (Company Code).",
+     "correcta": false
+    },
+    {
+     "texto": "A nivel de Canal de Distribución (Sales Channel).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Para visualizar el historial de tareas de abastecimiento hacia una línea de producción en específico, ¿qué nodo del Warehouse Monitor (/SCWM/MON) debe consultar el arquitecto?",
+   "opciones": [
+    {
+     "texto": "Production Supply / Production Material Request.",
+     "correcta": true
+    },
+    {
+     "texto": "Inbound / Inbound Delivery.",
+     "correcta": false
+    },
+    {
+     "texto": "Resource Management / Queue Sequence.",
+     "correcta": false
+    },
+    {
+     "texto": "Alerts / Exception Codes.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si la Orden de Producción CO01 requiere un material 'X' que EWM identifica como 'Out of Stock' (Sin inventario en toda la bodega), el documento PMR:",
+   "opciones": [
+    {
+     "texto": "Se genera, pero EWM no podrá crear las Warehouse Tasks de Staging para ese material hasta que se reciba nuevo inventario (Backorder).",
+     "correcta": true
+    },
+    {
+     "texto": "Destruye la Orden de Producción de SAP ERP.",
+     "correcta": false
+    },
+    {
+     "texto": "Cambia el requerimiento automáticamente por un material 'Y' al azar.",
+     "correcta": false
+    },
+    {
+     "texto": "Abre el cajón de dinero de la recepción.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En un escenario MFS + PP-EWM, el abastecimiento se realiza mediante grúas automáticas. ¿Qué documento desencadena el telegrama TCP/IP hacia el PLC de la grúa?",
+   "opciones": [
+    {
+     "texto": "La Warehouse Task de Staging originada por el PMR, al convertirse en telegrama MFS.",
+     "correcta": true
+    },
+    {
+     "texto": "La Orden de Producción CO02 del ERP.",
+     "correcta": false
+    },
+    {
+     "texto": "La factura electrónica del proveedor.",
+     "correcta": false
+    },
+    {
+     "texto": "La tarjeta de tiempo de Recursos Humanos.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si se fabrican piezas aeronáuticas críticas, ¿dónde se asegura la trazabilidad del Lote exacto y Número de Serie ensamblado en SAP?",
+   "opciones": [
+    {
+     "texto": "Se escanea y asocia de forma estricta (Serial Number Profile / Batch Management) durante el consumo (Goods Issue) en el PSA, quedando ligado al equipo final.",
+     "correcta": true
+    },
+    {
+     "texto": "En una hoja de Excel guardada en la computadora del gerente.",
+     "correcta": false
+    },
+    {
+     "texto": "No se requiere trazabilidad en S/4HANA.",
+     "correcta": false
+    },
+    {
+     "texto": "A través del color de la caja de empaque.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué módulo de SAP ERP debe estar activado y configurado en conjunto con EWM para que el flujo completo de PMR funcione?",
+   "opciones": [
+    {
+     "texto": "SAP PP (Production Planning) o SAP PP-PI (Production Planning for Process Industries).",
+     "correcta": true
+    },
+    {
+     "texto": "SAP HCM (Recursos Humanos).",
+     "correcta": false
+    },
+    {
+     "texto": "SAP FI-AA (Activos Fijos).",
+     "correcta": false
+    },
+    {
+     "texto": "SAP TRM (Treasury and Risk Management).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cómo se llama el proceso de recibir un producto de la fábrica y despacharlo directamente al cliente final sin almacenarlo (combinando PP y SD vía EWM)?",
+   "opciones": [
+    {
+     "texto": "Producción con Opportunistic Cross-Docking o Flow-Through.",
+     "correcta": true
+    },
+    {
+     "texto": "Dumping.",
+     "correcta": false
+    },
+    {
+     "texto": "Blind Receiving.",
+     "correcta": false
+    },
+    {
+     "texto": "Ciclo de Vida de Activos.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Como consultor senior, recomiendas implementar SAP EWM integrado con PP principalmente porque:",
+   "opciones": [
+    {
+     "texto": "Proporciona visibilidad 3D del stock en planta, optimiza el movimiento de montacargas, automatiza el reabastecimiento exacto y elimina el exceso de inventario inmovilizado en las líneas.",
+     "correcta": true
+    },
+    {
+     "texto": "Porque hace que los gráficos de Fiori se vean más bonitos.",
+     "correcta": false
+    },
+    {
+     "texto": "Porque elimina la necesidad de cobrarle a los clientes.",
+     "correcta": false
+    },
+    {
+     "texto": "Porque permite apagar el servidor los fines de semana.",
+     "correcta": false
+    }
+   ]
+  }
+ ]
+}

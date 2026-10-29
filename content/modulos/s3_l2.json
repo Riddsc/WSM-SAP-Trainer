@@ -1,0 +1,54 @@
+{
+ "id": "s3_l2",
+ "pasos": [
+  {
+   "instruccion": "Simulador RF",
+   "comando": "/RFUI",
+   "pista": "/RFUI",
+   "exito": "> Emulador RF cargado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Excepción",
+   "comando": "BIDF",
+   "pista": "BIDF",
+   "exito": "> BIDF Registrado. Bin Bloqueado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Monitor",
+   "comando": "/SCWM/MON",
+   "pista": "/SCWM/MON",
+   "exito": "> Ola en riesgo detectada.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Auditar",
+   "comando": "LQUA",
+   "pista": "LQUA",
+   "exito": "> Stock hallado en Reserva.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Reabastecer",
+   "comando": "REPLENISH",
+   "pista": "REPLENISH",
+   "exito": "> WT Creada.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Confirmar Rescate",
+   "comando": "CONFIRM",
+   "pista": "CONFIRM",
+   "exito": "> Stock en Staging.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Cierre Financiero",
+   "comando": "PGI",
+   "pista": "PGI",
+   "exito": "> CRISIS RESUELTA.",
+   "placeholder": ""
+  }
+ ]
+}

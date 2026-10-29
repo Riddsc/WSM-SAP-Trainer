@@ -1,0 +1,122 @@
+{
+ "id": "s3_m2",
+ "paginas": [
+  "<h3>Capítulo 1: La Realidad del Almacén</h3>\n            <p>El sistema dice que hay 100, pero físicamente hay 80. Aquí nacen las Excepciones.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Desfase Físico-Lógico)</summary>\n                <div class=\"details-content\">\n                    <p>En el mundo real los productos se rompen, se roban o se almacenan en pasillos equivocados. Cuando el inventario lógico de HANA no coincide con la realidad física, los algoritmos de EWM fallan al enviar a un operario a buscar \"aire\". El manejo de estas crisis en pleno flujo de trabajo sin detener el almacén se llama <strong>Exception Handling</strong>.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 2: Exception Codes</h3>\n            <p>Códigos de 4 letras. Ej: BIDF (Bin Denied), CHBA (Change Batch), SPLT (Split).</p>\n            <details>\n                <summary>Ver explicación a fondo (Comandos de Contingencia)</summary>\n                <div class=\"details-content\">\n                    <p>Cuando un operario de radiofrecuencia no puede completar su tarea, presiona la tecla <code>F4</code> (Exceptions) y digita un código técnico. <strong>BIDF:</strong> El Bin está vacío (Bin Denied). <strong>CHBA:</strong> El lote sugerido por SAP está averiado, pido permiso para sacar otro lote. <strong>SPLT:</strong> Mi carrito está lleno, divido la tarea y dejo el resto para el siguiente operario.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 3: Pick Denial</h3>\n            <p>BIDF ajusta inventario, bloquea el Bin, y recalcula el STSS buscando stock en otra ubicación.</p>\n            <details>\n                <summary>Ver explicación a fondo (Reacción en Cadena)</summary>\n                <div class=\"details-content\">\n                    <p>Si el montacarguista dispara <strong>BIDF</strong>, SAP EWM no solo lanza un error. En background, dispara tres reglas de negocio: 1) Ajusta contablemente el inventario a cero en ese Bin, 2) Bloquea el Bin con un candado para que a nadie más lo envíen allí, y 3) Despierta nuevamente el algoritmo de Picking para escanear el almacén y asignarle al operario otro Bin que sí contenga la mercancía en menos de un segundo.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 4: Replenishment</h3>\n            <p>Reabastecimiento de Racks Altos a Bins de Piso antes de que se queden vacíos.</p>\n            <details>\n                <summary>Ver explicación a fondo (Alimentación de Pick-Faces)</summary>\n                <div class=\"details-content\">\n                    <p>Si el nivel de piso (Picking Face) se queda sin stock, los pedidos se retrasan. <strong>Replenishment (Reabastecimiento)</strong> es el proceso de bajar palets enteros desde la zona de reserva (High Rack) y distribuirlos en las gavetas de los recolectores. Evita el \"Pick Denial\" adelantándose a la escasez de mercancía.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 5: Planned y Automatic</h3>\n            <p>Planned: Background Job nocturno. Automatic: Al caer bajo el mínimo durante un picking.</p>\n            <details>\n                <summary>Ver explicación a fondo (Estrategias de Reposición)</summary>\n                <div class=\"details-content\">\n                    <p><strong>Planned (Planificado):</strong> Un Job en S/4HANA corre a las 2:00 AM, calcula promedios y ordena llenar las gavetas para el turno matutino. <strong>Automatic (Automático):</strong> Si un operario extrae cajas y el stock del Bin cae por debajo del umbral Mínimo parametrizado, el sistema lanza una tarea inmediata al montacargas más cercano para reponer ese Bin urgente.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 6: Order-Related Replenishment</h3>\n            <p>Pausa la liberación de la Ola, ordena reabastecer, y luego libera las tareas de salida.</p>\n            <details>\n                <summary>Ver explicación a fondo (Reposición Bajo Demanda)</summary>\n                <div class=\"details-content\">\n                    <p>Este es el algoritmo más complejo. Al hacer Wave Release, SAP nota que un pedido requiere 500 baterías, pero en el piso de Picking solo hay 100. En lugar de crear un Picking parcial que trabaría el pedido, SAP EWM pausa la Ola de salida. Primero envía una tarea urgente de reabastecimiento (bajar palets). Solo cuando el montacarguista confirma que bajó los palets al piso, SAP \"descongela\" la Ola y libera el Picking final.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 7: Cancelaciones Outbound</h3>\n            <p>Requiere Reverse Goods Issue y tareas de Putaway inverso para devolver palets al rack.</p>\n            <details>\n                <summary>Ver explicación a fondo (Reversión Compleja)</summary>\n                <div class=\"details-content\">\n                    <p>Si el camión choca al salir de la planta y el cliente cancela la compra, debes anular el proceso en SAP. Si ya hiciste el PGI, debes hacer un <strong>Reverse PGI</strong> para regresar el saldo financiero. Sin embargo, físicamente los palets están en el andén de salida (920). EWM exige que generes Warehouse Tasks de Putaway inversas para devolver cada palet desde el andén de vuelta a su estantería original (Racks) liberando así el muelle.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 8: Batch Determination (FEFO)</h3>\n            <p>First Expired, First Out. Busca el lote más antiguo que aún cumpla la vida útil exigida.</p>\n            <details>\n                <summary>Ver explicación a fondo (Condiciones de Lotes)</summary>\n                <div class=\"details-content\">\n                    <p>En industrias farmacéuticas o alimenticias, no puedes enviar cualquier lote. El algoritmo <strong>FEFO</strong> rutea la tarea hacia el Bin que tenga la fecha de caducidad (SLED) más próxima. Además, SAP respeta los Acuerdos de Nivel de Servicio (SLA): si el cliente Wal-Mart exige que los yogures lleguen con mínimo 20 días de vida útil, EWM ignorará (saltará) los lotes que venzan en 10 días, forzando un Picking de lotes más frescos.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 9: Cartonization</h3>\n            <p>IA que lee dimensiones (X,Y,Z) y recomienda la caja de cartón exacta para evitar flete de aire.</p>\n            <details>\n                <summary>Ver explicación a fondo (Cartonization Planning / CAP)</summary>\n                <div class=\"details-content\">\n                    <p>Enviar \"aire\" es el mayor desperdicio en E-Commerce. El <em>Cartonization Planning</em> es un motor matemático. Conoce las dimensiones de los productos del pedido y las dimensiones de todas las cajas vacías del almacén (S, M, L, XL). Durante el Wave Release, SAP calcula un Tetris 3D virtual y le dice al operario de RF: \"Para este pedido, usa exactamente una caja Talla M y una caja Talla S\".</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 10: Warehouse Monitor</h3>\n            <p>Panel /SCWM/MON. Permite desencolar tareas, reasignar operarios y auditar inventario.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Centro de Mando EWM)</summary>\n                <div class=\"details-content\">\n                    <p>La transacción <strong>/SCWM/MON</strong> es el radar del consultor y supervisor. Desde aquí no solo visualizas datos, sino que ejecutas <em>Methods</em> (Acciones). Si una ODO está bloqueada por falta de stock, la desencolas. Si un operario desapareció con tareas pendientes, reasignas sus Warehouse Orders a otro empleado. Es la consola suprema de gestión de crisis en S/4HANA EWM.</p>\n                </div>\n            </details>"
+ ],
+ "resumen": "Un Exception Code como 'BIDF' no solo avisa del error, sino que dispara un flujo en background para resolver la crisis.",
+ "examen": [
+  {
+   "pregunta": "¿Qué es un Exception Code?",
+   "opciones": [
+    {
+     "texto": "Código de 4 letras que reporta anomalía y gatilla acción algorítmica.",
+     "correcta": true
+    },
+    {
+     "texto": "Error ABAP.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Código para Pick Denial (Rack vacío):",
+   "opciones": [
+    {
+     "texto": "BIDF (Bin Denied)",
+     "correcta": true
+    },
+    {
+     "texto": "MIGO",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Acción de EWM tras un BIDF:",
+   "opciones": [
+    {
+     "texto": "Ajusta inventario, bloquea Bin, busca alternativo.",
+     "correcta": true
+    },
+    {
+     "texto": "Despide operario.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Documento generado para investigar faltantes:",
+   "opciones": [
+    {
+     "texto": "Physical Inventory Document",
+     "correcta": true
+    },
+    {
+     "texto": "Purchase Order",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué Replenishment ocurre durante el Wave Release?",
+   "opciones": [
+    {
+     "texto": "Order-Related Replenishment",
+     "correcta": true
+    },
+    {
+     "texto": "Planned",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Cálculo matemático del tamaño de caja de envío:",
+   "opciones": [
+    {
+     "texto": "Cartonization Planning",
+     "correcta": true
+    },
+    {
+     "texto": "Slotting",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "FEFO significa:",
+   "opciones": [
+    {
+     "texto": "First Expired, First Out",
+     "correcta": true
+    },
+    {
+     "texto": "First Empty, First Out",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Consola maestra de monitoreo EWM:",
+   "opciones": [
+    {
+     "texto": "/SCWM/MON",
+     "correcta": true
+    },
+    {
+     "texto": "/SCWM/WAVE",
+     "correcta": false
+    }
+   ]
+  }
+ ]
+}

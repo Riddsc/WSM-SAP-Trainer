@@ -1,0 +1,213 @@
+{
+ "id": "s2_m2",
+ "paginas": [
+  "<h3>Capítulo 1: El Desafío del Putaway</h3>\n            <p>EWM elimina la decisión humana. Evalúa peso, volumen y rotación mediante el Slotting.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Fin del Operario Soberano)</summary>\n                <div class=\"details-content\">\n                    <p>En bodegas antiguas, el montacarguista decidía dónde guardar el palet, ocultando inventario en \"huecos secretos\" que nadie más encontraba. En EWM, el algoritmo es un dictador benevolente: calcula las dimensiones (X,Y,Z), la inflamabilidad, la rotación (ABC) y el peso (Kg) para generar una Warehouse Task con coordenadas inamovibles. El humano solo obedece al escáner.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 2: Putaway Control Indicator (PACI)</h3>\n            <p>La llave del algoritmo en el Material Master. Ej. PACI 'PESA' para cosas pesadas.</p>\n            <details>\n                <summary>Ver explicación a fondo (El Gatillo del Algoritmo)</summary>\n                <div class=\"details-content\">\n                    <p>El PACI se configura en la Vista <em>Warehouse Execution</em> del Material Master. Es el punto de partida del árbol de decisiones. Si un motor de avión tiene PACI = <code>HVY</code> (Pesado) y un chip tiene PACI = <code>SML</code> (Pequeño), el algoritmo separa sus caminos al instante: el motor buscará espacio en piso, y el chip buscará espacio en las estanterías de picking miniload.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 3: Storage Type Search Sequence (STSS)</h3>\n            <p>Filtro macro. Si la Zona 1 está llena, busca en la Zona 2.</p>\n            <details>\n                <summary>Ver explicación a fondo (La Cascada de Zonas)</summary>\n                <div class=\"details-content\">\n                    <p>El STSS es la matriz de prioridades del almacén. Para el PACI <code>SML</code>, la secuencia dicta: <em>Intenta guardar primero en el Storage Type 0050 (Gavetas Rápidas). Si la capacidad de ese Storage Type llegó al 100%, pasa a la Prioridad 2: Storage Type 0060 (Gavetas Lentas). Si también falla, lanza la Excepción de Capacidad y detiene el palet en el muelle.</em></p>\n                </div>\n            </details>",
+  "<h3>Capítulo 4: Storage Section y Bin Type</h3>\n            <p>Filtro micro. Alta rotación vs Baja rotación. Hueco grande vs Hueco pequeño.</p>\n            <details>\n                <summary>Ver explicación a fondo (Slotting de Precisión)</summary>\n                <div class=\"details-content\">\n                    <p>Una vez dentro del <em>Storage Type</em> ganador, el sistema aplica dos filtros más. <strong>Storage Section:</strong> ¿El material rota rápido (Fast-Mover)? Lo guarda en los primeros 3 pasillos cerca de la puerta. <strong>Bin Type:</strong> ¿El palet mide 1.5m de alto? El sistema descarta todos los <em>Bin Types</em> de 1.0m (para evitar que la carga se estrelle contra la viga superior) y elige el hueco perfecto.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 5: Capacity Checking</h3>\n            <p>Verifica que el Bin no colapse por el peso de la HU, por volumen, o por Key Figure.</p>\n            <details>\n                <summary>Ver explicación a fondo (Prevención de Desastres Estructurales)</summary>\n                <div class=\"details-content\">\n                    <p>Asignar dos palets de 2 toneladas a una viga que solo soporta 3 toneladas es un accidente mortal. EWM ejecuta el chequeo de capacidad de tres formas: <strong>Por Peso</strong> (suma el gross weight de la HU actual + la entrante vs el Max Weight del Bin), <strong>Por Volumen</strong> (metros cúbicos), o <strong>Por Capacity Indicator</strong> (un factor adimensional, ej. el estante tiene 100 puntos de capacidad, y cada caja consume 5 puntos).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 6: Bin Strategies</h3>\n            <p>Next Empty Bin, Addition to Existing Stock, o Fixed Bin.</p>\n            <details>\n                <summary>Ver explicación a fondo (Estrategias de Búsqueda Final)</summary>\n                <div class=\"details-content\">\n                    <p>Una vez definidos todos los filtros, ¿qué Bin vacío elegimos primero? <strong>Next Empty Bin:</strong> Busca el primer hueco vacío en orden alfanumérico (Ideal para Alta Elevación). <strong>Addition to Existing Stock:</strong> Si ya hay 20 tornillos sueltos en un gavetero, y recibes 10 más, EWM buscará guardarlos en ese mismo gavetero para maximizar la densidad y evitar desparramar el mismo SKU por todo el almacén.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 7: Bulk y Near Picking</h3>\n            <p>Bulk es piso sin altura Z. Near picking deja el palet de reserva justo sobre la zona de recolección.</p>\n            <details>\n                <summary>Ver explicación a fondo (Estrategias de Relleno)</summary>\n                <div class=\"details-content\">\n                    <p><strong>Bulk Storage (Almacenamiento en Bloque):</strong> Se usa para apilar cajas sobre cajas en el piso (sin racks metálicos), como los barriles de cerveza o llantas de tractor. EWM calcula el <em>Stacking Factor</em> (máximo 4 palets de altura antes de que la caja de abajo colapse). <strong>Near Picking:</strong> Sitúa el palet de sobrestock exactamente en el rack superior a la gaveta de picking para que el reabastecimiento demore segundos.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 8: Cross-Docking (El Santo Grial)</h3>\n            <p>Transferir mercancía directa de Inbound a Outbound sin almacenarla.</p>\n            <details>\n                <summary>Ver explicación a fondo (Aceleración de Flujo)</summary>\n                <div class=\"details-content\">\n                    <p>El almacenamiento genera costos. Si se detecta un faltante crítico al descargar un palet, EWM suspende el algoritmo clásico de Putaway (que lo mandaría al rack) y ejecuta un atajo: genera una Warehouse Task que desvía la mercancía del muelle 9010 directamente hacia el andén de despacho 9020. Cero almacenamiento, cien por ciento eficiencia.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 9: Planned vs Opportunistic CD</h3>\n            <p>Planificado por APO/TM, u Oportunista interceptado por EWM si hay pedidos atrasados al hacer PGR.</p>\n            <details>\n                <summary>Ver explicación a fondo (Decisiones Dinámicas)</summary>\n                <div class=\"details-content\">\n                    <p>El <strong>Planned Cross-Docking</strong> viene ordenado desde arriba (el ERP o SAP APO ya vincularon la entrada con la salida desde hace semanas). El verdadero poder de EWM radica en el <strong>Opportunistic Cross-Docking</strong>: una decisión heurística que el sistema toma en milisegundos en plena rampa de descarga cuando nota que un pedido acaba de caer en <em>Backorder</em> (atrasado por quiebre de stock).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 10: La BAdI de Putaway</h3>\n            <p>Código ABAP inyectado para reglas especiales que no existen en el estándar de SAP.</p>\n            <details>\n                <summary>Ver explicación a fondo (Business Add-Ins)</summary>\n                <div class=\"details-content\">\n                    <p>A veces el algoritmo nativo no basta. Ejemplo real: \"No guardes palets de productos químicos en Bins cuyo pasillo tenga palets de alimentos almacenados\". Como SAP no trae esta regla por defecto, el desarrollador crea una <strong>BAdI (Business Add-In) de Putaway</strong>. Es un fragmento de código ABAP customizado que intercepta la decisión del sistema y filtra los Bins peligrosos antes de generar la Warehouse Task final.</p>\n                </div>\n            </details>"
+ ],
+ "resumen": "Jerarquía de búsqueda: Putaway Control Indicator (PACI) -> Storage Type Search Sequence (STSS) -> Storage Section Search -> Storage Bin Type Search.",
+ "examen": [
+  {
+   "pregunta": "Disparador inicial para estrategia de almacenamiento en MM:",
+   "opciones": [
+    {
+     "texto": "PACI",
+     "correcta": true
+    },
+    {
+     "texto": "Material Group",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Secuencia lógica del algoritmo EWM:",
+   "opciones": [
+    {
+     "texto": "Storage Type -> Section -> Bin Type -> Bin",
+     "correcta": true
+    },
+    {
+     "texto": "Bin -> Section -> Type",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Configuración para buscar en Zona 1 y luego en Zona 2?",
+   "opciones": [
+    {
+     "texto": "STSS",
+     "correcta": true
+    },
+    {
+     "texto": "Capacity Check",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Objetivo de 'Addition to Existing Stock':",
+   "opciones": [
+    {
+     "texto": "Maximizar densidad agrupando material.",
+     "correcta": true
+    },
+    {
+     "texto": "Llenar más rápido.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Storage Type sin coordenadas de altura Z?",
+   "opciones": [
+    {
+     "texto": "Bulk Storage",
+     "correcta": true
+    },
+    {
+     "texto": "High Rack",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Capacity Check por Peso evalúa?",
+   "opciones": [
+    {
+     "texto": "Peso bruto HU vs límite del Bin.",
+     "correcta": true
+    },
+    {
+     "texto": "Peso camión.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Mover mercancía directa de muelles de recepción a salida:",
+   "opciones": [
+    {
+     "texto": "Cross-Docking",
+     "correcta": true
+    },
+    {
+     "texto": "Putaway",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Opportunistic Cross-Docking se basa en:",
+   "opciones": [
+    {
+     "texto": "Pedidos atrasados al hacer PGR.",
+     "correcta": true
+    },
+    {
+     "texto": "Planes de meses.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué es una BAdI?",
+   "opciones": [
+    {
+     "texto": "Punto de ampliación de código ABAP.",
+     "correcta": true
+    },
+    {
+     "texto": "Bin Data Interface.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Estrategia 'Fixed Bin' usada para:",
+   "opciones": [
+    {
+     "texto": "Artículos pequeños de alta rotación en gavetas.",
+     "correcta": true
+    },
+    {
+     "texto": "Palets de 3 tons.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Almacenar la reserva justo arriba del picking fijo:",
+   "opciones": [
+    {
+     "texto": "Near Picking Bin.",
+     "correcta": true
+    },
+    {
+     "texto": "Bulk.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Puede EWM mezclar lotes en un Bin?",
+   "opciones": [
+    {
+     "texto": "Si el Mixed Storage Flag lo permite.",
+     "correcta": true
+    },
+    {
+     "texto": "Nunca.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Una Warehouse Task de Putaway tiene:",
+   "opciones": [
+    {
+     "texto": "Línea de Origen y Línea de Destino.",
+     "correcta": true
+    },
+    {
+     "texto": "Vendor y Customer.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si STSS no encuentra Bin disponible:",
+   "opciones": [
+    {
+     "texto": "Falla la WT y palet queda en Zona GR.",
+     "correcta": true
+    },
+    {
+     "texto": "Va al pasillo.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Agrupación de Bins para optimizar ruta:",
+   "opciones": [
+    {
+     "texto": "Activity Area.",
+     "correcta": true
+    },
+    {
+     "texto": "Plant.",
+     "correcta": false
+    }
+   ]
+  }
+ ]
+}

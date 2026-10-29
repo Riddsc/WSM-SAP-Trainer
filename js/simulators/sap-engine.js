@@ -1,209 +1,235 @@
 /**
- * Logística Pro - Simulador de Terminal SAP S/4HANA / EWM
- * Nivel: Estricto. Incluye sistema de bloqueos de seguridad (3 Strikes).
- * Visual: Interfaz Retro Hacker (Glassmorphism) + Capacitor Haptics.
+ * Logística Pro - Simulador de terminal SAP.
+ * Cada laboratorio es una sesión con sus propios temporizadores. Al cerrar
+ * la terminal se cancelan todos, así nada sigue corriendo por detrás ni
+ * afecta otra pantalla u otro laboratorio.
  */
-let currentSapItemId = null;
-let currentSapStep = 0;
-let currentStrikes = 0; 
-
 const MAX_STRIKES = 3;
 
 const SAPEngine = {
-    // 1. Inicializa los eventos del nuevo HTML (Enter y Botón Cerrar)
-    init() {
-        const inputEl = document.getElementById('terminal-input');
-        const closeBtn = document.getElementById('terminal-close-btn');
+    modulo: null,
+    paso: 0,
+    errores: 0,
+    sesion: 0,          // cambia en cada apertura; invalida temporizadores viejos
+    temporizadores: [],
+    escribiendo: null,
 
-        if (inputEl) {
-            inputEl.addEventListener('keydown', (e) => {
+    init() {
+        const input = document.getElementById('terminal-input');
+        const cerrar = document.getElementById('terminal-close-btn');
+        if (input) {
+            input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     this.execute();
                 }
             });
         }
-
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                this.closeTerminal();
-            });
-        }
+        const ejecutar = document.getElementById('terminal-exec-btn');
+        if (ejecutar) ejecutar.addEventListener('click', () => this.execute());
+        if (cerrar) cerrar.addEventListener('click', () => this.closeTerminal());
     },
 
-    open(itemId) {
-        if (typeof AudioEngine !== 'undefined') AudioEngine.play('click');
-        const item = syllabusData.find(i => i.id === itemId);
-        if (!item || !item.simSteps) return;
-        
-        currentSapItemId = itemId;
-        currentSapStep = 0;
-        currentStrikes = 0; 
-        
-        // Limpiamos el historial visual de la nueva terminal e inyectamos el contexto
-        const historyContainer = document.getElementById('terminal-history');
-        if (historyContainer) {
-            historyContainer.innerHTML = `
-                <div class="log-system">SAP EWM Kernel 7.89 - Terminal Emulator Inicializado.</div>
-                <div class="log-system">--- INICIANDO SESIÓN: ${item.title.toUpperCase()} ---</div>
-                <div class="log-hint">CASO DE NEGOCIO: ${item.description}</div>
+    estaAbierta() {
+        const overlay = document.getElementById('sap-terminal-overlay');
+        return !!overlay && !overlay.classList.contains('terminal-hidden');
+    },
+
+    /** Programa una acción que solo ocurre si la sesión sigue siendo la misma. */
+    despues(ms, accion) {
+        const sesion = this.sesion;
+        const id = setTimeout(() => {
+            if (sesion === this.sesion) accion();
+        }, ms);
+        this.temporizadores.push(id);
+    },
+
+    cancelarTodo() {
+        this.temporizadores.forEach(clearTimeout);
+        this.temporizadores = [];
+        if (this.escribiendo) clearInterval(this.escribiendo);
+        this.escribiendo = null;
+    },
+
+    async open(id) {
+        AudioEngine.play('click');
+        let modulo;
+        try {
+            modulo = await ContentStore.cargar(id);
+        } catch (e) {
+            alert('No se pudo cargar el laboratorio. Intenta de nuevo.');
+            return;
+        }
+        if (!modulo.pasos || modulo.pasos.length === 0) return;
+
+        this.cancelarTodo();
+        this.sesion++;
+        this.modulo = modulo;
+        this.paso = 0;
+        this.errores = 0;
+
+        const historial = document.getElementById('terminal-history');
+        if (historial) {
+            historial.innerHTML = `
+                <div class="log-system">SAP S/4HANA · Simulador de práctica de Logística Pro</div>
+                <div class="log-system">--- SESIÓN: ${escaparHTML(modulo.titulo.toUpperCase())} ---</div>
+                <div class="log-hint">CASO DE NEGOCIO: ${escaparHTML(modulo.descripcion)}</div>
                 <div class="log-system">--------------------------------------------------</div>
             `;
         }
-
-        // Mostramos el nuevo overlay (reemplaza a tu antiguo global-overlay)
         document.getElementById('sap-terminal-overlay').classList.remove('terminal-hidden');
         this.renderStep();
     },
 
     closeTerminal() {
+        this.cancelarTodo();
+        this.sesion++;
         document.getElementById('sap-terminal-overlay').classList.add('terminal-hidden');
-        const inputEl = document.getElementById('terminal-input');
-        if (inputEl) {
-            inputEl.value = '';
-            inputEl.blur(); // Oculta el teclado
+        const input = document.getElementById('terminal-input');
+        if (input) {
+            input.value = '';
+            input.blur();
         }
     },
 
     renderStep() {
-        const item = syllabusData.find(i => i.id === currentSapItemId);
-        const step = item.simSteps[currentSapStep];
-        
-        // Actualizamos el panel de instrucciones de la nueva UI
-        const instructionText = document.getElementById('terminal-current-instruction');
-        const inputEl = document.getElementById('terminal-input');
-        
-        if (instructionText) {
-            instructionText.innerText = `PASO ${currentSapStep + 1}/${item.simSteps.length}: ${step.instruction}`;
+        const paso = this.modulo.pasos[this.paso];
+        const instruccion = document.getElementById('terminal-current-instruction');
+        const input = document.getElementById('terminal-input');
+        if (instruccion) {
+            instruccion.innerText = `PASO ${this.paso + 1}/${this.modulo.pasos.length}: ${paso.instruccion}`;
         }
-        
-        if (inputEl) {
-            inputEl.placeholder = step.placeholder || 'T-CODE O VALOR';
-            inputEl.disabled = false;
-            setTimeout(() => inputEl.focus(), 300);
+        if (input) {
+            input.placeholder = paso.placeholder || 'T-CODE O VALOR';
+            input.disabled = false;
+            this.despues(300, () => input.focus());
         }
     },
 
-    printLog(message, type) {
-        const historyContainer = document.getElementById('terminal-history');
-        const bodyContainer = document.getElementById('terminal-body');
-        if (!historyContainer) return;
-
-        const div = document.createElement('div');
-        div.className = `log-${type}`;
-        div.innerHTML = message; // Usamos innerHTML para soportar los <br> de tus mensajes de error
-        historyContainer.appendChild(div);
-
-        // Auto-scroll hacia abajo
-        if (bodyContainer) {
-            bodyContainer.scrollTop = bodyContainer.scrollHeight;
-        }
+    /** Agrega una línea a la terminal. El texto se escapa siempre. */
+    printLog(mensaje, tipo) {
+        const historial = document.getElementById('terminal-history');
+        if (!historial) return;
+        const linea = document.createElement('div');
+        linea.className = `log-${tipo}`;
+        String(mensaje).split('\n').forEach((parte, i) => {
+            if (i > 0) linea.appendChild(document.createElement('br'));
+            linea.appendChild(document.createTextNode(parte));
+        });
+        historial.appendChild(linea);
+        this.bajarScroll();
     },
 
-    triggerHaptic(type) {
-        if (window.Capacitor && window.Capacitor.Plugins.Haptics) {
-            const Haptics = window.Capacitor.Plugins.Haptics;
-            try {
-                if (type === 'success') Haptics.impact({ style: 'Light' });
-                else if (type === 'error') Haptics.notification({ type: 'ERROR' });
-                else if (type === 'heavy') Haptics.impact({ style: 'Heavy' });
-            } catch (e) { console.warn("Haptics no soportado."); }
-        }
+    bajarScroll() {
+        const cuerpo = document.getElementById('terminal-body');
+        if (cuerpo) cuerpo.scrollTop = cuerpo.scrollHeight;
     },
 
     execute() {
-        const inputEl = document.getElementById('terminal-input');
-        const item = syllabusData.find(i => i.id === currentSapItemId);
-        const step = item.simSteps[currentSapStep];
+        if (!this.modulo || !this.estaAbierta()) return;
+        const input = document.getElementById('terminal-input');
+        if (!input || input.disabled) return;
 
-        if (!inputEl || !item) return;
+        const paso = this.modulo.pasos[this.paso];
+        const valor = input.value.toUpperCase().trim();
+        if (valor === '') return;
 
-        const val = inputEl.value.toUpperCase().trim();
-        if (val === '') return;
+        this.printLog(`EWM_PRD:/> ${valor}`, 'user');
+        input.value = '';
+        AudioEngine.play('click');
 
-        // Imprimir lo que el usuario digitó
-        this.printLog(`EWM_PRD:/> ${val}`, 'user');
-        inputEl.value = ''; 
-        
-        if (typeof AudioEngine !== 'undefined') AudioEngine.play('click');
-
-        if (val === step.expectedCmd.toUpperCase() || val === `/N${step.expectedCmd.toUpperCase()}`) {
-            // ==========================================
-            // ACIERTO (Usando tu lógica original)
-            // ==========================================
-            if (typeof AudioEngine !== 'undefined') AudioEngine.play('success');
-            this.triggerHaptic('success');
-            currentStrikes = 0; 
-            
-            inputEl.disabled = true; 
-
-            // Tu efecto de máquina de escribir adaptado al nuevo DOM
-            let text = step.successMessage;
-            let i = 0;
-            let typingLog = document.createElement('div');
-            typingLog.className = 'log-success';
-            document.getElementById('terminal-history').appendChild(typingLog);
-
-            let typingInterval = setInterval(() => {
-                if (i < text.length) {
-                    typingLog.innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
-                    if (i % 4 === 0 && typeof AudioEngine !== 'undefined') AudioEngine.play('key');
-                    document.getElementById('terminal-body').scrollTop = document.getElementById('terminal-body').scrollHeight;
-                    i++;
-                } else {
-                    clearInterval(typingInterval);
-                    currentSapStep++;
-                    
-                    if (currentSapStep < item.simSteps.length) {
-                        setTimeout(() => { this.renderStep(); }, 1500); // Pausa corta antes del siguiente paso
-                    } else {
-                        // Fin del laboratorio
-                        this.printLog("<br><br>✅ LABORATORIO COMPLETADO CON ÉXITO. Sistema actualizado.", 'success');
-                        this.triggerHaptic('heavy');
-                        
-                        if (typeof AppState !== 'undefined') AppState.markComplete(currentSapItemId);
-                        
-                        setTimeout(() => { 
-                            this.closeTerminal(); 
-                            if (typeof Router !== 'undefined') Router.renderDashboard(); 
-                        }, 3000);
-                    }
-                }
-            }, 20);
-            
+        const esperado = String(paso.comando).toUpperCase();
+        if (valor === esperado || valor === `/N${esperado}`) {
+            this.acierto(paso, input);
         } else {
-            // ==========================================
-            // FALLO / STRIKE SYSTEM (Usando tu lógica original)
-            // ==========================================
-            if (typeof AudioEngine !== 'undefined') AudioEngine.play('error');
-            this.triggerHaptic('error');
-            currentStrikes++;
-            
-            if (currentStrikes >= MAX_STRIKES) {
-                // FATAL ERROR: Expulsión
-                this.printLog(`> FATAL ERROR: Se han detectado ${currentStrikes} intentos fallidos.<br>> Violación de protocolo operativo.<br>> CERRANDO CONEXIÓN DEL TERMINAL...`, 'error');
-                
-                inputEl.disabled = true;
-                
-                setTimeout(() => {
-                    this.closeTerminal();
-                    alert("Has sido expulsado de la terminal SAP por demasiados errores. Repasa la teoría y vuelve a intentar el laboratorio desde cero.");
-                }, 4000);
-            } else {
-                // Advertencia regular
-                const intentosRestantes = MAX_STRIKES - currentStrikes;
-                this.printLog(`> ER_INPUT_INVALID: El valor '${val}' es incorrecto.<br>> ADVERTENCIA: ${intentosRestantes} intento(s) restante(s) antes del bloqueo.`, 'error');
-                
-                // Mostrar la pista después de un error
-                setTimeout(() => {
-                    this.printLog(`PISTA DEL SISTEMA: Se esperaba [ ${step.hint} ]`, 'hint');
-                }, 600);
-            }
+            this.fallo(paso, valor, input);
         }
+    },
+
+    acierto(paso, input) {
+        AudioEngine.play('success');
+        NativeBridge.vibrar('LIGHT');
+        this.errores = 0;
+        input.disabled = true;
+
+        // Efecto de máquina de escribir
+        const texto = paso.exito || 'Paso completado.';
+        const linea = document.createElement('div');
+        linea.className = 'log-success';
+        document.getElementById('terminal-history').appendChild(linea);
+        let i = 0;
+        const sesion = this.sesion;
+        this.escribiendo = setInterval(() => {
+            if (sesion !== this.sesion) return;
+            if (i < texto.length) {
+                const letra = texto.charAt(i);
+                if (letra === '\n') linea.appendChild(document.createElement('br'));
+                else linea.appendChild(document.createTextNode(letra));
+                if (i % 4 === 0) AudioEngine.play('key');
+                this.bajarScroll();
+                i++;
+                return;
+            }
+            clearInterval(this.escribiendo);
+            this.escribiendo = null;
+            this.paso++;
+            if (this.paso < this.modulo.pasos.length) {
+                this.despues(1200, () => this.renderStep());
+            } else {
+                this.terminarLaboratorio();
+            }
+        }, 20);
+    },
+
+    terminarLaboratorio() {
+        const id = this.modulo.id;
+        this.printLog('\n✅ LABORATORIO COMPLETADO CON ÉXITO.', 'success');
+        NativeBridge.vibrarAviso('SUCCESS');
+        AppState.markComplete(id);
+        this.despues(2500, () => {
+            this.closeTerminal();
+            // Solo vuelve al inicio si el estudiante sigue en ese laboratorio
+            if (Router.currentView === 'lesson' && UIRenderer.moduloActual === id) Router.renderDashboard();
+        });
+    },
+
+    fallo(paso, valor, input) {
+        AudioEngine.play('error');
+        NativeBridge.vibrarAviso('ERROR');
+        this.errores++;
+
+        if (this.errores >= MAX_STRIKES) {
+            this.printLog(`> ERROR: ${this.errores} intentos fallidos.\n> La sesión se cerrará. Repasa la teoría y vuelve a intentarlo.`, 'error');
+            input.disabled = true;
+            this.despues(3500, () => {
+                this.closeTerminal();
+                alert('Se cerró el laboratorio por demasiados errores. Repasa la teoría y vuelve a intentarlo desde el inicio.');
+            });
+            return;
+        }
+
+        const restantes = MAX_STRIKES - this.errores;
+        this.printLog(`> El valor '${valor}' no es correcto. Te quedan ${restantes} intento(s).`, 'error');
+        // Pistas progresivas: primero una orientación, luego la pista completa
+        this.despues(500, () => {
+            if (this.errores === 1) {
+                this.printLog(`PISTA: relee la instrucción. ${this.orientacion(paso)}`, 'hint');
+            } else {
+                this.printLog(`PISTA: ${paso.pista}`, 'hint');
+            }
+        });
+    },
+
+    /** Primera pista: orienta sin dar la respuesta. */
+    orientacion(paso) {
+        const cmd = String(paso.comando);
+        if (cmd.startsWith('/')) return 'Se espera una transacción con espacio de nombres (empieza por /).';
+        if (/^\d+$/.test(cmd)) return `Se espera un número de ${cmd.length} dígitos.`;
+        if (/^[A-Z]{2,4}\d{1,3}[A-Z]?$/i.test(cmd)) return 'Se espera un código de transacción (letras y números).';
+        return `La respuesta tiene ${cmd.length} caracteres.`;
     }
 };
 
-// Autoinicializar el event listener del teclado cuando cargue el DOM
 document.addEventListener('DOMContentLoaded', () => {
     SAPEngine.init();
 });

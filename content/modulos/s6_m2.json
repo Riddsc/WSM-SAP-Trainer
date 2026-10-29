@@ -1,0 +1,443 @@
+{
+ "id": "s6_m2",
+ "paginas": [
+  "<h3>Capítulo 1: El Paradigma \"Code-to-Data\"</h3>\n            <p>La revolución de HANA. ¿Por qué traer los datos al código si el código puede ir a los datos?</p>\n            <details>\n                <summary>Ver explicación a fondo (El Fin de los Bucles ABAP)</summary>\n                <div class=\"details-content\">\n                    <p>En el antiguo ERP (R/3), el programa ABAP solicitaba a la base de datos (Oracle/SQL) 1 millón de registros, los cargaba en una tabla interna en memoria RAM de aplicación (Data-to-Code) y luego sumaba los valores con un ciclo <code>LOOP</code>. Esto tardaba minutos u horas. En S/4HANA, el paradigma es <strong>Code-to-Data</strong>: le envías la orden matemática (mediante CDS Views) directo al motor de HANA, y HANA te devuelve en milisegundos únicamente el gran total (1 solo registro).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 2: ABAP Core Data Services (CDS Views)</h3>\n            <p>El estándar moderno de modelado de datos en S/4HANA. SQL con esteroides y semántica de negocio.</p>\n            <details>\n                <summary>Ver explicación a fondo (Semántica y Anotaciones)</summary>\n                <div class=\"details-content\">\n                    <p>Una <strong>Vista CDS</strong> (Core Data Service) no es solo un VIEW de SQL. Además de hacer <em>Joins</em> entre <code>/SCWM/AQUA</code> (Inventario) y <code>/SCWM/WHO</code> (Órdenes), una CDS View incluye <strong>Anotaciones (@Annotations)</strong>. Por ejemplo, la anotación <code>@OData.publish: true</code> convierte automáticamente esa vista SQL en un servicio web API RESTful listo para la nube, sin programar una sola línea de backend.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 3: Virtual Data Model (VDM)</h3>\n            <p>La pirámide de datos de SAP S/4HANA: Vistas Básicas, Compuestas y de Consumo.</p>\n            <details>\n                <summary>Ver explicación a fondo (Arquitectura de Capas CDS)</summary>\n                <div class=\"details-content\">\n                    <p>SAP prohíbe que el desarrollador front-end lea directamente las tablas físicas crudas. Todo pasa por el <strong>VDM (Modelo de Datos Virtual)</strong>. 1) <strong>Basic Views (Private):</strong> Leen las tablas 1:1. 2) <strong>Composite Views:</strong> Unen las Basic Views aplicando cálculos de negocio (ej. \"Palets vencidos = Fecha Actual > SLED\"). 3) <strong>Consumption Views (C-Views):</strong> Son las que se exponen a Fiori, optimizadas para los gráficos y filtros de la interfaz gráfica.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 4: Fiori Elements y KPI Dashboards</h3>\n            <p>Creación de interfaces gráficas empresariales (UI) sin escribir código JavaScript ni HTML.</p>\n            <details>\n                <summary>Ver explicación a fondo (Smart Templates)</summary>\n                <div class=\"details-content\">\n                    <p>Con SAPUI5 puro, un desarrollador tardaba meses en programar una app con tablas, filtros y Excel export. <strong>Fiori Elements</strong> lee las anotaciones semánticas de la CDS View de EWM (ej. <code>@UI.lineItem</code>) y <em>renderiza la pantalla entera automáticamente</em>. Los gerentes logísticos usan la app \"KPI Workspace\" para crear gráficos de \"Productividad de Outbound\" en vivo usando drag-and-drop sobre estas vistas CDS.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 5: Embedded Analytics en SAP EWM</h3>\n            <p>Reportes gráficos y análisis predictivo ejecutándose en la misma máquina transaccional.</p>\n            <details>\n                <summary>Ver explicación a fondo (La Muerte de la Extracción Nocturna)</summary>\n                <div class=\"details-content\">\n                    <p>Históricamente, los reportes analíticos pesados paralizaban el sistema de almacén, por lo que los datos se extraían en la madrugada hacia SAP BW (Business Warehouse). Con <strong>S/4HANA Embedded Analytics</strong>, puedes tener tableros en vivo (ej. \"Cuellos de botella de Putaway hace 1 minuto\") corriendo en el mismo servidor de EWM transaccional, gracias a la capacidad de HANA de procesar OLTP y OLAP simultáneamente sin bloqueos.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 6: OData APIs (RESTful) para S/4HANA EWM</h3>\n            <p>El puente estándar y moderno para integrar EWM con aplicaciones web, celulares de terceros y software externo.</p>\n            <details>\n                <summary>Ver explicación a fondo (De RFC a OData v4)</summary>\n                <div class=\"details-content\">\n                    <p>Ya no enviamos archivos planos (TXT) por FTP ni usamos pesados IDocs de los 90s para sistemas web. SAP expone APIs estándar (ej. <em>WarehouseOrder API</em> o <em>InboundDelivery API</em>) basadas en el protocolo <strong>OData v2/v4 (REST/JSON)</strong>. Una startup que desarrolla drones para inventario puede llamar a la API de EWM con un <code>GET /sap/opu/odata/.../WarehouseTaskSet</code> para recibir las coordenadas de vuelo en JSON al instante.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 7: SAP Business Technology Platform (BTP)</h3>\n            <p>El entorno de innovación en la nube de SAP. Amplía EWM sin tocar el código central (Clean Core).</p>\n            <details>\n                <summary>Ver explicación a fondo (Side-by-Side Extensibility)</summary>\n                <div class=\"details-content\">\n                    <p>Los clientes antiguos destrozaban el código estándar (Core) de SAP con modificaciones Z (User Exits/BAdIs salvajes) que hacían imposible actualizar el ERP. El nuevo dogma es el <strong>Clean Core</strong>. Si necesitas una app compleja de Inteligencia Artificial para predecir atascos en EWM, la programas en la nube pública (SAP BTP) usando NodeJS o Java, y esta app en la nube se conecta a tu S/4HANA EWM local mediante APIs OData (Side-by-Side).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 8: Cloud Connector</h3>\n            <p>El túnel seguro de grado militar que conecta tu almacén físico on-premise con SAP BTP en la nube.</p>\n            <details>\n                <summary>Ver explicación a fondo (VPN Inversa)</summary>\n                <div class=\"details-content\">\n                    <p>Tu S/4HANA EWM está blindado tras el firewall corporativo de la fábrica y no tiene IP pública. El <strong>SAP Cloud Connector</strong> es un pequeño software instalado localmente que abre un túnel TLS saliente (VPN inversa) hacia SAP BTP. Gracias a esto, la app de drones en la nube puede leer los datos locales de EWM con máxima seguridad, sin necesidad de que el departamento de IT abra puertos entrantes peligrosos en el router principal.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 9: Event-Driven Architecture (Enterprise Messaging)</h3>\n            <p>La nueva forma de avisar a otros sistemas. \"EWM lanza un grito, y el que quiera lo escucha\".</p>\n            <details>\n                <summary>Ver explicación a fondo (Publish-Subscribe Pattern)</summary>\n                <div class=\"details-content\">\n                    <p>Antes, si EWM confirmaba un PGI, debía saber exactamente a qué 3 sistemas notificar de forma síncrona. Si uno estaba caído, fallaba todo. Ahora se usa <strong>SAP Event Mesh</strong>. EWM simplemente publica el evento asíncrono (ej. <code>GoodsIssueConfirmed</code>) en un bus de eventos (Topic). Un sistema CRM en AWS, una app móvil y una báscula pueden estar \"suscritos\" (Subscribers) a ese canal y reaccionar independientemente. Máxima escalabilidad.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 10: In-App Extensibility (Ampliaciones dentro de S/4HANA)</h3>\n            <p>Agregar un campo personalizado (Z) a un documento sin escribir código.</p>\n            <details>\n                <summary>Ver explicación a fondo (Key User Extensibility)</summary>\n                <div class=\"details-content\">\n                    <p>Necesitas agregar el campo \"Temperatura del Camión\" a la Inbound Delivery. Antes requerías semanas de un desarrollador ABAP (modificando tablas, pantallas y estructuras). Hoy, usas la app Fiori <strong>Custom Fields and Logic</strong>. En 5 clics creas el campo, y el sistema automáticamente altera la base de datos HANA, las Vistas CDS y las APIs OData en background. En 10 minutos está listo para producción (Key User Extensibility).</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 11: Machine Learning en EWM (SAP ISLM)</h3>\n            <p>Inteligencia artificial embebida para pronosticar fallos o predecir tiempos de entrega.</p>\n            <details>\n                <summary>Ver explicación a fondo (Intelligent Scenario Lifecycle Management)</summary>\n                <div class=\"details-content\">\n                    <p>La base de datos HANA posee bibliotecas nativas de Machine Learning (PAL - Predictive Analysis Library). EWM puede usarlas para predecir si una Outbound Delivery va a retrasarse basándose en el clima, el tráfico de la hora y el desempeño histórico del operario asignado, alertando al planificador en Fiori antes de que el camión siquiera llegue a la puerta.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 12: EWM Warehouse Monitor (/SCWM/MON) vs Fiori Dashboards</h3>\n            <p>¿Cuándo usar el monitor clásico y cuándo usar los analíticos de Fiori?</p>\n            <details>\n                <summary>Ver explicación a fondo (Operacional vs Analítico)</summary>\n                <div class=\"details-content\">\n                    <p>El <strong>Warehouse Monitor (/SCWM/MON)</strong> en SAP GUI es una herramienta <em>Operacional y Táctica</em>. Los supervisores lo usan para corregir errores, desbloquear WOs, cancelar tareas (Transaction Processing). Los <strong>Fiori CDS Dashboards</strong> son herramientas <em>Analíticas y Estratégicas</em>. Los gerentes las usan para ver gráficos circulares, tendencias semanales y cuellos de botella globales, pero generalmente no para intervenir en una caja específica rota.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 13: Core Data Services en Autorizaciones (DCL)</h3>\n            <p>Seguridad a nivel de fila. Un gerente regional solo puede ver gráficamente los almacenes de su región.</p>\n            <details>\n                <summary>Ver explicación a fondo (Data Control Language)</summary>\n                <div class=\"details-content\">\n                    <p>La seguridad de los reportes ya no se hace en la interfaz visual. Al crear una Vista CDS, el desarrollador asocia un objeto de autorización de SAP en un script <strong>DCL (Data Control Language)</strong>. Si el Gerente de Colombia entra a la app Fiori global, el motor de HANA filtra a nivel de SQL (Row-level security) asegurando que el gerente no pueda ver los inventarios del Centro de México, bloqueando fugas de datos de raíz.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 14: Migración del código antiguo al nuevo paradigma (AMDP)</h3>\n            <p>ABAP Managed Database Procedures. Cómo empujar procedimientos complejos a HANA.</p>\n            <details>\n                <summary>Ver explicación a fondo (SQLScript nativo)</summary>\n                <div class=\"details-content\">\n                    <p>Si la lógica de negocio es tan compleja que una Vista CDS no basta (ej. el algoritmo matricial de consolidación de cajas de EWM), los arquitectos escriben <strong>AMDP (ABAP Managed Database Procedures)</strong>. Básicamente, se incrusta código nativo SQLScript de HANA (Loops de base de datos ultrarrápidos) dentro de una clase ABAP, fusionando lo mejor del mantenimiento tradicional con la potencia paralela de la memoria in-memory.</p>\n                </div>\n            </details>",
+  "<h3>Capítulo 15: Fin del Viaje del Arquitecto EWM</h3>\n            <p>La maestría técnica exige visión holística: el almacén no es una isla, es el corazón del comercio digital.</p>\n            <details>\n                <summary>Ver explicación a fondo (De Configurador a Arquitecto)</summary>\n                <div class=\"details-content\">\n                    <p>¡Felicidades! Has completado el programa maestro. Como Arquitecto S/4HANA EWM, tu valor ya no reside en memorizar transacciones, sino en comprender cómo la Estructura Empresarial (Semestre 1) fluye hacia la Física del Inbound (Semestre 2) y el Ritmo del Outbound (Semestre 3), cómo la mecatrónica MFS y los recursos humanos escalan la operación (Semestre 4), cómo la industria de la Calidad y Producción dictan las reglas logísticas (Semestre 5) y finalmente, cómo exponer toda esta maquinaria mediante APIs modernas a la Inteligencia Artificial y Fiori (Semestre 6). Estás listo para certificar y liderar la Supply Chain global.</p>\n                </div>\n            </details>"
+ ],
+ "resumen": "Regla de Oro: En S/4HANA (Code-to-Data paradigm), los cálculos ya no se hacen en la capa de aplicación ABAP, sino que se delegan (Push-down) a los motores nativos de la base de datos HANA mediante Vistas CDS. Esto permite que millones de líneas de inventario se sumaricen en un gráfico de barras Fiori en 120 milisegundos y se expongan como APIs OData.",
+ "examen": [
+  {
+   "pregunta": "¿En qué consiste el paradigma tecnológico 'Code-to-Data' introducido por la base de datos SAP HANA?",
+   "opciones": [
+    {
+     "texto": "Delegar la carga de cálculos masivos (sumas, agrupaciones) directamente a los motores de la base de datos en memoria (HANA), en lugar de traer millones de registros a la memoria RAM de aplicación ABAP.",
+     "correcta": true
+    },
+    {
+     "texto": "Extraer la información a discos duros lentos para archivado.",
+     "correcta": false
+    },
+    {
+     "texto": "Imprimir en papel todo el código fuente.",
+     "correcta": false
+    },
+    {
+     "texto": "Usar bases de datos Oracle como almacenamiento en la nube.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En el moderno S/4HANA, ¿qué es una Vista CDS (Core Data Services)?",
+   "opciones": [
+    {
+     "texto": "Una vista SQL avanzada que, además de realizar uniones de tablas (Joins), integra semántica de negocio y anotaciones directas para seguridad, interfaces Fiori (UI) y publicación como servicios web.",
+     "correcta": true
+    },
+    {
+     "texto": "Una pantalla verde antigua de SAP GUI.",
+     "correcta": false
+    },
+    {
+     "texto": "Un disco de instalación de software en CD-ROM.",
+     "correcta": false
+    },
+    {
+     "texto": "Una herramienta de recursos humanos para contratar gerentes.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué característica poderosa proporcionan las 'Anotaciones' (@Annotations) dentro del código fuente de una Vista CDS?",
+   "opciones": [
+    {
+     "texto": "Permiten inyectar comportamientos automáticos, como @OData.publish:true, que expone inmediatamente la consulta de base de datos como una API RESTful sin tener que programar infraestructura backend.",
+     "correcta": true
+    },
+    {
+     "texto": "Permiten escribir comentarios de texto para que los lean los auditores legales.",
+     "correcta": false
+    },
+    {
+     "texto": "Eliminan por completo la necesidad de tener tablas SQL.",
+     "correcta": false
+    },
+    {
+     "texto": "Apagan el servidor HANA durante los fines de semana.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En la arquitectura analítica de SAP (Virtual Data Model - VDM), ¿qué diferencia hay entre las Basic Views y las Consumption Views (C-Views)?",
+   "opciones": [
+    {
+     "texto": "Las Basic Views leen las tablas físicas 1:1 (son privadas/base). Las Consumption Views están en la punta de la pirámide, adaptadas con filtros y gráficos específicos para ser consumidas directamente por SAP Fiori.",
+     "correcta": true
+    },
+    {
+     "texto": "Las Basic Views están en Fiori y las Consumption Views son para Oracle.",
+     "correcta": false
+    },
+    {
+     "texto": "Las Basic Views son gratuitas y las Consumption Views cuestan dinero.",
+     "correcta": false
+    },
+    {
+     "texto": "Son exactamente lo mismo.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué herramienta del ecosistema SAP UI permite a los desarrolladores o arquitectos generar aplicaciones Fiori (listas, tablas y dashboards) leyendo automáticamente las anotaciones de las Vistas CDS sin programar JavaScript/HTML5 desde cero?",
+   "opciones": [
+    {
+     "texto": "SAP Fiori Elements (Smart Templates).",
+     "correcta": true
+    },
+    {
+     "texto": "Microsoft Excel.",
+     "correcta": false
+    },
+    {
+     "texto": "Adobe Acrobat Reader.",
+     "correcta": false
+    },
+    {
+     "texto": "SAP Logon Pad (GUI).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál es el beneficio de 'S/4HANA Embedded Analytics' en la operación diaria de EWM frente al uso histórico de SAP BW (Business Warehouse)?",
+   "opciones": [
+    {
+     "texto": "Permite ejecutar tableros y KPIs gráficos pesados en tiempo real directo sobre la misma máquina transaccional EWM sin bloquear el almacén, eliminando los retrasos (latencia) de la extracción nocturna.",
+     "correcta": true
+    },
+    {
+     "texto": "Requiere comprar servidores nuevos cada año.",
+     "correcta": false
+    },
+    {
+     "texto": "Obliga a detener el almacén durante 2 horas al día para procesar los datos.",
+     "correcta": false
+    },
+    {
+     "texto": "Envía la información de inventario por fax a los clientes.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Para integrar SAP S/4HANA EWM con aplicaciones externas modernas (como drones, apps móviles de clientes en AWS o Azure), ¿qué protocolo estándar y ligero expone SAP a través del SAP Gateway?",
+   "opciones": [
+    {
+     "texto": "OData v2/v4 APIs (RESTful web services respondiendo típicamente en JSON o XML).",
+     "correcta": true
+    },
+    {
+     "texto": "Floppy Disks de 3.5 pulgadas.",
+     "correcta": false
+    },
+    {
+     "texto": "Documentos físicos impresos en matricial.",
+     "correcta": false
+    },
+    {
+     "texto": "Mensajes SMS analógicos.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué es 'SAP Business Technology Platform' (BTP) en el paradigma del 'Clean Core' corporativo?",
+   "opciones": [
+    {
+     "texto": "El entorno y plataforma en la nube (PaaS) de SAP donde los desarrolladores construyen integraciones complejas y apps satélite (Side-by-Side Extensibility) sin contaminar o modificar el código fuente estándar del servidor S/4HANA local.",
+     "correcta": true
+    },
+    {
+     "texto": "Una empresa de transporte de camiones físicos.",
+     "correcta": false
+    },
+    {
+     "texto": "Un sistema operativo para teléfonos Android.",
+     "correcta": false
+    },
+    {
+     "texto": "La herramienta para compilar código ABAP clásico en terminales de texto.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En una arquitectura donde el almacén SAP EWM se aloja de forma local (On-Premise) en los servidores corporativos físicos, ¿cómo se conecta de manera segura a las apps y servicios de la nube pública SAP BTP sin abrir puertos de entrada vulnerables en el firewall?",
+   "opciones": [
+    {
+     "texto": "Utilizando SAP Cloud Connector, que establece un túnel VPN saliente (TLS) desde la red interna hacia la nube BTP de SAP, garantizando control y cifrado de grado militar.",
+     "correcta": true
+    },
+    {
+     "texto": "Publicando la base de datos HANA abierta a Internet para todos.",
+     "correcta": false
+    },
+    {
+     "texto": "Mediante memorias USB enviadas por correo certificado.",
+     "correcta": false
+    },
+    {
+     "texto": "Cambiando temporalmente las contraseñas a '1234'.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "A diferencia de las comunicaciones síncronas clásicas punto-a-punto (API/RFC) que fallan si el receptor está caído, ¿qué arquitectura moderna usa SAP Event Mesh (Event-Driven Architecture) para ser resiliente?",
+   "opciones": [
+    {
+     "texto": "Publish-Subscribe Pattern: EWM publica eventos de negocio ('Se confirmó un despacho') asíncronamente en un Bus o Topic en la nube, y múltiples sistemas suscritos pueden consumirlos a su propio ritmo sin bloquear a EWM.",
+     "correcta": true
+    },
+    {
+     "texto": "Llamadas telefónicas de emergencia del gerente.",
+     "correcta": false
+    },
+    {
+     "texto": "Transmisión de radio FM local.",
+     "correcta": false
+    },
+    {
+     "texto": "Peticiones sincrónicas que congelan EWM hasta que el sistema destino responde.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si el negocio logístico exige añadir un campo personalizado (Z) llamado 'Temperatura Camión' al documento Inbound Delivery de EWM, ¿qué herramienta de S/4HANA permite a un Key User hacerlo en minutos sin requerir un programador ABAP?",
+   "opciones": [
+    {
+     "texto": "La aplicación Fiori 'Custom Fields and Logic' (In-App Extensibility), que adapta automáticamente la BD, CDS y APIs subyacentes.",
+     "correcta": true
+    },
+    {
+     "texto": "Un script en lenguaje C++ ensamblado desde cero.",
+     "correcta": false
+    },
+    {
+     "texto": "Alterar directamente las celdas en SQL Developer como DBA.",
+     "correcta": false
+    },
+    {
+     "texto": "No se pueden agregar campos en S/4HANA EWM.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En el mundo analítico, ¿qué rol juegan los archivos DCL (Data Control Language) unidos a una Vista CDS de EWM?",
+   "opciones": [
+    {
+     "texto": "Aplican reglas de autorización y seguridad a nivel de fila (Row-Level Security), bloqueando directamente en la base de datos SQL el acceso a datos (ej. un centro logístico) que el usuario no tiene permiso de ver.",
+     "correcta": true
+    },
+    {
+     "texto": "Generan colores bonitos en el gráfico de pastel de Fiori.",
+     "correcta": false
+    },
+    {
+     "texto": "Borran el disco duro si detectan un ataque cibernético.",
+     "correcta": false
+    },
+    {
+     "texto": "Traducen las consultas de inglés a español.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál es la distinción primordial en los casos de uso entre el EWM Warehouse Monitor (/SCWM/MON) y un Dashboard de KPIs en SAP Fiori CDS?",
+   "opciones": [
+    {
+     "texto": "El Monitor es táctico/operativo (permite resolver excepciones, cancelar WTs o interactuar activamente). Los Fiori Dashboards son analíticos/estratégicos (para visualizar métricas históricas, tendencias y sumatorias directivas).",
+     "correcta": true
+    },
+    {
+     "texto": "Fiori solo funciona en blanco y negro, el Monitor es a color.",
+     "correcta": false
+    },
+    {
+     "texto": "No hay diferencia, son el mismo programa con distinto nombre.",
+     "correcta": false
+    },
+    {
+     "texto": "El Monitor es solo para Finanzas (FI) y Fiori es solo para EWM.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Cuando un algoritmo logístico requiere matemáticas iterativas tan complejas y densas que las sentencias SQL estándar de una Vista CDS no son suficientes, ¿qué tecnología permite a los desarrolladores empujar lógicas potentes a la memoria de HANA?",
+   "opciones": [
+    {
+     "texto": "AMDP (ABAP Managed Database Procedures), donde el código nativo de HANA (SQLScript) se incrusta y encapsula dentro de clases ABAP.",
+     "correcta": true
+    },
+    {
+     "texto": "BAdIs clásicas corriendo en la RAM del servidor de aplicación.",
+     "correcta": false
+    },
+    {
+     "texto": "Macros de Microsoft Excel.",
+     "correcta": false
+    },
+    {
+     "texto": "SmartForms.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué característica de SAP HANA (PAL) permite implementar algoritmos predictivos en EWM, como prever demoras en salidas basándose en el clima y la eficiencia histórica?",
+   "opciones": [
+    {
+     "texto": "Las bibliotecas nativas de Machine Learning e Inteligencia Artificial embebidas (ISLM), que entrenan y ejecutan predicciones directamente sobre los datos operativos sin exportarlos.",
+     "correcta": true
+    },
+    {
+     "texto": "Un generador de números aleatorios simple.",
+     "correcta": false
+    },
+    {
+     "texto": "El catálogo de piezas de repuesto en formato PDF.",
+     "correcta": false
+    },
+    {
+     "texto": "El sistema de control de accesos (molinetes) de la garita de seguridad.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En S/4HANA In-App Extensibility, ¿qué tecnología se utiliza si un Key User necesita aplicar una regla de validación de negocio simple en Fiori (ej. si campo X > 10, mostrar error)?",
+   "opciones": [
+    {
+     "texto": "ABAP para Cloud (Restricted ABAP / Cloud BAdIs), que es un subconjunto seguro del lenguaje ABAP que garantiza que la lógica no romperá el sistema en futuras actualizaciones (Clean Core).",
+     "correcta": true
+    },
+    {
+     "texto": "Ensamblador de 16 bits.",
+     "correcta": false
+    },
+    {
+     "texto": "BAdIs clásicas sin restricciones donde se puede borrar toda la base de datos.",
+     "correcta": false
+    },
+    {
+     "texto": "Modificación del kernel de Linux de SAP.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si creas una CDS View Consumption en S/4HANA EWM, ¿cómo es que SAP Fiori sabe que debe presentar un 'Gráfico de Barras' en lugar de una simple tabla al usuario final?",
+   "opciones": [
+    {
+     "texto": "Porque el desarrollador inyectó las Anotaciones de Interfaz Gráfica de Fiori Elements (@UI.chart, @UI.lineItem) directamente en el código de la Vista CDS, indicando el tipo de renderizado esperado.",
+     "correcta": true
+    },
+    {
+     "texto": "Fiori adivina aleatoriamente el gráfico cada vez que el usuario se conecta.",
+     "correcta": false
+    },
+    {
+     "texto": "El gerente llama a soporte técnico de SAP para configurar el gráfico manualmente.",
+     "correcta": false
+    },
+    {
+     "texto": "HANA envía un correo pidiendo instrucciones al usuario.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En un ecosistema BTP (Business Technology Platform) integrado a EWM local (On-Premise), ¿cómo se considera arquitectónicamente a la aplicación en la nube que consume las APIs de EWM para pronosticar stock?",
+   "opciones": [
+    {
+     "texto": "Una aplicación de extensibilidad paralela o Side-by-Side Extensibility, que escala el poder de cómputo en AWS/Azure sin poner en riesgo la máquina EWM local.",
+     "correcta": true
+    },
+    {
+     "texto": "Un virus de red.",
+     "correcta": false
+    },
+    {
+     "texto": "Una versión pirata de SAP.",
+     "correcta": false
+    },
+    {
+     "texto": "Un add-on (plug-in) que se instala con CD-ROM en el servidor físico local.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál de las siguientes afirmaciones describe mejor el verdadero rol moderno de un 'Consultor Arquitecto Senior' en SAP S/4HANA EWM (como tú al finalizar este curso)?",
+   "opciones": [
+    {
+     "texto": "Un orquestador holístico que no solo configura almacenes, sino que entiende cómo la EWM se integra con Finanzas, Manufactura, Calidad, Mecatrónica y APIs modernas para construir la Cadena de Suministro Digital del futuro.",
+     "correcta": true
+    },
+    {
+     "texto": "Alguien que memoriza transacciones antiguas pero se niega a usar Fiori o CDS.",
+     "correcta": false
+    },
+    {
+     "texto": "Un operador de montacargas que aprobó un examen teórico.",
+     "correcta": false
+    },
+    {
+     "texto": "Un desarrollador web frontend que no sabe nada de logística.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál es la misión tecnológica de S/4HANA como pilar en la revolución logística y Supply Chain?",
+   "opciones": [
+    {
+     "texto": "Convertir operaciones complejas, asiladas y reactivas en procesos empresariales integrados, en tiempo real (In-Memory), predecibles y escalables hacia ecosistemas de automatización y nube (Intelligent Enterprise).",
+     "correcta": true
+    },
+    {
+     "texto": "Hacer que los reportes se impriman con letras más oscuras en papel.",
+     "correcta": false
+    },
+    {
+     "texto": "Cobrar suscripciones más baratas para bases de datos de texto plano.",
+     "correcta": false
+    },
+    {
+     "texto": "Vender montacargas diésel pintados de color azul corporativo.",
+     "correcta": false
+    }
+   ]
+  }
+ ]
+}

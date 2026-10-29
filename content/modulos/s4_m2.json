@@ -1,0 +1,863 @@
+{
+ "id": "s4_m2",
+ "paginas": [
+  "<h3>Capítulo 1: El Problema Económico del Viaje en Vacío (Deadheading)</h3>\n            <p>En un centro de distribución operado de forma tradicional, la flota de montacargas se divide en compartimentos estancos: un grupo de operarios se dedica exclusivamente a guardar palets entrantes (Putaway) y otro grupo se dedica a extraer palets para pedidos de salida (Picking). Analicemos la cinemática de este modelo clásico:</p>\n            <ul>\n                <li>El Montacargas A toma un palet en el muelle de recepción (Zona 9010), conduce 250 metros hasta el Pasillo 14 Nivel 5, deposita el palet y <strong>regresa los 250 metros con las horquillas completamente vacías</strong> hasta el muelle para buscar otro palet.</li>\n                <li>Simultáneamente, el Montacargas B sale vacío desde el muelle de despacho (Zona 9020), conduce los mismos 250 metros hasta el Pasillo 14 Nivel 4, toma un palet para un cliente y regresa cargado al muelle.</li>\n            </ul>\n            <p>En este escenario sin orquestación algorítmica, <strong>el 50% de los kilómetros recorridos por la flota de montacargas se realiza sin carga útil</strong>. En logística industrial, este fenómeno se denomina <strong>Deadheading (Viaje en Vacío)</strong>. Representa millones de dólares anuales desperdiciados en ciclos de batería de litio, desgaste de llantas de poliuretano, congestión de pasillos y horas-hombre improductivas. El módulo de <strong>Resource Management (RM)</strong> de SAP S/4HANA EWM existe para reducir ese 50% de viaje en vacío a menos del 12%.</p>",
+  "<h3>Capítulo 2: Arquitectura de Resource Management en SAP S/4HANA EWM</h3>\n            <p>Para que SAP EWM deje de ser un simple registro contable de ubicaciones y se convierta en un director de orquesta en tiempo real, el sistema modela a cada actor que ejecuta trabajo físico dentro del almacén como un <strong>Recurso (Resource)</strong>. Un Recurso en SAP EWM es la combinación lógica de un vehículo o equipo de manipulación (montacargas retráctil, transpaleta eléctrica, grúa trilateral, carrito de picking manual) y el operario humano que se autentica en él mediante un dispositivo móvil.</p>\n            <p>La arquitectura de Resource Management descansa sobre cuatro pilares configurables en SPRO y datos maestros:</p>\n            <ol>\n                <li><strong>Resource Type (Tipo de Recurso):</strong> Clasifica las capacidades físicas y mecánicas de la máquina (velocidad horizontal, velocidad de elevación vertical, peso máximo soportado y tipo de acceso a estanterías).</li>\n                <li><strong>Resource Queue (Cola de Trabajo):</strong> Agrupación lógica de órdenes de almacén (Warehouse Orders - WOs) según su área de actividad de origen, área de destino y proceso logístico.</li>\n                <li><strong>Resource Group (Grupo de Recursos):</strong> Define a qué colas de trabajo tiene permitido acceder un conjunto de montacargas y en qué orden de prioridad (Queue Sequence).</li>\n                <li><strong>Execution Priorities (Prioridades de Ejecución):</strong> Ponderación matemática que determina qué tarea es más urgente dentro de una misma cola.</li>\n            </ol>",
+  "<h3>Capítulo 3: Resource Types, Velocidad y Restricciones Dimensionales (Bin Access Types)</h3>\n            <p>Imagina el caos operativo si SAP enviara a un operario que camina a pie con una carretilla hidráulica manual a extraer un palet situado a <strong>11 metros de altura</strong> en el nivel 6 de un rack selectivo, o si enviara a un montacargas contrabalanceado gigante a un pasillo ultra-angosto (VNA - Very Narrow Aisle) donde físicamente no cabe y derribaría la estantería.</p>\n            <p>SAP EWM previene este error físico cruzando dos parámetros maestros críticos antes de asignar cualquier trabajo:</p>\n            <ul>\n                <li><strong>Bin Access Type (Tipo de Acceso a Ubicación):</strong> Es un atributo que se asigna a cada Storage Bin en el dato maestro (<code>/SCWM/LS01</code> o carga masiva). Por ejemplo: <code>BA01</code> = Nivel de Piso (accesible a pie), <code>BA02</code> = Rack Medio hasta 4 metros (apilador eléctrico), <code>BA03</code> = Gran Altura hasta 14 metros (montacargas retráctil Reach Truck), <code>BA04</code> = Pasillo VNA con cable guía.</li>\n                <li><strong>Handling Unit Type Group (Grupo de Tipo de HU):</strong> Define qué tipos de contenedores puede levantar la horquilla del recurso (ej. EuroPalet, Tambor Químico, Caja suelta, Bobina de acero).</li>\n            </ul>\n            <p>En la configuración del <strong>Resource Type</strong>, el consultor declara exactamente qué combinación de <em>Bin Access Types</em> y <em>HU Type Groups</em> soporta ese vehículo, además de su velocidad media en metros por segundo (ej. <code>2.5 m/s</code>). Si una Warehouse Order involucra un Bin con acceso <code>BA03</code>, un operario logueado con un recurso que solo tiene permiso <code>BA01</code> jamás verá esa tarea en su pantalla RF.</p>",
+  "<h3>Capítulo 4: Ingeniería de Colas de Trabajo (Resource Queues y Queue Determination)</h3>\n            <p>Una <strong>Resource Queue (Cola de Recursos)</strong> es el buzón virtual donde caen las Warehouse Orders (WOs) recién creadas esperando a que un operario las tome y ejecute. En un almacén bien diseñado en SAP EWM, las colas nunca se crean al azar; responden a una matriz determinista llamada <strong>Queue Determination Criteria</strong>.</p>\n            <p>Cuando SAP EWM crea una Warehouse Order (por ejemplo, al liberar una Ola o contabilizar un PGR), el sistema consulta la tabla de determinación de colas evaluando cinco variables clave de la tarea:</p>\n            <ul>\n                <li><strong>1. Source Activity Area (Área de Actividad Origen):</strong> ¿En qué zona nace el movimiento? (Ej. <code>GR01</code> Zona de Recepción).</li>\n                <li><strong>2. Destination Activity Area (Área de Actividad Destino):</strong> ¿Hacia qué zona va la carga? (Ej. <code>RACK</code> Estantería Alta o <code>GI01</code> Zona de Despacho).</li>\n                <li><strong>3. Bin Access Type:</strong> ¿Qué tipo de máquina requiere la ubicación?</li>\n                <li><strong>4. Warehouse Process Type (WPT):</strong> ¿Cuál es la naturaleza del movimiento? (Ej. <code>1010</code> Putaway, <code>2010</code> Picking, <code>3010</code> Replenishment).</li>\n                <li><strong>5. Activity (Actividad):</strong> <code>PUTA</code> (Guardar), <code>PICK</code> (Extraer), <code>internal</code> (Movimiento interno), <code>INVE</code> (Conteo físico).</li>\n            </ul>\n            <p>Por ejemplo: <em>Origen = GR01 + Destino = RACK + WPT = 1010 -> Asignar automáticamente a la Cola <code>Q_INB_PUTAWAY</code></em>.</p>",
+  "<h3>Capítulo 5: Grupos de Recursos y Secuencias de Colas (Queue Sequences)</h3>\n            <p>Si un montacarguista estuviera atado de forma rígida a una sola cola (por ejemplo, solo a la cola <code>Q_PASILLO_01</code>), en el momento en que se acaben las tareas del Pasillo 1 el operario se quedaría de brazos cruzados mirando su pantalla vacía, mientras en el Pasillo 2 hay 80 tareas atrasadas a punto de perder la hora de corte del camión.</p>\n            <p>Para dotar de elasticidad a la plantilla laboral, SAP EWM utiliza los <strong>Resource Groups (Grupos de Recursos)</strong> y las <strong>Queue Sequences (Secuencias de Colas)</strong> mantenidas en la transacción <code>/SCWM/QSEQ</code>:</p>\n            <ul>\n                <li>Al Recurso <code>FORK_01</code> no se le asigna una cola única, sino que se le vincula al Grupo de Recursos <code>RG_ZONA_NORTE</code>.</li>\n                <li>El Grupo <code>RG_ZONA_NORTE</code> tiene configurada una secuencia ordenada de búsqueda:\n                    <br><strong>Prioridad 1:</strong> Cola <code>Q_INB_URGENTE</code> (Descargas prioritarias).\n                    <br><strong>Prioridad 2:</strong> Cola <code>Q_REPLENISH_NORTE</code> (Reabastecimientos de piso).\n                    <br><strong>Prioridad 3:</strong> Cola <code>Q_PICK_NORTE</code> (Picking general).\n                    <br><strong>Prioridad 4:</strong> Cola <code>Q_PICK_SUR</code> (Apoyo solidario a la zona vecina si todo el Norte está limpio).</li>\n            </ul>\n            <p>De esta manera, SAP busca trabajo en la Prioridad 1; solo cuando esa cola tiene 0 tareas disponibles, salta en milisegundos a buscar en la Prioridad 2, garantizando ocupación continua del 100% durante todo el turno.</p>",
+  "<h3>Capítulo 6: Modos de Procesamiento: System-Guided vs Semi-System-Guided vs Manual</h3>\n            <p>Cuando un operario sostiene la pistola de Radiofrecuencia (RFUI), SAP EWM permite tres filosofías operativas para entregarle su trabajo:</p>\n            <ul>\n                <li><strong>1. System-Guided Processing (Guiado por el Sistema - Recomendado Enterprise):</strong> El operario no elige qué hacer. Pulsa \"Ejecutar Guiado por Sistema\" y el motor algorítmico de SAP selecciona la mejor Warehouse Order disponible y la proyecta directamente en pantalla. Elimina el vicio del <em>\"Cherry-Picking\"</em> (donde los operarios escogen las tareas fáciles o cercanas al baño y dejan las pesadas para el turno nocturno).</li>\n                <li><strong>2. Semi-System-Guided Processing (Semi-Guiado por Cola):</strong> Se utiliza cuando hay varias órdenes de trabajo apiladas físicamente sin un orden previsible (por ejemplo, 30 palets mezclados en el muelle de recepción). El operario elige o escanea cualquier HU física que tiene frente a él en la cola, y a partir de ese escaneo el sistema toma el control guiándolo hacia el Bin destino.</li>\n                <li><strong>3. Manual Selection (Por Solicitud Directa de WO/HU):</strong> El operario digita o escanea manualmente el código de barras de una hoja de picking impresa o el número exacto de una Warehouse Order. Se reserva únicamente para supervisores, auditorías o contingencias.</li>\n            </ul>",
+  "<h3>Capítulo 7: El Algoritmo Matemático de Selección de Warehouse Orders (WO Prioritization)</h3>\n            <p>Supongamos que en la Cola <code>Q_PICK_NORTE</code> hay 50 Warehouse Orders abiertas esperando ser ejecutadas y el montacargas <code>FORK_01</code> acaba de quedar libre. ¿Cómo decide SAP EWM cuál de esas 50 órdenes enviarle primero en modo <em>System-Guided</em>? El motor calcula en tiempo real un puntaje de prioridad combinando tres factores:</p>\n            <ol>\n                <li><strong>Execution Priority Weighting (Peso de Prioridad de Origen):</strong> Combina la prioridad del tipo de proceso (WPT), la prioridad del tipo de ubicación y la prioridad comercial del cliente en la Outbound Delivery Order.</li>\n                <li><strong>Latest Starting Date / Time (LSD - Fecha/Hora Límite de Inicio):</strong> SAP calcula hacia atrás a partir de la hora de salida del camión (Wave Cutoff / Departure Time) restando el tiempo estimado de carga, empaque y duración de la tarea. A medida que el reloj actual se acerca al <strong>LSD</strong> de una Warehouse Order, su urgencia sube exponencialmente para evitar que el camión salga incompleto.</li>\n                <li><strong>Posición Actual del Recurso (Last Known Bin):</strong> SAP guarda en la tabla de estado del recurso cuál fue el último Storage Bin donde ese montacargas confirmó su tarea anterior. Entre dos WOs de igual urgencia, SAP elige aquella cuyo primer Bin de origen esté a menor distancia física de la ubicación actual del montacargas.</li>\n            </ol>",
+  "<h3>Capítulo 8: Task Interleaving (Entrelazado de Tareas): El Santo Grial de la Eficiencia</h3>\n            <p>Llegamos a la cúspide de la optimización operativa en SAP S/4HANA EWM: el <strong>Task Interleaving (Entrelazado de Tareas)</strong>. Como estudiamos en el Capítulo 1, el peor enemigo de la rentabilidad es el <em>Deadheading</em> (regresar vacío al muelle después de guardar un palet). El Task Interleaving erradica este fenómeno unificando los ciclos de entrada y salida en un bucle continuo.</p>\n            <p>Veamos cómo opera un ciclo con <strong>Task Interleaving Activo</strong>:</p>\n            <ol>\n                <li>El montacargas <code>FORK_01</code> está en el muelle de entrada (Zona 9010). El sistema mira su secuencia de colas y le asigna una tarea de la <strong>Cola 1: Putaway (<code>Q_PUTAWAY</code>)</strong>.</li>\n                <li>El operario toma el Palet Entrante X, viaja al Pasillo 8, Ubicación <code>08-15-03</code>, lo deposita en el rack y escanea el código de confirmación en su terminal RF.</li>\n                <li>En ese exacto milisegundo, el sistema sabe que <code>FORK_01</code> se encuentra detenido en las coordenadas del Pasillo 8 (<code>08-15-03</code>) con las horquillas vacías.</li>\n                <li>En lugar de buscar otra tarea en la Cola 1 (que lo obligaría a viajar vacío de vuelta al muelle 9010), <strong>el algoritmo de Task Interleaving salta forzosamente a la Cola 2: Picking o Replenishment (<code>Q_PICKING</code>)</strong> y busca la Warehouse Order de extracción cuyo Bin de origen esté más cerca de <code>08-15-03</code>.</li>\n                <li>SAP encuentra una tarea de Picking en <code>08-16-01</code> (a solo 3 metros de distancia). El operario se mueve 3 metros, extrae el Palet Saliente Y y viaja cargado hacia el muelle de despacho (Zona 9020). ¡Cero metros recorridos en vacío!</li>\n            </ol>",
+  "<h3>Capítulo 9: Configuración Técnica del Task Interleaving y Radios de Búsqueda</h3>\n            <p>Como arquitecto de sistemas, no basta con entender el concepto: debes saber cómo se parametriza en SPRO y en las transacciones maestras de SAP EWM para que el entrelazado no genere efectos secundarios indeseados:</p>\n            <ul>\n                <li><strong>Activación en la Queue Sequence (<code>/SCWM/QSEQ</code>):</strong> Dentro de la secuencia de colas asignada al Resource Group, existe una casilla de verificación (Flag) llamada <strong><code>Interleaving</code> (Entrelazado activo)</strong> por cada cola. Si marcas con este flag la cola <code>Q_PUTAWAY</code> y la cola <code>Q_PICKING</code>, cuando el recurso termine una WO de <code>Q_PUTAWAY</code>, el sistema no volverá a leer <code>Q_PUTAWAY</code> en el siguiente ciclo, sino que pasará obligatoriamente a evaluar <code>Q_PICKING</code>.</li>\n                <li><strong>Radio Máximo de Búsqueda (Maximum Travel Distance for Interleaving):</strong> ¿Qué ocurre si el montacargas termina un Putaway en el Pasillo 1 (extremo norte), y la única tarea de Picking disponible en toda la bodega está en el Pasillo 50 (a 800 metros en el extremo sur)? Si el sistema lo obligara a cruzar 800 metros vacío para hacer ese picking, el remedio sería peor que la enfermedad. Por ello, en SAP se configura un <strong>Radio Máximo de Distancia</strong>: si no existe ninguna tarea de Picking dentro de un radio cercano (ej. 60 metros) respecto a la ubicación actual del montacargas, SAP aborta el Interleaving en ese ciclo o busca en la siguiente cola cercana.</li>\n            </ul>",
+  "<h3>Capítulo 10: Arquitectura del Radio Frequency Framework (/SCWM/RFUI) y Logical Transactions</h3>\n            <p>El 95% de los operarios de un almacén jamás ven la interfaz gráfica de escritorio de SAP (SAP GUI ni Fiori Launchpad de oficina). Ellos interactúan con el sistema a través del <strong>RF Framework (Transacción <code>/SCWM/RFUI</code>)</strong>, renderizado en terminales portátiles robustas (Zebra, Honeywell), tablets montadas en el chasis del montacargas (Vehicle-Mounted Terminals) o lectores de anillo en el dedo, frecuentemente conectados mediante <strong>SAP ITSmobile</strong> (que convierte pantallas ABAP en HTML ligero para navegadores industriales).</p>\n            <p>A diferencia de SAP ERP clásico, donde cada pantalla era un programa rígido, el <strong>RF Framework de EWM</strong> separa completamente la lógica de negocio de la visualización mediante tres capas arquitectónicas:</p>\n            <ul>\n                <li><strong>Logical Transaction (Transacción Lógica):</strong> Es el proceso funcional sin pantalla (ej. <code>PIIN</code> para Picking por WR, <code>PUHU</code> para Putaway por HU). Controla el flujo de pasos (Step Flow).</li>\n                <li><strong>Function Module (Módulos de Función ABAP):</strong> Bloques de código que se ejecutan al pulsar <em>Enter</em> en cada paso (PBO - Process Before Output para preparar los datos en pantalla, y PAI - Process After Input para validar lo que escaneó el operario).</li>\n                <li><strong>Subscreens y Dynpros Técnicas:</strong> Las plantillas visuales que se adaptan al tamaño en píxeles o líneas de caracteres (ej. formato <code>8x40</code> o <code>16x20</code>) del dispositivo físico.</li>\n            </ul>",
+  "<h3>Capítulo 11: Personalización de Pantallas RF, Perfiles de Presentación y Campos de Verificación</h3>\n            <p>En la vida real, cada cliente corporativo exige adaptar las pantallas de sus pistolas RF: ocultar campos irrelevantes, agregar el logo o cambiar el orden de escaneo sin romper el estándar de SAP. Esto se logra en el Customizing mediante el <strong>RF Screen Manager (<code>/SCWM/RFSCR</code>)</strong> manejando dos perfiles maestros:</p>\n            <ul>\n                <li><strong>Presentation Profile (Perfil de Presentación):</strong> Agrupa las características de la interfaz general y el menú de botones asignado a un tipo de almacén o grupo de usuarios.</li>\n                <li><strong>Personalization Profile (Perfil de Personalización):</strong> Permite clonar una pantalla estándar a una sub-pantalla personalizada (en el rango de cliente <code>9000</code>), mover botones de función (<code>F1</code> a <code>F12</code>), o fusionar dos pasos de confirmación en uno solo sin tocar el motor estándar de SAP.</li>\n            </ul>\n            <p>Además, para garantizar <strong>Cero Errores Humanos</strong>, SAP EWM utiliza los <strong>Verification Profiles (Perfiles de Verificación)</strong> y el campo <strong>Check Digit (Dígito Verificador del Bin)</strong>: cuando el operario llega al Bin <code>05-10-02</code>, el sistema no le pide que escriba \"05-10-02\" de memoria, sino que lo obliga a disparar el láser contra un código de barras único pegado en la viga metálica del estante. Si el código escaneado no coincide al 100% con el Bin o con la HU solicitada, la pistola emite un pitido grave de error y bloquea la confirmación.</p>",
+  "<h3>Capítulo 12: Cálculo de Distancias de Viaje (Travel Distance Calculation - TDC) y Redes Viales</h3>\n            <p>Para que SAP EWM pueda saber exactamente cuántos metros debe recorrer un montacargas entre el Bin A y el Bin B (indispensable tanto para el <em>Task Interleaving</em> como para <em>Labor Management</em>), el sistema no puede calcular una simple línea recta diagonal (Distancia Euclidiana $\\sqrt{\\Delta X^2 + \\Delta Y^2}$), ¡porque los montacargas no pueden atravesar las estanterías de acero como fantasmas!</p>\n            <p>SAP EWM resuelve esto mediante el motor de <strong>Travel Distance Calculation (TDC - Cálculo de Distancia de Viaje)</strong>:</p>\n            <ul>\n                <li><strong>Coordenadas X, Y, Z en el Maestro de Bins:</strong> Cada ubicación del almacén tiene cargadas sus coordenadas métricas exactas en el plano cartesiano del edificio.</li>\n                <li><strong>Distancia Manhattan vs Red Vial (Storage Type Specific Networks):</strong> Dentro de un mismo pasillo, el sistema calcula el desplazamiento longitudinal más la elevación vertical del mástil. Para moverse del Pasillo 2 al Pasillo 9, SAP modela una <strong>Red de Nodos y Arcos (Edges & Nodes)</strong> que representa los pasillos transversales de circulación, definiendo si un pasillo es de doble vía o de <strong>Un Solo Sentido (One-Way Aisle)</strong>.</li>\n                <li><strong>Algoritmo de Dijkstra en HANA:</strong> Al evaluar qué tarea asignar o cuánto tiempo debe tardar un operario, SAP ejecuta el algoritmo de ruta más corta sobre la red de pasillos permitidos, obteniendo la distancia real al centímetro.</li>\n            </ul>",
+  "<h3>Capítulo 13: Introducción a SAP EWM Labor Management (LM) y Tiempos Estándar (ELS)</h3>\n            <p>¿Cómo sabe un Director de Operaciones si el operario Juan Pérez, que hoy movió 120 palets, fue más productivo que María Gómez, que movió 95 palets? Si Juan movió 120 palets que estaban a 5 metros de la puerta, y María movió 95 palets subiendo a 14 metros de altura en el fondo de la bodega, ¡en realidad María trabajó mucho mejor que Juan! Medir solo \"bultos por hora\" es injusto e inexacto.</p>\n            <p>El módulo <strong>SAP EWM Labor Management (LM)</strong> elimina la subjetividad aplicando la ingeniería industrial de <strong>Engineered Labor Standards (ELS - Estándares de Trabajo de Ingeniería)</strong> para calcular el <strong>Planned Duration (Tiempo Planificado Exacto)</strong> de cada tarea individual:</p>\n            <ul>\n                <li><strong>Fórmulas Basadas en MTM (Methods-Time Measurement):</strong> SAP divide la tarea en micro-movimientos: <em>Tiempo de aceleración del montacargas + (Distancia TDC / Velocidad del Resource Type) + Tiempo de elevación de horquillas a altura Z + Tiempo de lectura de escáner + Tiempo por peso/volumen de cajas recolectadas</em>.</li>\n                <li><strong>BRFplus (Business Rule Framework plus) o Fórmulas de Condición:</strong> El sistema calcula automáticamente que la Warehouse Order #500124 debe tomar exactamente <strong>4 minutos y 18 segundos</strong> en condiciones normales, teniendo en cuenta las curvas, el peso y la altura real de ese movimiento específico.</li>\n            </ul>",
+  "<h3>Capítulo 14: Documentos de Carga de Trabajo (Executed Workload) e Integración con RRHH/Bonos</h3>\n            <p>En <strong>Labor Management</strong>, toda la actividad diaria del personal se divide y audita en dos categorías que se registran mediante el procesador (<strong>Processor / Business Partner del Operario</strong>):</p>\n            <ul>\n                <li><strong>1. Direct Labor (Trabajo Directo):</strong> Todo movimiento rastreado automáticamente por el sistema al confirmar Warehouse Orders (Putaway, Picking, Replenishment, Conteo Físico). Al cerrarse la WO, SAP genera un registro en firme llamado <strong>Executed Workload (Carga de Trabajo Ejecutada)</strong> comparando el <em>Tiempo Planificado (ej. 4.5 min)</em> contra el <em>Tiempo Real Cronometrado (ej. 4.1 min)</em>.</li>\n                <li><strong>2. Indirect Labor (Trabajo Indirecto):</strong> Actividades necesarias que no mueven stock en el sistema, tales como limpiar el pasillo, cambiar la batería del montacargas, asistir a una charla de seguridad o envolver un palet con plástico film a mano. El operario registra el inicio y fin de estas tareas en su pistola RF para que ese tiempo no penalice su índice de eficiencia.</li>\n            </ul>\n            <p>Al finalizar la semana o el mes, estos registros de eficiencia (por ejemplo: <em>Eficiencia de María = 112% sobre el estándar ELS</em>) se transmiten vía interfaz estándar hacia <strong>SAP HCM (Human Capital Management) o SuccessFactors</strong> para liquidar de forma transparente y auditable los bonos salariales de productividad variable.</p>",
+  "<h3>Capítulo 15: Tablas Core SQL de Recursos y Gestión de Crisis en Vivo (/SCWM/MON)</h3>\n            <p>Para cerrar el Semestre 4 como un verdadero Arquitecto Senior de SAP S/4HANA EWM, debes dominar las tablas de base de datos donde reside la inteligencia de recursos y las herramientas de intervención en vivo ante emergencias operativas:</p>\n            <ul>\n                <li><strong>Tabla <code>/SCWM/RSRC</code>:</strong> Maestro y estado en vivo de todos los Recursos (indica qué usuario está logueado, en qué cola activa está, cuál es su última ubicación conocida y qué Warehouse Order tiene bloqueada actualmente).</li>\n                <li><strong>Tabla <code>/SCWM/QUEUE</code> y <code>/SCWM/QSEQ</code>:</strong> Definición de colas y secuencias de asignación por grupo.</li>\n                <li><strong>Tabla <code>/SCWM/WHO</code>:</strong> Cabecera de las Warehouse Orders (contiene el campo <code>QUEUE</code>, el <code>RSRC</code> asignado, el estado de ejecución y el <code>LSD</code> - Latest Starting Date).</li>\n                <li><strong>Tabla <code>/SCWM/EXCLD</code>:</strong> Almacena los documentos de <em>Executed Workload</em> de Labor Management con los tiempos planificados y reales.</li>\n            </ul>\n            <p><strong>Intervención de Crisis en <code>/SCWM/MON</code>:</strong> Si un montacarguista sufre un desmayo o la batería de su equipo muere a mitad de un pasillo dejando una Warehouse Order urgente \"En Proceso\" (bloqueada bajo su usuario), ningún otro operario podría tomarla. En segundos, el supervisor entra a <code>/SCWM/MON</code> -> nodo <em>Resource Management</em> -> ejecuta el método <strong>\"Forzar Cierre de Sesión / Desasignar WO del Recurso\"</strong> y cambia dinámicamente el grupo de colas de otros 3 montacargas para absorber la sobrecarga del pasillo afectado sin perder el corte de facturación.</p>"
+ ],
+ "resumen": "Regla de Oro: Resource Management asigna la Warehouse Order (WO) óptima evaluando Queue Sequence, Bin Access Type, Prioridad de Ejecución y Posición Actual del Recurso. El Task Interleaving alterna una WO de Putaway con una WO de Picking/Replenishment en la misma zona para erradicar el Deadheading (viajes con horquillas vacías).",
+ "examen": [
+  {
+   "pregunta": "En la ingeniería de almacenes, ¿qué significa exactamente el término 'Deadheading' que SAP EWM Resource Management busca erradicar?",
+   "opciones": [
+    {
+     "texto": "El desplazamiento de un montacargas u operario viajando con las horquillas vacías (sin carga útil) entre una tarea y la siguiente.",
+     "correcta": true
+    },
+    {
+     "texto": "Un bloqueo de base de datos SQL en el servidor HANA.",
+     "correcta": false
+    },
+    {
+     "texto": "La pérdida de señal Wi-Fi en las antenas del techo de la bodega.",
+     "correcta": false
+    },
+    {
+     "texto": "El vencimiento de la fecha de caducidad (SLED) de un lote farmacéutico.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En un almacén tradicional sin Task Interleaving donde los equipos de Putaway y Picking trabajan separados, ¿qué porcentaje aproximado de la distancia recorrida corresponde a viajes en vacío?",
+   "opciones": [
+    {
+     "texto": "Aproximadamente el 50% de los recorridos se realiza en vacío.",
+     "correcta": true
+    },
+    {
+     "texto": "Exactamente el 0%, porque nunca viajan vacíos.",
+     "correcta": false
+    },
+    {
+     "texto": "Menos del 1% del recorrido total.",
+     "correcta": false
+    },
+    {
+     "texto": "El 100%, ya que los montacargas nunca mueven palets.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Dentro de la arquitectura de SAP S/4HANA EWM, ¿qué representa la entidad maestra 'Resource' (Recurso)?",
+   "opciones": [
+    {
+     "texto": "El vehículo de manipulación o equipo ejecutor (montacargas, apilador, operario pedestre) que se autentica en RF para procesar Warehouse Orders.",
+     "correcta": true
+    },
+    {
+     "texto": "Una cuenta contable del Balance General en SAP FI.",
+     "correcta": false
+    },
+    {
+     "texto": "Un proveedor extranjero de materias primas en la tabla LFA1.",
+     "correcta": false
+    },
+    {
+     "texto": "Una orden de compra bloqueada por estrategia de liberación.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿En qué objeto de configuración se definen la velocidad media de desplazamiento horizontal y las restricciones físicas de un tipo de montacargas?",
+   "opciones": [
+    {
+     "texto": "En el Resource Type (Tipo de Recurso).",
+     "correcta": true
+    },
+    {
+     "texto": "En el Company Code (Sociedad Financiera).",
+     "correcta": false
+    },
+    {
+     "texto": "En la Purchasing Organization.",
+     "correcta": false
+    },
+    {
+     "texto": "En el Billing Type de SAP SD.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cómo evita SAP EWM asignar una tarea ubicada en el nivel 7 de un rack (a 12 metros de altura) a un operario que conduce una transpaleta eléctrica de piso?",
+   "opciones": [
+    {
+     "texto": "Mediante la validación cruzada del 'Bin Access Type' (Tipo de Acceso a Ubicación) del Bin contra los accesos permitidos del Resource Type.",
+     "correcta": true
+    },
+    {
+     "texto": "Enviando un correo electrónico de advertencia al gerente financiero.",
+     "correcta": false
+    },
+    {
+     "texto": "Bloqueando el código de material en la transacción MM01.",
+     "correcta": false
+    },
+    {
+     "texto": "Cambiando el precio estándar del producto a precio variable.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Además del Bin Access Type, ¿qué otro parámetro físico valida el Resource Type para asegurar que las horquillas del equipo puedan levantar un contenedor específico?",
+   "opciones": [
+    {
+     "texto": "El Handling Unit Type Group (Grupo de Tipo de HU).",
+     "correcta": true
+    },
+    {
+     "texto": "El grupo de vendedores de SAP SD.",
+     "correcta": false
+    },
+    {
+     "texto": "El plan de cuentas corporativo (Chart of Accounts).",
+     "correcta": false
+    },
+    {
+     "texto": "El código postal del cliente final.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué es una 'Resource Queue' (Cola de Recursos) en SAP EWM?",
+   "opciones": [
+    {
+     "texto": "Un buzón lógico donde se agrupan y encolan las Warehouse Orders (WOs) pendientes según sus áreas de actividad y proceso para ser tomadas por los recursos.",
+     "correcta": true
+    },
+    {
+     "texto": "Una fila física de camiones esperando en la calle afuera de la planta.",
+     "correcta": false
+    },
+    {
+     "texto": "Una cola de impresión de facturas láser en la oficina administrativa.",
+     "correcta": false
+    },
+    {
+     "texto": "Un lote de productos rechazados por control de calidad.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuáles son las cinco variables estándar que evalúa la matriz de 'Queue Determination Criteria' para decidir a qué cola enviar una Warehouse Order recién creada?",
+   "opciones": [
+    {
+     "texto": "Source Activity Area, Destination Activity Area, Bin Access Type, Warehouse Process Type (WPT) y Activity.",
+     "correcta": true
+    },
+    {
+     "texto": "Sociedad, Centro de Costo, Moneda, Idioma y País del Proveedor.",
+     "correcta": false
+    },
+    {
+     "texto": "Peso neto, color del empaque, marca comercial, descuento e IVA.",
+     "correcta": false
+    },
+    {
+     "texto": "Nombre del chofer, placa del camión, aseguradora, peajes y combustible.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué problema operativo ocurre si asignamos un montacargas de forma fija a una única cola sin usar un Resource Group ni Queue Sequence?",
+   "opciones": [
+    {
+     "texto": "Cuando esa cola específica se queda sin tareas, el operario queda ocioso sin recibir trabajo aunque existan urgencias en colas vecinas.",
+     "correcta": true
+    },
+    {
+     "texto": "El servidor SAP S/4HANA se reinicia automáticamente.",
+     "correcta": false
+    },
+    {
+     "texto": "Se borra el inventario de la tabla LQUA.",
+     "correcta": false
+    },
+    {
+     "texto": "La pistola de radiofrecuencia se desconfigura permanentemente.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué transacción de SAP EWM permite definir y mantener la secuencia priorizada de colas (Queue Sequence) para un Resource Group?",
+   "opciones": [
+    {
+     "texto": "/SCWM/QSEQ",
+     "correcta": true
+    },
+    {
+     "texto": "MIGO",
+     "correcta": false
+    },
+    {
+     "texto": "MM02",
+     "correcta": false
+    },
+    {
+     "texto": "VA02",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si un Resource Group tiene configuradas 3 colas en secuencia (Prioridad 1: Q_URG, Prioridad 2: Q_REPL, Prioridad 3: Q_PICK), ¿cuándo buscará SAP tareas en la cola Q_REPL?",
+   "opciones": [
+    {
+     "texto": "Únicamente cuando no existan tareas ejecutables disponibles en la cola de Prioridad 1 (Q_URG) o según las reglas de alternancia de Interleaving.",
+     "correcta": true
+    },
+    {
+     "texto": "Solo los días domingos por la noche.",
+     "correcta": false
+    },
+    {
+     "texto": "Nunca, porque el sistema solo lee la primera línea de la tabla.",
+     "correcta": false
+    },
+    {
+     "texto": "Al azar mediante una lotería informática.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En la operación con terminales RF, ¿qué significa el modo de trabajo 'System-Guided Processing' (Guiado por el Sistema)?",
+   "opciones": [
+    {
+     "texto": "El algoritmo de SAP selecciona y empuja automáticamente la Warehouse Order óptima a la pantalla del operario, impidiendo que él elija tareas a conveniencia (Cherry-Picking).",
+     "correcta": true
+    },
+    {
+     "texto": "El operario camina libremente sin pistola RF y anota lo que mueve en una libreta de papel.",
+     "correcta": false
+    },
+    {
+     "texto": "Un robot humanoide conduce el montacargas sin ningún ser humano en la planta.",
+     "correcta": false
+    },
+    {
+     "texto": "El departamento de contabilidad dicta por teléfono cada movimiento.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿En qué escenario operativo resulta ideal utilizar el modo 'Semi-System-Guided Processing'?",
+   "opciones": [
+    {
+     "texto": "En un muelle de descarga abarrotado donde hay decenas de palets acumulados y el operario escanea la HU que tiene físicamente más a mano para que luego el sistema lo guíe al Bin destino.",
+     "correcta": true
+    },
+    {
+     "texto": "Cuando el almacén está completamente vacío y cerrado por vacaciones.",
+     "correcta": false
+    },
+    {
+     "texto": "Durante el cierre fiscal anual del Balance General.",
+     "correcta": false
+    },
+    {
+     "texto": "Para crear nuevos códigos de materiales terminados.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué significa el vicio operativo conocido como 'Cherry-Picking' en un almacén sin asignación guiada por sistema?",
+   "opciones": [
+    {
+     "texto": "Cuando los operarios seleccionan manualmente de una lista solo las órdenes fáciles, ligeras o cercanas y postergan las tareas pesadas o lejanas.",
+     "correcta": true
+    },
+    {
+     "texto": "La cosecha agrícola de frutas en el campo.",
+     "correcta": false
+    },
+    {
+     "texto": "Un método contable de valoración de divisas.",
+     "correcta": false
+    },
+    {
+     "texto": "La rotura de una tarima de madera en el rack.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Dentro de una misma cola de trabajo, ¿qué significa el parámetro 'LSD' (Latest Starting Date / Time) de una Warehouse Order?",
+   "opciones": [
+    {
+     "texto": "La hora límite máxima en la que debe comenzar a ejecutarse esa Warehouse Order para no retrasar la salida del camión o el corte de la Ola.",
+     "correcta": true
+    },
+    {
+     "texto": "La fecha en que se fundó la empresa propietaria del almacén.",
+     "correcta": false
+    },
+    {
+     "texto": "El último día del año fiscal contable.",
+     "correcta": false
+    },
+    {
+     "texto": "La fecha de fabricación del montacargas eléctrico.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cómo influye la 'Posición Actual del Recurso' (Last Known Bin) en el algoritmo de selección de la siguiente Warehouse Order?",
+   "opciones": [
+    {
+     "texto": "Entre tareas urgentes elegibles, el sistema prioriza aquella cuyo Bin de inicio esté físicamente más cerca de la ubicación donde el montacargas acaba de confirmar su tarea previa.",
+     "correcta": true
+    },
+    {
+     "texto": "Obliga al montacargas a regresar siempre al estacionamiento de baterías después de cada palet.",
+     "correcta": false
+    },
+    {
+     "texto": "No tiene ninguna influencia; SAP ignora las distancias físicas.",
+     "correcta": false
+    },
+    {
+     "texto": "Bloquea al operario si intenta moverse a otro pasillo.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál es la definición técnica exacta de 'Task Interleaving' (Entrelazado de Tareas) en SAP S/4HANA EWM?",
+   "opciones": [
+    {
+     "texto": "La alternancia algorítmica entre una tarea de entrada/guardado (ej. Putaway) y una tarea de extracción cercana (ej. Picking/Replenishment) para que el montacargas trabaje en doble ciclo sin regresar vacío.",
+     "correcta": true
+    },
+    {
+     "texto": "La fusión de dos sociedades financieras en un mismo mandante.",
+     "correcta": false
+    },
+    {
+     "texto": "El conteo físico de un mismo Bin por dos auditores al mismo tiempo.",
+     "correcta": false
+    },
+    {
+     "texto": "La impresión simultánea de facturas y remitos en la puerta de despacho.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Dónde se activa técnicamente el indicador (Flag) para que una cola participe en el ciclo de Task Interleaving?",
+   "opciones": [
+    {
+     "texto": "En la definición de la secuencia de colas (Queue Sequence - /SCWM/QSEQ) del Resource Group.",
+     "correcta": true
+    },
+    {
+     "texto": "En la vista de Contabilidad 1 del Maestro de Materiales (MM01).",
+     "correcta": false
+    },
+    {
+     "texto": "En los datos maestros del cliente (BP).",
+     "correcta": false
+    },
+    {
+     "texto": "En la configuración de monedas de SAP FI.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Por qué es crítico configurar un 'Radio Máximo de Búsqueda' (Maximum Travel Distance) al activar Task Interleaving?",
+   "opciones": [
+    {
+     "texto": "Para evitar que el sistema obligue a un montacargas que terminó un Putaway en el Pasillo 1 a viajar 900 metros vacío hasta el otro extremo de la bodega solo por forzar un Picking lejano.",
+     "correcta": true
+    },
+    {
+     "texto": "Para limitar el alcance de la señal Bluetooth de los auriculares del operario.",
+     "correcta": false
+    },
+    {
+     "texto": "Para impedir que el montacargas salga a la autopista pública.",
+     "correcta": false
+    },
+    {
+     "texto": "Para reducir el tamaño de la base de datos SQL.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si un montacargas con Task Interleaving activo termina un Putaway en el Pasillo 5, pero no existe ninguna tarea de Picking dentro del radio máximo permitido (ej. 50 metros), ¿qué hace SAP EWM?",
+   "opciones": [
+    {
+     "texto": "Omite el entrelazado forzado en esa ocasión y busca la siguiente tarea óptima disponible según la secuencia de colas para no hacerle perder tiempo en un cruce absurdo.",
+     "correcta": true
+    },
+    {
+     "texto": "Apaga el motor del montacargas de forma remota y bloquea al usuario.",
+     "correcta": false
+    },
+    {
+     "texto": "Crea un pedido de venta falso en el Pasillo 5.",
+     "correcta": false
+    },
+    {
+     "texto": "Genera un error ABAP Short Dump (ST22).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál es el código de transacción estándar para lanzar el entorno de simulación y ejecución de Radiofrecuencia en SAP EWM?",
+   "opciones": [
+    {
+     "texto": "/SCWM/RFUI",
+     "correcta": true
+    },
+    {
+     "texto": "/SCWM/PRDO",
+     "correcta": false
+    },
+    {
+     "texto": "VL01N",
+     "correcta": false
+    },
+    {
+     "texto": "ME23N",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué tecnología de servidor integrada en SAP permite publicar las pantallas del RF Framework como páginas HTML ultraligeras para los navegadores industriales de las pistolas Zebra o Honeywell?",
+   "opciones": [
+    {
+     "texto": "SAP ITSmobile (Internet Transaction Server Mobile).",
+     "correcta": true
+    },
+    {
+     "texto": "SAP Crystal Reports.",
+     "correcta": false
+    },
+    {
+     "texto": "Adobe Document Services (ADS).",
+     "correcta": false
+    },
+    {
+     "texto": "SAP BusinessObjects Lumira.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En la arquitectura interna del RF Framework de SAP EWM, ¿qué elemento gobierna el flujo de pasos funcionales (Step Flow) independientemente del tamaño de la pantalla física?",
+   "opciones": [
+    {
+     "texto": "La Logical Transaction (Transacción Lógica).",
+     "correcta": true
+    },
+    {
+     "texto": "El hoja de estilos CSS del navegador.",
+     "correcta": false
+    },
+    {
+     "texto": "El número de serie de la batería de la pistola.",
+     "correcta": false
+    },
+    {
+     "texto": "La tabla de tipos de cambio TCURR.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Cuando un operario escanea un código de barras en la pistola RF y presiona Enter, ¿en qué momento de programación ABAP se ejecutan los módulos de función que validan si el dato escaneado es correcto?",
+   "opciones": [
+    {
+     "texto": "En el evento PAI (Process After Input).",
+     "correcta": true
+    },
+    {
+     "texto": "En el evento PBO (Process Before Output) antes de mostrar la pantalla inicial.",
+     "correcta": false
+    },
+    {
+     "texto": "Un mes después durante el cierre contable.",
+     "correcta": false
+    },
+    {
+     "texto": "Al instalar el sistema operativo Windows.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué herramienta de configuración de SAP EWM permite clonar pantallas RF al rango de cliente (9000), ocultar campos o reubicar teclas de función sin modificar el código fuente estándar?",
+   "opciones": [
+    {
+     "texto": "El RF Screen Manager (/SCWM/RFSCR) utilizando un Personalization Profile.",
+     "correcta": true
+    },
+    {
+     "texto": "La transacción MIGO.",
+     "correcta": false
+    },
+    {
+     "texto": "El generador de balances financieros F.01.",
+     "correcta": false
+    },
+    {
+     "texto": "El maestro de lotes MSC1N.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Para qué sirve configurar un 'Verification Profile' y un 'Check Digit' (código verificador) en las ubicaciones físicas para la operación RF?",
+   "opciones": [
+    {
+     "texto": "Para obligar al operario a escanear físicamente la etiqueta pegada en la viga del Bin, garantizando que realmente se encuentra frente al estante correcto y no digitando de memoria.",
+     "correcta": true
+    },
+    {
+     "texto": "Para encriptar la contraseña del gerente general.",
+     "correcta": false
+    },
+    {
+     "texto": "Para calcular el peso bruto del camión en la báscula de entrada.",
+     "correcta": false
+    },
+    {
+     "texto": "Para traducir el menú del español al alemán.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si durante un picking en /SCWM/RFUI la etiqueta de la caja está manchada y no se puede escanear, o falta stock en el Bin, ¿qué debe ingresar el operario en la pantalla RF?",
+   "opciones": [
+    {
+     "texto": "Un Exception Code (Código de Excepción RF, como BIDF o SPLT) habilitado para ese paso de la transacción lógica.",
+     "correcta": true
+    },
+    {
+     "texto": "Apagar la pistola quitándole la batería en silencio.",
+     "correcta": false
+    },
+    {
+     "texto": "Inventar un código de barras escribiendo números al azar.",
+     "correcta": false
+    },
+    {
+     "texto": "Entrar a SPRO desde la pistola y borrar el almacén.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Por qué el motor de 'Travel Distance Calculation' (TDC) de SAP EWM NO utiliza una línea recta diagonal simple (Euclidiana) entre el Bin A y el Bin B?",
+   "opciones": [
+    {
+     "texto": "Porque en un almacén físico los montacargas no pueden atravesar las estanterías metálicas; deben circular por pasillos y cruces definidos (Distancia Manhattan / Red Vial).",
+     "correcta": true
+    },
+    {
+     "texto": "Porque el procesador de SAP S/4HANA no sabe calcular raíces cuadradas.",
+     "correcta": false
+    },
+    {
+     "texto": "Porque la Tierra es curva en distancias de 10 metros.",
+     "correcta": false
+    },
+    {
+     "texto": "Porque las baterías de litio solo funcionan en línea recta.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué datos maestros deben cargarse obligatoriamente en los Storage Bins para que el motor TDC pueda calcular las distancias de desplazamiento y elevación?",
+   "opciones": [
+    {
+     "texto": "Las coordenadas espaciales X (largo), Y (ancho) y Z (altura) medidas en la unidad métrica del almacén.",
+     "correcta": true
+    },
+    {
+     "texto": "El precio de compra del estante metálico y su proveedor.",
+     "correcta": false
+    },
+    {
+     "texto": "El color de la pintura epóxica del piso.",
+     "correcta": false
+    },
+    {
+     "texto": "El nombre del arquitecto que construyó el techo.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cómo modela SAP EWM TDC las reglas de tránsito cuando un almacén tiene pasillos estrechos de 'Un Solo Sentido' (One-Way Aisles) donde está prohibido girar en U?",
+   "opciones": [
+    {
+     "texto": "Mediante una Red Vial específica (Edges & Nodes / Arcos dirigidos) donde cada tramo tiene dirección permitida y puntos de entrada/salida.",
+     "correcta": true
+    },
+    {
+     "texto": "No lo soporta; asume que todos los montacargas vuelan por el aire.",
+     "correcta": false
+    },
+    {
+     "texto": "Bloqueando todas las órdenes de venta del sistema.",
+     "correcta": false
+    },
+    {
+     "texto": "Cambiando la unidad de medida base del material a kilómetros.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué algoritmo matemático clásico de grafos utiliza internamente SAP EWM sobre la red de nodos y pasillos para hallar la ruta más corta entre dos ubicaciones?",
+   "opciones": [
+    {
+     "texto": "El algoritmo de ruta más corta de Dijkstra (o variantes de búsqueda heurística sobre grafos dirigidos).",
+     "correcta": true
+    },
+    {
+     "texto": "El método contable de amortización lineal.",
+     "correcta": false
+    },
+    {
+     "texto": "La transformada rápida de Fourier para audio.",
+     "correcta": false
+    },
+    {
+     "texto": "El método de regresión logística de ventas.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Por qué medir la productividad de los operarios contando únicamente 'cajas o palets movidos por hora' sin usar SAP Labor Management es técnicamente erróneo?",
+   "opciones": [
+    {
+     "texto": "Porque castiga injustamente al operario que realiza movimientos largos, a gran altura o de productos pesados frente al que mueve cajas ligeras al lado del muelle.",
+     "correcta": true
+    },
+    {
+     "texto": "Porque en SAP está prohibido contar palets.",
+     "correcta": false
+    },
+    {
+     "texto": "Porque las cajas no tienen código de barras.",
+     "correcta": false
+    },
+    {
+     "texto": "Porque los montacargas no tienen reloj interno.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué significan las siglas 'ELS' dentro del módulo SAP EWM Labor Management?",
+   "opciones": [
+    {
+     "texto": "Engineered Labor Standards (Estándares de Trabajo de Ingeniería para calcular el tiempo objetivo justo de cada tarea).",
+     "correcta": true
+    },
+    {
+     "texto": "Enterprise Logistics Server.",
+     "correcta": false
+    },
+    {
+     "texto": "External Labeling System.",
+     "correcta": false
+    },
+    {
+     "texto": "Emergency Lift Shutdown.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Qué herramienta de reglas de negocio integrada en SAP S/4HANA utiliza Labor Management para evaluar fórmulas complejas de tiempo (distancia + altura + peso + tipo de envase)?",
+   "opciones": [
+    {
+     "texto": "BRFplus (Business Rule Framework plus) y fórmulas de condición de tiempos estándar.",
+     "correcta": true
+    },
+    {
+     "texto": "SAP GUI Logon Pad.",
+     "correcta": false
+    },
+    {
+     "texto": "Batch Input Recorder (SHDB).",
+     "correcta": false
+    },
+    {
+     "texto": "Transport Management System (STMS).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "En SAP Labor Management, ¿cuál es la diferencia entre 'Direct Labor' (Trabajo Directo) e 'Indirect Labor' (Trabajo Indirecto)?",
+   "opciones": [
+    {
+     "texto": "Direct Labor son tareas operativas rastreadas por WOs (Picking, Putaway); Indirect Labor son actividades de soporte sin movimiento de stock (limpieza, cambio de batería, reuniones).",
+     "correcta": true
+    },
+    {
+     "texto": "Direct Labor lo hacen los gerentes e Indirect Labor lo hacen los proveedores externos.",
+     "correcta": false
+    },
+    {
+     "texto": "Direct Labor se paga en dólares e Indirect Labor no se paga.",
+     "correcta": false
+    },
+    {
+     "texto": "Son exactamente lo mismo en la base de datos.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Cuando un operario confirma una Warehouse Order en RF con Labor Management activo, ¿qué documento técnico se genera automáticamente para registrar su tiempo planificado versus su tiempo real?",
+   "opciones": [
+    {
+     "texto": "Un registro de 'Executed Workload' (Carga de Trabajo Ejecutada) en la tabla /SCWM/EXCLD.",
+     "correcta": true
+    },
+    {
+     "texto": "Una factura de proveedor en la tabla RBKP.",
+     "correcta": false
+    },
+    {
+     "texto": "Un asiento contable en la tabla ACDOCA.",
+     "correcta": false
+    },
+    {
+     "texto": "Una orden de transporte de código ABAP en la tabla E070.",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Con qué módulo de Recursos Humanos se integra SAP EWM Labor Management para enviar los porcentajes de eficiencia y liquidar bonos e incentivos en la nómina?",
+   "opciones": [
+    {
+     "texto": "SAP HCM (Human Capital Management) / SAP SuccessFactors.",
+     "correcta": true
+    },
+    {
+     "texto": "SAP Plant Maintenance (PM).",
+     "correcta": false
+    },
+    {
+     "texto": "SAP Real Estate Management (RE-FX).",
+     "correcta": false
+    },
+    {
+     "texto": "SAP Environment, Health and Safety (EHS).",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿Cuál es la tabla SQL maestra y de estado en tiempo real donde SAP EWM guarda qué usuario está logueado en cada Recurso, su última ubicación y su cola actual?",
+   "opciones": [
+    {
+     "texto": "/SCWM/RSRC",
+     "correcta": true
+    },
+    {
+     "texto": "MARA",
+     "correcta": false
+    },
+    {
+     "texto": "T001",
+     "correcta": false
+    },
+    {
+     "texto": "VBAK",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "¿En qué tabla de base de datos de SAP EWM se almacena la cabecera de las Warehouse Orders (incluyendo a qué Queue y a qué Resource están asignadas)?",
+   "opciones": [
+    {
+     "texto": "/SCWM/WHO",
+     "correcta": true
+    },
+    {
+     "texto": "MARD",
+     "correcta": false
+    },
+    {
+     "texto": "EKPO",
+     "correcta": false
+    },
+    {
+     "texto": "LIKP",
+     "correcta": false
+    }
+   ]
+  },
+  {
+   "pregunta": "Si un montacarguista sufre una avería mecánica a mitad del pasillo dejando una Warehouse Order urgente tomada bajo su sesión RF, ¿qué acción ejecuta el supervisor en /SCWM/MON?",
+   "opciones": [
+    {
+     "texto": "Entra al nodo Resource Management, fuerza el cierre de sesión o desasigna la WO del recurso averiado para liberarla de inmediato a la cola de los demás montacargas.",
+     "correcta": true
+    },
+    {
+     "texto": "Espera 3 días hasta que el taller mecánico repare el montacargas sin tocar el sistema.",
+     "correcta": false
+    },
+    {
+     "texto": "Elimina el almacén completo desde SPRO.",
+     "correcta": false
+    },
+    {
+     "texto": "Realiza una reversión MIGO 102 de todas las compras del año.",
+     "correcta": false
+    }
+   ]
+  }
+ ]
+}

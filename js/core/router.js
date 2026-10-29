@@ -1,92 +1,94 @@
 /**
- * Logística Pro - Enrutador SPA y Control de Navegación Nativa
+ * Logística Pro - Navegación entre pantallas y botón "atrás" de Android.
  */
 const Router = {
     currentView: 'dashboard',
 
-    init() {
-        // 1. Botón Academia
-        const navAcademy = document.getElementById('nav-academy');
-        if (navAcademy) {
-            navAcademy.addEventListener('click', () => {
-                if (typeof AudioEngine !== 'undefined' && AudioEngine.play) AudioEngine.play('click');
-                this.currentView = 'dashboard';
-                this.setActiveNav('nav-academy');
-                UIRenderer.renderDashboard();
-            });
+    async init() {
+        this.conectarMenu('nav-academy', 'dashboard', () => UIRenderer.renderDashboard());
+        this.conectarMenu('nav-glossary', 'glossary', () => UIRenderer.renderGlossary());
+        this.conectarMenu('nav-profile', 'profile', () => UIRenderer.renderProfile());
+
+        // Botón "atrás" físico de Android
+        const appPlugin = NativeBridge.plugin('App');
+        if (appPlugin) {
+            appPlugin.addListener('backButton', () => this.atras());
         }
 
-        // 2. Botón Glosario (T-Codes)
-        const navGlossary = document.getElementById('nav-glossary');
-        if (navGlossary) {
-            navGlossary.addEventListener('click', () => {
-                if (typeof AudioEngine !== 'undefined' && AudioEngine.play) AudioEngine.play('click');
-                this.currentView = 'glossary';
-                this.setActiveNav('nav-glossary');
-                UIRenderer.renderGlossary();
-            });
+        try {
+            await ContentStore.init();
+        } catch (e) {
+            console.error(e);
+            UIRenderer.renderError('No se pudo cargar el contenido de la maestría.', 'Cierra y vuelve a abrir la app. Si el problema sigue, reinstálala.');
+            return;
         }
-
-        // 3. Botón Perfil / Backups
-        const navProfile = document.getElementById('nav-profile');
-        if (navProfile) {
-            navProfile.addEventListener('click', () => {
-                if (typeof AudioEngine !== 'undefined' && AudioEngine.play) AudioEngine.play('click');
-                this.currentView = 'profile';
-                this.setActiveNav('nav-profile');
-                UIRenderer.renderProfile();
-            });
-        }
-
-        // 4. Cierre de ventanas modales (Con validación segura por si no está en el DOM)
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        if (closeModalBtn) {
-            closeModalBtn.addEventListener('click', () => {
-                this.closeModal();
-            });
-        }
-
-        // 5. Control del botón "Atrás" físico del celular (Android nativo)
-        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
-            window.Capacitor.Plugins.App.addListener('backButton', () => {
-                const overlay = document.getElementById('global-overlay');
-                if (overlay && !overlay.classList.contains('hidden')) {
-                    this.closeModal();
-                } else if (this.currentView !== 'dashboard') {
-                    this.currentView = 'dashboard';
-                    this.setActiveNav('nav-academy');
-                    UIRenderer.renderDashboard();
-                } else {
-                    window.Capacitor.Plugins.App.exitApp();
-                }
-            });
-        }
-
-        // Arrancar en Dashboard por defecto al abrir la app
+        UIRenderer.actualizarBarraProgreso();
         this.renderDashboard();
     },
 
+    conectarMenu(idBoton, vista, render) {
+        const boton = document.getElementById(idBoton);
+        if (!boton) return;
+        boton.addEventListener('click', () => {
+            AudioEngine.play('click');
+            this.irA(vista, idBoton);
+            render();
+        });
+    },
+
+    irA(vista, idBoton) {
+        this.currentView = vista;
+        if (idBoton) this.setActiveNav(idBoton);
+    },
+
+    /**
+     * Lo que hace el botón "atrás": primero cierra lo que esté abierto
+     * encima (terminal, apuntes); luego vuelve a la pantalla anterior;
+     * en el inicio, sale de la app.
+     */
+    atras() {
+        if (SAPEngine.estaAbierta()) {
+            SAPEngine.closeTerminal();
+            return;
+        }
+        if (smartNotes.estaAbierto()) {
+            smartNotes.closeNotes();
+            return;
+        }
+        switch (this.currentView) {
+            case 'report':
+            case 'certificate':
+                this.irA('profile', 'nav-profile');
+                UIRenderer.renderProfile();
+                break;
+            case 'exam':
+                if (confirm('¿Salir del examen? Perderás las respuestas marcadas.')) this.renderDashboard();
+                break;
+            case 'dashboard': {
+                const appPlugin = NativeBridge.plugin('App');
+                if (appPlugin) appPlugin.exitApp();
+                break;
+            }
+            default:
+                this.renderDashboard();
+        }
+    },
+
     renderDashboard() {
-        this.currentView = 'dashboard';
-        this.setActiveNav('nav-academy');
+        this.irA('dashboard', 'nav-academy');
+        smartNotes.setContext('general', 'Apuntes generales');
         UIRenderer.renderDashboard();
     },
 
     openModule(id) {
-        this.currentView = 'lesson';
+        this.irA('lesson', 'nav-academy');
         UIRenderer.renderLesson(id, 0);
-    },
-
-    closeModal() {
-        if (typeof AudioEngine !== 'undefined' && AudioEngine.play) AudioEngine.play('click');
-        const overlay = document.getElementById('global-overlay');
-        if (overlay) overlay.classList.add('hidden');
     },
 
     setActiveNav(navId) {
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = document.getElementById(navId);
-        if (activeBtn) activeBtn.classList.add('active');
+        const activo = document.getElementById(navId);
+        if (activo) activo.classList.add('active');
     }
 };
 

@@ -1,0 +1,54 @@
+{
+ "id": "s1_l1",
+ "pasos": [
+  {
+   "instruccion": "Inicia Customizing",
+   "comando": "SPRO",
+   "pista": "SPRO",
+   "exito": "> Cargado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "T-Code Mantener SLoc",
+   "comando": "OX09",
+   "pista": "OX09",
+   "exito": "> T001L abierta.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Plant",
+   "comando": "1000",
+   "pista": "1000",
+   "exito": "> Validado.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "SLoc",
+   "comando": "0001",
+   "pista": "0001",
+   "exito": "> Memoria.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Descripción",
+   "comando": "RAW MATERIALS",
+   "pista": "RAW MATERIALS",
+   "exito": "> Text OK.",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "Guardar",
+   "comando": "SAVE",
+   "pista": "SAVE",
+   "exito": "> Batch...",
+   "placeholder": ""
+  },
+  {
+   "instruccion": "TR",
+   "comando": "CONFIRM",
+   "pista": "CONFIRM",
+   "exito": "> Éxito.",
+   "placeholder": ""
+  }
+ ]
+}
